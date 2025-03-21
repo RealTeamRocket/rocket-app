@@ -7,6 +7,9 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
+  User user = User(name: 'Max', nachName: 'Mustermann');
+  saveUser(user);
+
   fetchUsers();
 
   runApp(const MyApp());
