@@ -1,1 +1,22 @@
-{"flutter":{"platforms":{"android":{"default":{"projectId":"real-rocket-app","appId":"1:72395050049:android:12b489eae26a78816f4ac0","fileOutput":"android/app/google-services.json"}},"dart":{"lib/firebase_options.dart":{"projectId":"real-rocket-app","configurations":{"android":"1:72395050049:android:12b489eae26a78816f4ac0","ios":"1:72395050049:ios:59c140c3fc8a68b96f4ac0"}}}}}}
+{
+  "flutter": {
+    "platforms": {
+      "android": {
+        "default": {
+          "projectId": "real-rocket-app",
+          "appId": "1:72395050049:android:12b489eae26a78816f4ac0",
+          "fileOutput": "android/app/google-services.json"
+        }
+      },
+      "dart": {
+        "lib/firebase_options.dart": {
+          "projectId": "real-rocket-app",
+          "configurations": {
+            "android": "1:72395050049:android:12b489eae26a78816f4ac0",
+            "ios": "1:72395050049:ios:59c140c3fc8a68b96f4ac0"
+          }
+        }
+      }
+    }
+  }
+}
