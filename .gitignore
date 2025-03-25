@@ -26,3 +26,7 @@ yarn-error.log*
 
 # Environment files (local configs)
 /.env.*
+
+# IDE dirs
+.idea/
+.vscode/
