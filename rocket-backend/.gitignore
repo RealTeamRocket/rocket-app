@@ -25,5 +25,11 @@ go.work.sum
 .env
 
 # IDE files
-.idea/
-.vscode/
+.vscode/*
+!.vscode/extensions.json
+.idea
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
