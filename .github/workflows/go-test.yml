@@ -7,14 +7,16 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+
       - name: Setup Go
         uses: actions/setup-go@v4
         with:
           go-version: '1.22.x'
 
-      - name: Change directory
-        run: cd rocket-backend
       - name: Build
+        working-directory: rocket-backend
         run: go build -v ./...
+
       - name: Test with the Go CLI
+        working-directory: rocket-backend
         run: go test ./...
