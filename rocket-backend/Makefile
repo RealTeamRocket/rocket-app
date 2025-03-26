@@ -1,51 +1,64 @@
-# Go parameters
-GOCMD=go
-GOBUILD=$(GOCMD) build
-GOCLEAN=$(GOCMD) clean
-GOTEST=$(GOCMD) test
-GOVET=$(GOCMD) vet
-GOGET=$(GOCMD) get
-BINARY_NAME=myapp
-BINARY_DIR=bin
-BINARY_LINUX=$(BINARY_DIR)/$(BINARY_NAME)_linux
-BINARY_WINDOWS=$(BINARY_DIR)/$(BINARY_NAME)_windows.exe
-MAIN_SRC=cmd/server/main.go
+# Simple Makefile for a Go project
 
-# All target
-all: test vet build
+# Build the application
+all: build test
 
-# Build the project
 build:
-	$(GOBUILD) -o $(BINARY_DIR)/$(BINARY_NAME) -v $(MAIN_SRC)
-
-# Run tests
-test:
-	$(GOTEST) -v ./...
-
-# Vet the code
-vet:
-	$(GOVET) ./...
-
-# Clean build artifacts
-clean:
-	$(GOCLEAN)
-	rm -rf $(BINARY_DIR)
+	@echo "Building..."
+	
+	
+	@go build -o main cmd/api/main.go
 
 # Run the application
 run:
-	$(GOBUILD) -o $(BINARY_DIR)/$(BINARY_NAME) -v $(MAIN_SRC)
-	./$(BINARY_DIR)/$(BINARY_NAME)
+	@go run cmd/api/main.go
+# Create DB container
+docker-run:
+	@if docker compose up --build 2>/dev/null; then \
+		: ; \
+	else \
+		echo "Falling back to Docker Compose V1"; \
+		docker-compose up --build; \
+	fi
 
-# Install dependencies
-dep:
-	$(GOGET) -u ./...
+# Shutdown DB container
+docker-down:
+	@if docker compose down 2>/dev/null; then \
+		: ; \
+	else \
+		echo "Falling back to Docker Compose V1"; \
+		docker-compose down; \
+	fi
 
-# Cross compile for Linux
-build-linux:
-	GOOS=linux GOARCH=amd64 $(GOBUILD) -o $(BINARY_LINUX) -v $(MAIN_SRC)
+# Test the application
+test:
+	@echo "Testing..."
+	@go test ./... -v
+# Integrations Tests for the application
+itest:
+	@echo "Running integration tests..."
+	@go test ./internal/database -v
 
-# Cross compile for Windows
-build-windows:
-	GOOS=windows GOARCH=amd64 $(GOBUILD) -o $(BINARY_WINDOWS) -v $(MAIN_SRC)
+# Clean the binary
+clean:
+	@echo "Cleaning..."
+	@rm -f main
 
-.PHONY: all build clean test vet run dep build-linux build-windows
+# Live Reload
+watch:
+	@if command -v air > /dev/null; then \
+            air; \
+            echo "Watching...";\
+        else \
+            read -p "Go's 'air' is not installed on your machine. Do you want to install it? [Y/n] " choice; \
+            if [ "$$choice" != "n" ] && [ "$$choice" != "N" ]; then \
+                go install github.com/air-verse/air@latest; \
+                air; \
+                echo "Watching...";\
+            else \
+                echo "You chose not to install air. Exiting..."; \
+                exit 1; \
+            fi; \
+        fi
+
+.PHONY: all build run test clean watch docker-run docker-down itest
