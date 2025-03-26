@@ -15,7 +15,7 @@ func TestHelloWorldHandler(t *testing.T) {
 		api.GET("/", s.HelloWorldHandler)
 	}
 	// Create a test HTTP request
-	req, err := http.NewRequest("GET", "/", nil)
+	req, err := http.NewRequest("GET", "/api/v1/", nil)
 	if err != nil {
 		t.Fatal(err)
 	}
