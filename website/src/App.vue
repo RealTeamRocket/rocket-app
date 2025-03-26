@@ -1,8 +1,3 @@
-<script setup lang="ts">
-import { RouterLink, RouterView } from 'vue-router'
-import HelloWorld from './components/HelloWorld.vue'
-</script>
-
 <template>
   <header>
     <img alt="Vue logo" class="logo" src="@/assets/logo.svg" width="125" height="125" />
@@ -16,9 +11,29 @@ import HelloWorld from './components/HelloWorld.vue'
       </nav>
     </div>
   </header>
-
   <RouterView />
 </template>
+
+<script setup lang="ts">
+import { RouterLink, RouterView } from 'vue-router'
+import HelloWorld from './components/HelloWorld.vue'
+import api from './api/backend-api'
+import { onMounted } from 'vue'
+
+const fetchMessage = async () => {
+  try {
+    const response = await api.helloWorld()
+    return response.data
+  } catch (error) {
+    console.error(error)
+  }
+}
+
+onMounted(async () => {
+  const message = await fetchMessage()
+  console.log(message)
+})
+</script>
 
 <style scoped>
 header {

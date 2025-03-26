@@ -5,7 +5,13 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// RegisterRoutes sets up the API endpoints
+// registerAPIRoutes registers all routes within the given router group
+func registerAPIRoutes(api *gin.RouterGroup) {
+	api.GET("/hello", handlers.HelloHandler)
+}
+
+// RegisterRoutes sets up the API endpoints with the /api prefix
 func RegisterRoutes(r *gin.Engine) {
-	r.GET("/hello", handlers.HelloHandler)
+	api := r.Group("/api")
+	registerAPIRoutes(api)
 }
