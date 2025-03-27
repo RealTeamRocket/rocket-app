@@ -4,7 +4,7 @@ import '../pages/pages.dart';
 import '../utils/utils.dart';
 import 'menu_bar.dart';
 
-class _MyHomePageState extends State<MyHomePage> {
+class MyHomePageState extends State<MyHomePage> {
   final int totalSteps = 2000;
   final int currentSteps = 900;
 
@@ -21,7 +21,7 @@ class _MyHomePageState extends State<MyHomePage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            Container(
+            SizedBox(
               width: 300.0,
               height: 300.0,
               child: CustomPaint(

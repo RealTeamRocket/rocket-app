@@ -23,7 +23,7 @@ migrate_working_dir/
 # is commented out by default.
 .vscode/*
 !.vscode/extensions.json
-.idea
+.idea/
 *.suo
 *.ntvs*
 *.njsproj
