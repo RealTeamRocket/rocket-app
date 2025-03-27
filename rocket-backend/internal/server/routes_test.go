@@ -2,6 +2,7 @@ package server
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/stretchr/testify/assert"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -16,20 +17,16 @@ func TestHelloWorldHandler(t *testing.T) {
 	}
 	// Create a test HTTP request
 	req, err := http.NewRequest("GET", "/api/v1/", nil)
-	if err != nil {
-		t.Fatal(err)
-	}
+	assert.NoError(t, err)
+
 	// Create a ResponseRecorder to record the response
 	rr := httptest.NewRecorder()
 	// Serve the HTTP request
 	r.ServeHTTP(rr, req)
 	// Check the status code
-	if status := rr.Code; status != http.StatusOK {
-		t.Errorf("Handler returned wrong status code: got %v want %v", status, http.StatusOK)
-	}
+	assert.Equal(t, http.StatusOK, rr.Code, "Handler returned wrong status code")
+
 	// Check the response body
 	expected := "{\"message\":\"Hello World\"}"
-	if rr.Body.String() != expected {
-		t.Errorf("Handler returned unexpected body: got %v want %v", rr.Body.String(), expected)
-	}
+	assert.JSONEq(t, expected, rr.Body.String(), "Handler returned unexpected body")
 }

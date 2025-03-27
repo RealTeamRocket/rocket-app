@@ -6,6 +6,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/assert"
 	"github.com/testcontainers/testcontainers-go"
 	"github.com/testcontainers/testcontainers-go/modules/postgres"
 	"github.com/testcontainers/testcontainers-go/wait"
@@ -68,9 +69,7 @@ func TestMain(m *testing.M) {
 
 func TestNew(t *testing.T) {
 	srv := New()
-	if srv == nil {
-		t.Fatal("New() returned nil")
-	}
+	assert.NotNil(t, srv, "New() returned nil")
 }
 
 func TestHealth(t *testing.T) {
@@ -78,23 +77,13 @@ func TestHealth(t *testing.T) {
 
 	stats := srv.Health()
 
-	if stats["status"] != "up" {
-		t.Fatalf("expected status to be up, got %s", stats["status"])
-	}
-
-	if _, ok := stats["error"]; ok {
-		t.Fatalf("expected error not to be present")
-	}
-
-	if stats["message"] != "It's healthy" {
-		t.Fatalf("expected message to be 'It's healthy', got %s", stats["message"])
-	}
+	assert.Equal(t, "up", stats["status"], "expected status to be up")
+	assert.NotContains(t, stats, "error", "expected error not to be present")
+	assert.Equal(t, "It's healthy", stats["message"], "expected message to be 'It's healthy'")
 }
 
 func TestClose(t *testing.T) {
 	srv := New()
 
-	if srv.Close() != nil {
-		t.Fatalf("expected Close() to return nil")
-	}
+	assert.NoError(t, srv.Close(), "expected Close() to return nil")
 }
