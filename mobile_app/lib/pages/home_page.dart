@@ -13,12 +13,12 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  final int totalSteps = 2000;
+  final int dailyGoal = 2000;
   final int currentSteps = 1000;
 
   @override
   Widget build(BuildContext context) {
-    double progress = currentSteps / totalSteps;
+    double progress = currentSteps / dailyGoal;
 
     return Scaffold(
       appBar: AppBar(
