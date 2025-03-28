@@ -16,11 +16,13 @@ services:
       BLUEPRINT_DB_USERNAME: ${BLUEPRINT_DB_USERNAME}
       BLUEPRINT_DB_PASSWORD: ${BLUEPRINT_DB_PASSWORD}
       BLUEPRINT_DB_SCHEMA: ${BLUEPRINT_DB_SCHEMA}
+      DATABASE_URL: postgres://${BLUEPRINT_DB_USERNAME}:${BLUEPRINT_DB_PASSWORD}@${BLUEPRINT_DB_HOST}:${BLUEPRINT_DB_PORT}/${BLUEPRINT_DB_DATABASE}?sslmode=disable&search_path=${BLUEPRINT_DB_SCHEMA}
     depends_on:
       psql_bp:
         condition: service_healthy
     networks:
       - blueprint
+
   psql_bp:
     image: postgres:latest
     restart: unless-stopped
@@ -41,7 +43,20 @@ services:
     networks:
       - blueprint
 
+  migrate:
+    image: migrate/migrate
+    networks:
+      - blueprint
+    volumes:
+      - ./migrations:/migrations
+    entrypoint: ["/bin/sh", "-c"]
+    command: ["migrate -path /migrations -database postgres://${BLUEPRINT_DB_USERNAME}:${BLUEPRINT_DB_PASSWORD}@psql_bp:5432/${BLUEPRINT_DB_DATABASE}?sslmode=disable up"]
+    depends_on:
+      psql_bp:
+        condition: service_healthy
+
 volumes:
   psql_volume_bp:
+
 networks:
   blueprint:
