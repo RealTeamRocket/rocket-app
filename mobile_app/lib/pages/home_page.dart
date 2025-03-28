@@ -18,6 +18,7 @@ class _MyHomePageState extends State<MyHomePage> {
   int currentSteps = 1000;
   late Timer _timer;
   bool isRunning = false;
+  Duration elapsedTime = Duration.zero;
 
   @override
   void initState() {
@@ -33,15 +34,23 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void _startStepCounter() {
     _timer = Timer.periodic(Duration(seconds: 1), (timer) {
-      setState(() {
-        currentSteps += 10;
-      });
+      if (isRunning) {
+        setState(() {
+          currentSteps += 10;
+          elapsedTime += Duration(seconds: 1);
+        });
+      }
     });
   }
 
   void _toggleRun() {
     setState(() {
-      isRunning = !isRunning;
+      if (isRunning) {
+        isRunning = false;
+      } else {
+        isRunning = true;
+        elapsedTime = Duration.zero;
+      }
     });
   }
 
@@ -53,6 +62,16 @@ class _MyHomePageState extends State<MyHomePage> {
     } else {
       return Colors.red;
     }
+  }
+
+  String _formatDuration(Duration duration) {
+    if (duration == Duration.zero && !isRunning ) {
+      return "";
+    }
+    String twoDigits(int n) => n.toString().padLeft(2, '0');
+    String twoDigitMinutes = twoDigits(duration.inMinutes.remainder(60));
+    String twoDigitSeconds = twoDigits(duration.inSeconds.remainder(60));
+    return "${twoDigits(duration.inHours)}:$twoDigitMinutes:$twoDigitSeconds";
   }
 
   @override
@@ -71,6 +90,17 @@ class _MyHomePageState extends State<MyHomePage> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
+                Padding(
+                  padding: const EdgeInsets.all(10.0),
+                  child: Text(
+                    _formatDuration(elapsedTime),
+                    style: TextStyle(
+                      fontSize: 30.0,
+                      fontWeight: FontWeight.bold,
+                      color: ColorConstants.white,
+                    ),
+                  ),
+                ),
                 Padding(
                   padding: const EdgeInsets.all(10.0),
                   child: Container(
