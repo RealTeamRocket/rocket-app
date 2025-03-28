@@ -29,13 +29,26 @@ class CircularProgressPainter extends CustomPainter {
     final double sweepAngle = 3 * pi / 2 * progress;
 
     // Draw the arc
-    canvas.drawArc(
-      Rect.fromCircle(center: center, radius: radius),
-      startAngle,
-      sweepAngle,
-      false,
-      paint,
-    );
+    if (progress < 1.0) {
+      canvas.drawArc(
+        Rect.fromCircle(center: center, radius: radius),
+        startAngle,
+        sweepAngle,
+        false,
+        paint,
+      );
+    }
+    // Draw the full circle
+    else {
+      canvas.drawArc(
+        Rect.fromCircle(center: center, radius: radius),
+        startAngle,
+        3 * pi / 2,
+        false,
+        paint,
+      );
+
+    }
 
     // Draw the text "Steps" at the bottom center
     final TextPainter textPainter = TextPainter(
