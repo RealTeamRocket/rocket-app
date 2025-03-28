@@ -1,9 +1,10 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:mobile_app/constants/constants.dart';
 
 class CircularProgressPainter extends CustomPainter {
-  final double progress; // Progress value between 0.0 and 1.0
+  final double progress;
   final Color color;
   final double strokeWidth;
 
@@ -15,17 +16,19 @@ class CircularProgressPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    final Paint paint = Paint()
-      ..color = color
-      ..strokeWidth = strokeWidth
-      ..style = PaintingStyle.stroke
-      ..strokeCap = StrokeCap.round;
+    final Paint paint =
+        Paint()
+          ..color = color
+          ..strokeWidth = strokeWidth
+          ..style = PaintingStyle.stroke
+          ..strokeCap = StrokeCap.round;
 
     final double radius = (size.width / 2) - (strokeWidth / 2);
     final Offset center = Offset(size.width / 2, size.height / 2);
-    final double startAngle = -pi / 2;
-    final double sweepAngle = 2 * pi * progress;
+    final double startAngle = 3 * pi / 4;
+    final double sweepAngle = 3 * pi / 2 * progress;
 
+    // Draw the arc
     canvas.drawArc(
       Rect.fromCircle(center: center, radius: radius),
       startAngle,
@@ -33,6 +36,23 @@ class CircularProgressPainter extends CustomPainter {
       false,
       paint,
     );
+
+    // Draw the text "Steps" at the bottom center
+    final TextPainter textPainter = TextPainter(
+      text: TextSpan(
+        text: 'Steps',
+        style: TextStyle(
+          color: ColorConstants.white,
+          fontSize: 40.0,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+      textDirection: TextDirection.ltr,
+    );
+    textPainter.layout();
+    final double textX = center.dx - textPainter.width / 2;
+    final double textY = center.dy + radius - textPainter.height / 2 - 30;
+    textPainter.paint(canvas, Offset(textX, textY));
   }
 
   @override

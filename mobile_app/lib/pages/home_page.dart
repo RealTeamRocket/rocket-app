@@ -14,7 +14,7 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   final int dailyGoal = 2000;
-  final int currentSteps = 1000;
+  final int currentSteps = 2000;
 
   @override
   Widget build(BuildContext context) {
@@ -25,6 +25,7 @@ class _MyHomePageState extends State<MyHomePage> {
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         title: Text(widget.title),
       ),
+      backgroundColor: ColorConstants.backgroundColor,
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -32,7 +33,7 @@ class _MyHomePageState extends State<MyHomePage> {
             Stack(
               alignment: Alignment.center,
               children: [
-                Container(
+                SizedBox(
                   width: 300.0,
                   height: 300.0,
                   child: CustomPaint(
@@ -48,6 +49,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   style: TextStyle(
                     fontSize: 42.0,
                     fontWeight: FontWeight.bold,
+                    color: ColorConstants.white,
                   ),
                 ),
               ],
