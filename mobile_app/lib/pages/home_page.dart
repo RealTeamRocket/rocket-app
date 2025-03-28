@@ -15,7 +15,7 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   final int dailyGoal = 2000;
-  int currentSteps = 0;
+  int currentSteps = 1000;
   late Timer _timer;
   bool isRunning = false;
 
@@ -65,60 +65,72 @@ class _MyHomePageState extends State<MyHomePage> {
         title: Text(widget.title),
       ),
       backgroundColor: ColorConstants.backgroundColor,
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Container(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(colors: [Colors.blue, Colors.purple]),
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: SizedBox(
-                  width: 200,
-                  height: 60,
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.transparent,
-                      shadowColor: Colors.transparent,
+      body: Column(
+        children: <Widget>[
+          Expanded(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Padding(
+                  padding: const EdgeInsets.all(10.0),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [Colors.blue, Colors.purple],
+                      ),
+                      borderRadius: BorderRadius.circular(10),
                     ),
-                    onPressed: _toggleRun,
-                    child: Text(
-                      isRunning ? 'Stop Run' : 'Start Run',
-                      style: TextStyle(color: ColorConstants.white, fontSize: 20),
+                    child: SizedBox(
+                      width: 200,
+                      height: 60,
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.transparent,
+                          shadowColor: Colors.transparent,
+                        ),
+                        onPressed: _toggleRun,
+                        child: Text(
+                          isRunning ? 'Stop Run' : 'Start Run',
+                          style: TextStyle(
+                            color: ColorConstants.white,
+                            fontSize: 20,
+                          ),
+                        ),
+                      ),
                     ),
-                  ),
-                ),
-              ),
-            ),
-            Stack(
-              alignment: Alignment.center,
-              children: [
-                SizedBox(
-                  width: 300.0,
-                  height: 300.0,
-                  child: CustomPaint(
-                    painter: CircularProgressPainter(
-                      progress: progress,
-                      color: _getProgressColor(progress),
-                      strokeWidth: 20.0,
-                    ),
-                  ),
-                ),
-                Text(
-                  '$currentSteps',
-                  style: TextStyle(
-                    fontSize: 50.0,
-                    fontWeight: FontWeight.bold,
-                    color: ColorConstants.white,
                   ),
                 ),
               ],
             ),
-          ],
-        ),
+          ),
+          Stack(
+            alignment: Alignment.center,
+            children: [
+              SizedBox(
+                width: 300.0,
+                height: 300.0,
+                child: CustomPaint(
+                  painter: CircularProgressPainter(
+                    progress: progress,
+                    color: _getProgressColor(progress),
+                    strokeWidth: 20.0,
+                  ),
+                ),
+              ),
+              Text(
+                '$currentSteps',
+                style: TextStyle(
+                  fontSize: 50.0,
+                  fontWeight: FontWeight.bold,
+                  color: ColorConstants.white,
+                ),
+              ),
+            ],
+          ),
+          Expanded(
+            child: Container(),
+          ),
+        ],
       ),
       bottomNavigationBar: const CustomMenuBar(),
     );
