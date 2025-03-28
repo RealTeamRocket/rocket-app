@@ -17,6 +17,7 @@ class _MyHomePageState extends State<MyHomePage> {
   final int dailyGoal = 2000;
   int currentSteps = 0;
   late Timer _timer;
+  bool isRunning = false;
 
   @override
   void initState() {
@@ -35,6 +36,12 @@ class _MyHomePageState extends State<MyHomePage> {
       setState(() {
         currentSteps += 10;
       });
+    });
+  }
+
+  void _toggleRun() {
+    setState(() {
+      isRunning = !isRunning;
     });
   }
 
@@ -62,6 +69,30 @@ class _MyHomePageState extends State<MyHomePage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Container(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(colors: [Colors.blue, Colors.purple]),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: SizedBox(
+                  width: 200,
+                  height: 60,
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.transparent,
+                      shadowColor: Colors.transparent,
+                    ),
+                    onPressed: _toggleRun,
+                    child: Text(
+                      isRunning ? 'Stop Run' : 'Start Run',
+                      style: TextStyle(color: ColorConstants.white, fontSize: 20),
+                    ),
+                  ),
+                ),
+              ),
+            ),
             Stack(
               alignment: Alignment.center,
               children: [
