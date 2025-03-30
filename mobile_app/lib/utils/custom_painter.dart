@@ -1,5 +1,4 @@
 import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:mobile_app/constants/constants.dart';
 
@@ -16,39 +15,40 @@ class CircularProgressPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    final Paint paint =
-        Paint()
-          ..color = color
-          ..strokeWidth = strokeWidth
-          ..style = PaintingStyle.stroke
-          ..strokeCap = StrokeCap.round;
+    final Paint backgroundPaint = Paint()
+      ..color = ColorConstants.greyColor
+      ..strokeWidth = strokeWidth
+      ..style = PaintingStyle.stroke
+      ..strokeCap = StrokeCap.round;
+
+    final Paint progressPaint = Paint()
+      ..color = color
+      ..strokeWidth = strokeWidth
+      ..style = PaintingStyle.stroke
+      ..strokeCap = StrokeCap.round;
 
     final double radius = (size.width / 2) - (strokeWidth / 2);
     final Offset center = Offset(size.width / 2, size.height / 2);
     final double startAngle = 3 * pi / 4;
     final double sweepAngle = 3 * pi / 2 * progress;
 
-    // Draw the arc
-    if (progress < 1.0) {
-      canvas.drawArc(
-        Rect.fromCircle(center: center, radius: radius),
-        startAngle,
-        sweepAngle,
-        false,
-        paint,
-      );
-    }
-    // Draw the full circle
-    else {
-      canvas.drawArc(
-        Rect.fromCircle(center: center, radius: radius),
-        startAngle,
-        3 * pi / 2,
-        false,
-        paint,
-      );
+    // Draw the background arc
+    canvas.drawArc(
+      Rect.fromCircle(center: center, radius: radius),
+      startAngle,
+      3 * pi / 2,
+      false,
+      backgroundPaint,
+    );
 
-    }
+    // Draw the progress arc
+    canvas.drawArc(
+      Rect.fromCircle(center: center, radius: radius),
+      startAngle,
+      sweepAngle,
+      false,
+      progressPaint,
+    );
 
     // Draw the text "Steps" at the bottom center
     final TextPainter textPainter = TextPainter(
