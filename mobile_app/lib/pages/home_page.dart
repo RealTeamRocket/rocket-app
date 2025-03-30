@@ -34,12 +34,12 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void _startStepCounter() {
     _timer = Timer.periodic(Duration(seconds: 1), (timer) {
-      if (isRunning) {
-        setState(() {
-          currentSteps += 10;
+      setState(() {
+        currentSteps += 10;
+        if (isRunning) {
           elapsedTime += Duration(seconds: 1);
-        });
-      }
+        }
+      });
     });
   }
 
@@ -65,7 +65,7 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   String _formatDuration(Duration duration) {
-    if (duration == Duration.zero && !isRunning ) {
+    if (duration == Duration.zero && !isRunning) {
       return "";
     }
     String twoDigits(int n) => n.toString().padLeft(2, '0');
