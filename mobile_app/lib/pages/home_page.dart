@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'package:flutter/material.dart';
 import '/widgets/widgets.dart';
 import '/utils/utils.dart';
@@ -16,6 +15,7 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   final int dailyGoal = 2000;
   int currentSteps = 1000;
+  String selectedButton = 'Steps';
 
   Color _getProgressColor(double progress) {
     return ColorConstants.purpleColor;
@@ -68,8 +68,16 @@ class _MyHomePageState extends State<MyHomePage> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 ElevatedButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    setState(() {
+                      selectedButton = 'Steps';
+                    });
+                  },
                   style: ElevatedButton.styleFrom(
+                    backgroundColor: selectedButton == 'Steps'
+                        ? ColorConstants.greenColor
+                        : ColorConstants.blueColor,
+                    foregroundColor: ColorConstants.white,
                     padding: EdgeInsets.symmetric(
                       horizontal: 30.0,
                       vertical: 15.0,
@@ -86,8 +94,16 @@ class _MyHomePageState extends State<MyHomePage> {
                 ),
                 SizedBox(width: 10.0),
                 ElevatedButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    setState(() {
+                      selectedButton = 'Race';
+                    });
+                  },
                   style: ElevatedButton.styleFrom(
+                    backgroundColor: selectedButton == 'Race'
+                        ? ColorConstants.greenColor
+                        : ColorConstants.blueColor,
+                    foregroundColor: ColorConstants.white,
                     padding: EdgeInsets.symmetric(
                       horizontal: 30.0,
                       vertical: 15.0,
