@@ -12,7 +12,7 @@ class CustomMenuBar extends StatelessWidget {
         BottomNavigationBarItem(
           icon: Icon(Icons.home),
           label: 'Home',
-          backgroundColor: ColorConstants.balckColor,
+          backgroundColor: ColorConstants.greyColor,
         ),
         BottomNavigationBarItem(
           icon: Icon(Icons.checklist),

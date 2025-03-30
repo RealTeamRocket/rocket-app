@@ -44,13 +44,14 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Color _getProgressColor(double progress) {
-    if (progress >= 1.0) {
-      return Colors.green;
-    } else if (progress >= 0.5) {
-      return Colors.orange;
-    } else {
-      return Colors.red;
-    }
+    // if (progress >= 1.0) {
+    //   return Colors.green;
+    // } else if (progress >= 0.5) {
+    //   return Colors.orange;
+    // } else {
+    //   return Colors.red;
+    // }
+    return ColorConstants.purpleColor;
   }
 
   @override
@@ -59,10 +60,13 @@ class _MyHomePageState extends State<MyHomePage> {
 
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: Text(widget.title),
+        backgroundColor: ColorConstants.deepBlue,
+        title: Text(
+          widget.title,
+          style: TextStyle(color: ColorConstants.white),
+        ),
       ),
-      backgroundColor: ColorConstants.backgroundColor,
+      backgroundColor: ColorConstants.deepBlue,
       body: Column(
         children: <Widget>[
           Expanded(
