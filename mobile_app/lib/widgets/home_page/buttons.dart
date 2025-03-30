@@ -37,7 +37,15 @@ class ButtonsWidget extends StatelessWidget {
                 borderRadius: BorderRadius.circular(7.0),
               ),
             ),
-            child: Text("Steps"),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                //TODO: maybe a foot or feet icon
+                Icon(Icons.directions_walk, size: 24.0),
+                SizedBox(width: 8.0),
+                Text("Steps"),
+              ],
+            ),
           ),
           SizedBox(width: 10.0),
           ElevatedButton(
@@ -59,7 +67,14 @@ class ButtonsWidget extends StatelessWidget {
                 borderRadius: BorderRadius.circular(7.0),
               ),
             ),
-            child: Text("Race"),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(Icons.directions_run, size: 24.0),
+                SizedBox(width: 8.0),
+                Text("Race"),
+              ],
+            ),
           ),
         ],
       ),
