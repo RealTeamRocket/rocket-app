@@ -16,32 +16,6 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   final int dailyGoal = 2000;
   int currentSteps = 1000;
-  late Timer _timer;
-  bool isRunning = false;
-  Duration elapsedTime = Duration.zero;
-
-  @override
-  void initState() {
-    super.initState();
-    _startStepCounter();
-  }
-
-  @override
-  void dispose() {
-    _timer.cancel();
-    super.dispose();
-  }
-
-  void _startStepCounter() {
-    _timer = Timer.periodic(Duration(seconds: 1), (timer) {
-      setState(() {
-        currentSteps += 10;
-        if (isRunning) {
-          elapsedTime += Duration(seconds: 1);
-        }
-      });
-    });
-  }
 
   Color _getProgressColor(double progress) {
     return ColorConstants.purpleColor;

@@ -28,7 +28,7 @@ class CustomMenuBar extends StatelessWidget {
         ),
       ],
       currentIndex: 0,
-      selectedItemColor: Colors.amber[800],
+      selectedItemColor: ColorConstants.purpleColor,
       onTap: (index) {
 
       },
