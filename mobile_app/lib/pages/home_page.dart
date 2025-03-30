@@ -43,17 +43,6 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
-  void _toggleRun() {
-    setState(() {
-      if (isRunning) {
-        isRunning = false;
-      } else {
-        isRunning = true;
-        elapsedTime = Duration.zero;
-      }
-    });
-  }
-
   Color _getProgressColor(double progress) {
     if (progress >= 1.0) {
       return Colors.green;
@@ -62,16 +51,6 @@ class _MyHomePageState extends State<MyHomePage> {
     } else {
       return Colors.red;
     }
-  }
-
-  String _formatDuration(Duration duration) {
-    if (duration == Duration.zero && !isRunning) {
-      return "";
-    }
-    String twoDigits(int n) => n.toString().padLeft(2, '0');
-    String twoDigitMinutes = twoDigits(duration.inMinutes.remainder(60));
-    String twoDigitSeconds = twoDigits(duration.inSeconds.remainder(60));
-    return "${twoDigits(duration.inHours)}:$twoDigitMinutes:$twoDigitSeconds";
   }
 
   @override
@@ -87,78 +66,32 @@ class _MyHomePageState extends State<MyHomePage> {
       body: Column(
         children: <Widget>[
           Expanded(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                Padding(
-                  padding: const EdgeInsets.all(10.0),
-                  child: Text(
-                    _formatDuration(elapsedTime),
+            child: Center(
+              child: Stack(
+                alignment: Alignment.center,
+                children: [
+                  SizedBox(
+                    width: 300.0,
+                    height: 300.0,
+                    child: CustomPaint(
+                      painter: CircularProgressPainter(
+                        progress: progress,
+                        color: _getProgressColor(progress),
+                        strokeWidth: 20.0,
+                      ),
+                    ),
+                  ),
+                  Text(
+                    '$currentSteps',
                     style: TextStyle(
-                      fontSize: 30.0,
+                      fontSize: 50.0,
                       fontWeight: FontWeight.bold,
                       color: ColorConstants.white,
                     ),
                   ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(10.0),
-                  child: Container(
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: [Colors.blue, Colors.purple],
-                      ),
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: SizedBox(
-                      width: 200,
-                      height: 60,
-                      child: ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.transparent,
-                          shadowColor: Colors.transparent,
-                        ),
-                        onPressed: _toggleRun,
-                        child: Text(
-                          isRunning ? 'Stop Run' : 'Start Run',
-                          style: TextStyle(
-                            color: ColorConstants.white,
-                            fontSize: 20,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
-          Stack(
-            alignment: Alignment.center,
-            children: [
-              SizedBox(
-                width: 300.0,
-                height: 300.0,
-                child: CustomPaint(
-                  painter: CircularProgressPainter(
-                    progress: progress,
-                    color: _getProgressColor(progress),
-                    strokeWidth: 20.0,
-                  ),
-                ),
-              ),
-              Text(
-                '$currentSteps',
-                style: TextStyle(
-                  fontSize: 50.0,
-                  fontWeight: FontWeight.bold,
-                  color: ColorConstants.white,
-                ),
-              ),
-            ],
-          ),
-          Expanded(
-            child: Container(),
           ),
         ],
       ),
