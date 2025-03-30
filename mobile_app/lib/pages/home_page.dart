@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import '/widgets/widgets.dart';
 import '/utils/utils.dart';
@@ -16,6 +17,27 @@ class _MyHomePageState extends State<MyHomePage> {
   final int dailyGoal = 2000;
   int currentSteps = 1000;
   String selectedButton = 'Steps';
+  Timer? _timer;
+
+  @override
+  void initState() {
+    super.initState();
+    _startStepCounter();
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
+  }
+
+  void _startStepCounter() {
+    _timer = Timer.periodic(Duration(seconds: 1), (timer) {
+      setState(() {
+        currentSteps += 10;
+      });
+    });
+  }
 
   Color _getProgressColor(double progress) {
     return ColorConstants.purpleColor;
