@@ -44,13 +44,6 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Color _getProgressColor(double progress) {
-    // if (progress >= 1.0) {
-    //   return Colors.green;
-    // } else if (progress >= 0.5) {
-    //   return Colors.orange;
-    // } else {
-    //   return Colors.red;
-    // }
     return ColorConstants.purpleColor;
   }
 
@@ -68,33 +61,74 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
       backgroundColor: ColorConstants.deepBlue,
       body: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
-          Expanded(
-            child: Center(
-              child: Stack(
-                alignment: Alignment.center,
-                children: [
-                  SizedBox(
-                    width: 300.0,
-                    height: 300.0,
-                    child: CustomPaint(
-                      painter: CircularProgressPainter(
-                        progress: progress,
-                        color: _getProgressColor(progress),
-                        strokeWidth: 20.0,
-                      ),
-                    ),
+          Stack(
+            alignment: Alignment.center,
+            children: [
+              SizedBox(
+                width: 300.0,
+                height: 300.0,
+                child: CustomPaint(
+                  painter: CircularProgressPainter(
+                    progress: progress,
+                    color: _getProgressColor(progress),
+                    strokeWidth: 20.0,
                   ),
-                  Text(
-                    '$currentSteps',
-                    style: TextStyle(
-                      fontSize: 50.0,
-                      fontWeight: FontWeight.bold,
-                      color: ColorConstants.white,
-                    ),
-                  ),
-                ],
+                ),
               ),
+              Text(
+                '$currentSteps',
+                style: TextStyle(
+                  fontSize: 50.0,
+                  fontWeight: FontWeight.bold,
+                  color: ColorConstants.white,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 20.0),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 20.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                ElevatedButton(
+                  onPressed: () {},
+                  style: ElevatedButton.styleFrom(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 30.0,
+                      vertical: 15.0,
+                    ),
+                    textStyle: TextStyle(
+                      fontSize: 20.0,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(7.0),
+                    ),
+                  ),
+                  child: Text("Steps"),
+                ),
+                SizedBox(width: 10.0),
+                ElevatedButton(
+                  onPressed: () {},
+                  style: ElevatedButton.styleFrom(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 30.0,
+                      vertical: 15.0,
+                    ),
+                    textStyle: TextStyle(
+                      fontSize: 20.0,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(7.0),
+                    ),
+                  ),
+                  child: Text("Race"),
+                ),
+              ],
             ),
           ),
         ],
