@@ -24,7 +24,7 @@ services:
       - blueprint
 
   psql_bp:
-    image: postgres:latest
+    image: postgis/postgis:latest
     restart: unless-stopped
     environment:
       POSTGRES_DB: ${BLUEPRINT_DB_DATABASE}

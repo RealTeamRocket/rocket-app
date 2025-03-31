@@ -1,19 +1,17 @@
-CREATE DATABASE userdata;
-USE userdata;
 --TABLE for users
 CREATE TABLE users (
 username VARCHAR(255) NOT NULL PRIMARY KEY,
 email VARCHAR(255) NOT NULL,
 firstname VARCHAR(255) NOT NULL,
 lastname VARCHAR(255) NOT NULL,
-rocketpoints INT DEFAULT 0,
+rocketpoints INT DEFAULT 0
 );
 
 CREATE TABLE runs (
 username VARCHAR(255) NOT NULL REFERENCES users(username),
 duration TIME NOT NULL,
-distance DOUBLE NOT NULL,
-avg_speed DOUBLE NOT NULL,
+distance real NOT NULL,
+avg_speed real NOT NULL,
 date DATE NOT NULL,
 route GEOMETRY(LINESTRING, 4326) NOT NULL,
 --LINESTRING is a type of geometry that represents a sequence of points in 2D space
