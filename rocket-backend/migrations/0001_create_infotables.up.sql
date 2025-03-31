@@ -1,3 +1,6 @@
+CREATE DATABASE userdata;
+USE userdata;
+--TABLE for users
 CREATE TABLE users (
 username VARCHAR(255) NOT NULL PRIMARY KEY,
 email VARCHAR(255) NOT NULL,
