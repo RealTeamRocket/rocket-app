@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 import 'package:http/http.dart' as http;
 
@@ -40,8 +41,9 @@ class HealthStats {
   }
 
   static Future<HealthStats> fetchHealth() async {
+    final backendUrl = dotenv.get('BACKEND_URL', fallback: "http://10.0.2.2:8080");
     final response = await http.get(
-      Uri.parse('http://10.0.2.2:8080/api/v1/health'),
+      Uri.parse('$backendUrl/api/v1/health'),
     );
     if (response.statusCode == 200) {
       return HealthStats.fromJson(

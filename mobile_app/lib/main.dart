@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'utils/backend_api/backend_api.dart' as api;
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 import 'pages/pages.dart';
 
 void main() async {
+  await dotenv.load(fileName: ".env");
   try {
     final healtStats = await api.HealthStats.fetchHealth();
     debugPrint("$healtStats");
