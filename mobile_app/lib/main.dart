@@ -5,7 +5,11 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'pages/pages.dart';
 
 void main() async {
-  await dotenv.load(fileName: ".env");
+  try {
+    await dotenv.load(fileName: ".env");
+  } catch (e) {
+    debugPrint("Error loading .env file using fallback: $e");
+  }
   try {
     final healtStats = await api.HealthStats.fetchHealth();
     debugPrint("$healtStats");
