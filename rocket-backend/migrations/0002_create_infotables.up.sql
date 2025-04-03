@@ -21,3 +21,6 @@ PRIMARY KEY (username, date)
 );
 --TABLE for friends
 --HOW TO HANDLE FRIENDS? AND REQUESTS?
+
+--CREATE TABLE friendrequest
+--CREATE TABLE friends
