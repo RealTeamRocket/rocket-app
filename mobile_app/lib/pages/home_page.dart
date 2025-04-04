@@ -1,5 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'package:pedometer/pedometer.dart';
 import '/widgets/widgets.dart';
 import '/constants/constants.dart';
 
@@ -14,28 +16,64 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   final int dailyGoal = 2000;
-  int currentSteps = 1000;
+  int currentSteps = 0;
   String selectedButton = 'Steps';
-  Timer? _timer;
+  Stream<StepCount>? _stepCountStream;
 
   @override
   void initState() {
     super.initState();
-    _startStepCounter();
+    _requestActivityRecognitionPermission();
+  }
+
+  Future<void> _requestActivityRecognitionPermission() async {
+    var status = await Permission.activityRecognition.status;
+    if (!status.isGranted) {
+      status = await Permission.activityRecognition.request();
+    }
+    if (status.isGranted) {
+      _startStepCounter();
+    } else {
+      _showPermissionDeniedDialog();
+    }
   }
 
   @override
   void dispose() {
-    _timer?.cancel();
     super.dispose();
   }
 
   void _startStepCounter() {
-    _timer = Timer.periodic(Duration(seconds: 1), (timer) {
-      setState(() {
-        currentSteps += 10;
-      });
+    _stepCountStream = Pedometer.stepCountStream;
+    _stepCountStream?.listen(onStepCount, onError: onStepCountError);
+  }
+
+  void onStepCount(StepCount event) {
+    setState(() {
+      currentSteps = event.steps;
     });
+  }
+
+  void onStepCountError(error) {
+    debugPrint("Pedometer Error: $error");
+  }
+
+  void _showPermissionDeniedDialog() {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text("Permission Denied"),
+          content: Text("Activity recognition permission is required to count your steps. Please grant the permission in settings."),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: Text("OK"),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   void _onButtonPressed(String button) {
