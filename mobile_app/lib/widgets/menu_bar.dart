@@ -16,6 +16,7 @@ class _CustomMenuBarState extends State<CustomMenuBar> {
   @override
   Widget build(BuildContext context) {
     return BottomNavigationBar(
+      type: BottomNavigationBarType.shifting,
       items: const <BottomNavigationBarItem>[
         BottomNavigationBarItem(
           icon: Icon(Icons.home),
@@ -25,14 +26,17 @@ class _CustomMenuBarState extends State<CustomMenuBar> {
         BottomNavigationBarItem(
           icon: Icon(Icons.checklist),
           label: 'Search',
+          backgroundColor: ColorConstants.greyColor,
         ),
         BottomNavigationBarItem(
           icon: Icon(Icons.leaderboard),
           label: 'Leaderboards',
+          backgroundColor: ColorConstants.greyColor,
         ),
         BottomNavigationBarItem(
           icon: Icon(Icons.person),
           label: 'Profile',
+          backgroundColor: ColorConstants.greyColor,
         ),
       ],
       currentIndex: _currentIndex,

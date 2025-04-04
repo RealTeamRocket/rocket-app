@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../constants/color_constants.dart';
 import '/widgets/widgets.dart';
 import 'pages.dart';
 
@@ -47,10 +48,11 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: ColorConstants.deepBlue,
         title: Center(
           child: Text(
             widget.title,
-            style: const TextStyle(color: Colors.white),
+            style: TextStyle(color: ColorConstants.white),
           ),
         ),
       ),

@@ -49,15 +49,6 @@ class _RunPageState extends State<RunPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: ColorConstants.deepBlue,
-        title: Center(
-          child: Text(
-            widget.title,
-            style: TextStyle(color: ColorConstants.white),
-          ),
-        ),
-      ),
       backgroundColor: ColorConstants.deepBlue,
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,

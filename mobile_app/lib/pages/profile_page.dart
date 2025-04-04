@@ -7,14 +7,17 @@ class Profile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      height: 300, // Höhe hinzugefügt
-      width: double.infinity,
-      color: ColorConstants.deepBlue, // Farbanpassung
-      child: const Center(
-        child: Text(
-          'Profile',
-          style: TextStyle(color: ColorConstants.white, fontSize: 28), // Größere Schrift
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Container(
+        //height: 300,
+        width: double.infinity,
+        color: ColorConstants.greenColor,
+        child: const Center(
+          child: Text(
+            'Profile',
+            style: TextStyle(color: ColorConstants.white, fontSize: 28),
+          ),
         ),
       ),
     );
@@ -26,14 +29,17 @@ class History extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      height: 300, // Höhe hinzugefügt
-      width: double.infinity,
-      color: ColorConstants.deepBlue, // Farbanpassung
-      child: const Center(
-        child: Text(
-          'History',
-          style: TextStyle(color: ColorConstants.white, fontSize: 28), // Größere Schrift
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Container(
+        //height: 300,
+        width: double.infinity,
+        color: ColorConstants.deepBlue,
+        child: const Center(
+          child: Text(
+            'Histroy',
+            style: TextStyle(color: ColorConstants.white, fontSize: 28),
+          ),
         ),
       ),
     );
@@ -51,18 +57,16 @@ class _ProfilePageState extends State<ProfilePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Profile Page'),
-        backgroundColor: ColorConstants.deepBlue, // Farbanpassung
-      ),
-      body: SingleChildScrollView( // Scrollbarkeit hinzugefügt
-        child: Column(
-          children: const [
-            Profile(),
-            SizedBox(height: 16), // Abstand zwischen den Widgets
-            History(),
-          ],
-        ),
+      body: Column(
+        children: [
+          Expanded(
+            child: Profile(),
+          ),
+          const SizedBox(height: 10),
+          Expanded(
+            child: History(),
+          ),
+        ],
       ),
     );
   }
