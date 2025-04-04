@@ -59,6 +59,7 @@ class WelcomePage extends StatelessWidget {
                         child: Text(
                           'Register',
                           style: TextStyle(
+                            color: ColorConstants.blackColor,
                             fontSize: 18.0,
                             fontWeight: FontWeight.bold,
                           ),
@@ -87,6 +88,7 @@ class WelcomePage extends StatelessWidget {
                         child: Text(
                           'Login',
                           style: TextStyle(
+                            color: ColorConstants.blackColor,
                             fontSize: 18.0,
                             fontWeight: FontWeight.bold,
                           ),

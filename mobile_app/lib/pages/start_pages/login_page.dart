@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mobile_app/pages/pages.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -29,6 +30,11 @@ class _LoginPageState extends State<LoginPage> {
           Image.asset(
             'assets/images/welcome-background.png',
             fit: BoxFit.cover,
+            filterQuality: FilterQuality.high,
+          ),
+          // Overlay to darken the background image
+          Container(
+            color: Colors.black.withValues(alpha: 0.5),
           ),
           // Content
           Center(
@@ -38,22 +44,27 @@ class _LoginPageState extends State<LoginPage> {
                 key: _formKey,
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: <Widget>[
                     Text(
                       'Login',
+                      textAlign: TextAlign.center,
                       style: TextStyle(
-                        fontSize: 24.0,
+                        fontSize: 32.0,
                         fontWeight: FontWeight.bold,
                         color: Colors.white,
                       ),
                     ),
-                    SizedBox(height: 20.0),
+                    SizedBox(height: 40.0),
                     TextFormField(
                       controller: _usernameController,
                       decoration: InputDecoration(
                         labelText: 'Username',
                         filled: true,
                         fillColor: Colors.white.withValues(alpha: 0.8),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(30.0),
+                        ),
                       ),
                       validator: (value) {
                         if (value == null || value.isEmpty) {
@@ -62,13 +73,16 @@ class _LoginPageState extends State<LoginPage> {
                         return null;
                       },
                     ),
-                    SizedBox(height: 10.0),
+                    SizedBox(height: 20.0),
                     TextFormField(
                       controller: _passwordController,
                       decoration: InputDecoration(
                         labelText: 'Password',
                         filled: true,
                         fillColor: Colors.white.withValues(alpha: 0.8),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(30.0),
+                        ),
                       ),
                       obscureText: true,
                       validator: (value) {
@@ -78,17 +92,37 @@ class _LoginPageState extends State<LoginPage> {
                         return null;
                       },
                     ),
-                    SizedBox(height: 20.0),
-                    ElevatedButton(
-                      onPressed: () {
-                        if (_formKey.currentState!.validate()) {
-                          // Process login
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text('Logging in')),
-                          );
-                        }
-                      },
-                      child: Text('Login'),
+                    SizedBox(height: 40.0),
+                    Center(
+                      child: SizedBox(
+                        width: 200.0, // Set the desired width here
+                        child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.blueAccent,
+                            padding: EdgeInsets.symmetric(vertical: 16.0),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(30.0),
+                            ),
+                          ),
+                          onPressed: () {
+                            if (_formKey.currentState!.validate()) {
+                              //TODO: Implement login logic
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(builder: (context) => MyHomePage(title: 'Step Counter')),
+                              );
+
+                            }
+                          },
+                          child: Text(
+                            'Login',
+                            style: TextStyle(
+                              fontSize: 18.0,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ),
                     ),
                   ],
                 ),

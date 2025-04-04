@@ -1,5 +1,6 @@
-import 'login_page.dart';
 import 'package:flutter/material.dart';
+import 'login_page.dart';
+import 'package:mobile_app/constants/constants.dart';
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({super.key});
@@ -45,6 +46,10 @@ class _RegisterPageState extends State<RegisterPage> {
           Image.asset(
             'assets/images/welcome-background.png',
             fit: BoxFit.cover,
+          ),
+          // Overlay to darken the background image
+          Container(
+            color: Colors.black.withValues(alpha: 0.5),
           ),
           // Content
           Center(
@@ -125,7 +130,11 @@ class _RegisterPageState extends State<RegisterPage> {
                     ),
                     SizedBox(height: 20.0),
                     ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: ColorConstants.blueColor,
+                      ),
                       onPressed: () {
+                        //TODO: Implement registration logic
                         if (_formKey.currentState!.validate()) {
                           Navigator.push(
                             context,
@@ -133,9 +142,18 @@ class _RegisterPageState extends State<RegisterPage> {
                               builder: (context) => LoginPage(),
                             ),
                           );
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text('Please fill out the form correctly')),
+                          );
                         }
                       },
-                      child: Text('Register'),
+                      child: Text(
+                        'Register',
+                        style: TextStyle(
+                          color: ColorConstants.blackColor
+                        ),
+                      ),
                     ),
                   ],
                 ),
