@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '/constants/constants.dart';
-import '/widgets/widgets.dart';
+// import '/widgets/widgets.dart';
 
 class Profile extends StatelessWidget {
   const Profile({super.key});
@@ -9,16 +9,23 @@ class Profile extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.all(16.0),
-      child: Container(
-        //height: 300,
-        width: double.infinity,
-        color: ColorConstants.greenColor,
-        child: const Center(
-          child: Text(
-            'Profile',
-            style: TextStyle(color: ColorConstants.white, fontSize: 28),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          CircleAvatar(
+            radius: 50,
+            backgroundImage: AssetImage('assets/images/profile_picture.png'),
           ),
-        ),
+          const SizedBox(height: 16),
+          const Text(
+            'Profile Name',
+            style: TextStyle(
+              color: ColorConstants.white,
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -32,12 +39,11 @@ class History extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.all(16.0),
       child: Container(
-        //height: 300,
         width: double.infinity,
-        color: ColorConstants.deepBlue,
+        color: ColorConstants.greenColor,
         child: const Center(
           child: Text(
-            'Histroy',
+            'History',
             style: TextStyle(color: ColorConstants.white, fontSize: 28),
           ),
         ),
@@ -57,12 +63,12 @@ class _ProfilePageState extends State<ProfilePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: ColorConstants.deepBlue,
       body: Column(
         children: [
           Expanded(
             child: Profile(),
           ),
-          const SizedBox(height: 10),
           Expanded(
             child: History(),
           ),
