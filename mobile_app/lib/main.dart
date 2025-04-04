@@ -24,21 +24,20 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // return MaterialApp(
-    //   title: 'Rocket App',
-    //   debugShowCheckedModeBanner: false,
-    //   theme: ThemeData(
-    //     colorScheme: ColorScheme.fromSeed(seedColor: Colors.blueGrey),
-    //   ),
-    //   home: const MyHomePage(title: 'Step Counter'),
-    // );
+    final bool isAuthenticated = checkIfAuthenticated();
+
     return MaterialApp(
       title: 'Rocket App',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.blueGrey),
       ),
-      home: const WelcomePage(),
+      home: isAuthenticated ?  const MyHomePage(title: 'Step Counter') : const WelcomePage(),
     );
+  }
+
+  bool checkIfAuthenticated() {
+    //TODO: Implement check for JWT token in local storage
+    return false;
   }
 }
