@@ -131,7 +131,7 @@ class _RegisterPageState extends State<RegisterPage> {
                     SizedBox(height: 20.0),
                     ElevatedButton(
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: ColorConstants.blueColor,
+                        backgroundColor: ColorConstants.white,
                       ),
                       onPressed: () {
                         //TODO: Implement registration logic

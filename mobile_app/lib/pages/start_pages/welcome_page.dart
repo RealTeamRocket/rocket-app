@@ -44,7 +44,7 @@ class WelcomePage extends StatelessWidget {
                       width: 300,
                       child: ElevatedButton(
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: ColorConstants.blueColor,
+                          backgroundColor: ColorConstants.white,
                           padding: EdgeInsets.symmetric(vertical: 16.0),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(30.0),
@@ -73,7 +73,7 @@ class WelcomePage extends StatelessWidget {
                       width: 300,
                       child: ElevatedButton(
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: ColorConstants.greenColor,
+                          backgroundColor: ColorConstants.white,
                           padding: EdgeInsets.symmetric(vertical: 16.0),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(30.0),

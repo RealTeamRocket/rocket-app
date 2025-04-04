@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mobile_app/constants/constants.dart';
 import 'package:mobile_app/pages/pages.dart';
 
 class LoginPage extends StatefulWidget {
@@ -98,7 +99,7 @@ class _LoginPageState extends State<LoginPage> {
                         width: 200.0, // Set the desired width here
                         child: ElevatedButton(
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.blueAccent,
+                            backgroundColor: ColorConstants.white,
                             padding: EdgeInsets.symmetric(vertical: 16.0),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(30.0),
