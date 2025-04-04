@@ -62,9 +62,6 @@ class _LoginPageState extends State<LoginPage> {
                         hintText: 'Username',
                         filled: true,
                         fillColor: Colors.white.withValues(alpha: 0.8),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(30.0),
-                        ),
                       ),
                       validator: (value) {
                         if (value == null || value.isEmpty) {
@@ -80,9 +77,6 @@ class _LoginPageState extends State<LoginPage> {
                         hintText: 'Password',
                         filled: true,
                         fillColor: Colors.white.withValues(alpha: 0.8),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(30.0),
-                        ),
                       ),
                       obscureText: true,
                       validator: (value) {
