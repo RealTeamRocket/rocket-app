@@ -33,7 +33,6 @@ class _LoginPageState extends State<LoginPage> {
             fit: BoxFit.cover,
             filterQuality: FilterQuality.high,
           ),
-          // Overlay to darken the background image
           Container(
             color: Colors.black.withValues(alpha: 0.5),
           ),
@@ -60,7 +59,7 @@ class _LoginPageState extends State<LoginPage> {
                     TextFormField(
                       controller: _usernameController,
                       decoration: InputDecoration(
-                        labelText: 'Username',
+                        hintText: 'Username',
                         filled: true,
                         fillColor: Colors.white.withValues(alpha: 0.8),
                         border: OutlineInputBorder(
@@ -78,7 +77,7 @@ class _LoginPageState extends State<LoginPage> {
                     TextFormField(
                       controller: _passwordController,
                       decoration: InputDecoration(
-                        labelText: 'Password',
+                        hintText: 'Password',
                         filled: true,
                         fillColor: Colors.white.withValues(alpha: 0.8),
                         border: OutlineInputBorder(
@@ -112,7 +111,6 @@ class _LoginPageState extends State<LoginPage> {
                                 context,
                                 MaterialPageRoute(builder: (context) => MyHomePage(title: 'Step Counter')),
                               );
-
                             }
                           },
                           child: Text(
