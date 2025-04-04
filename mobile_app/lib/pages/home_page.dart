@@ -72,7 +72,7 @@ class _MyHomePageState extends State<MyHomePage> {
               style: TextStyle(
                 fontSize: 30.0,
                 fontWeight: FontWeight.bold,
-                color: ColorConstants.white,
+                color: ColorConstants.blackColor,
               ),
             ),
             const SizedBox(height: 20.0),
