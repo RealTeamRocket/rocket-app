@@ -2,9 +2,8 @@ import 'package:flutter/material.dart';
 
 import '../pages/pages.dart';
 import '../utils/utils.dart';
-import 'menu_bar.dart';
 
-class MyHomePageState extends State<MyHomePage> {
+class _HomePageState extends State<HomePage>  {
   final int totalSteps = 2000;
   final int currentSteps = 900;
 
@@ -35,7 +34,6 @@ class MyHomePageState extends State<MyHomePage> {
           ],
         ),
       ),
-      bottomNavigationBar: const CustomMenuBar(),
     );
   }
 }
