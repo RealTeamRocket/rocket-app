@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
-import '../pages/pages.dart';
-import '../utils/utils.dart';
-import 'menu_bar.dart';
+import '../../pages/pages.dart';
+import '../menu_bar.dart';
+import '../painters/painters.dart';
 
 class MyHomePageState extends State<MyHomePage> {
   final int totalSteps = 2000;
