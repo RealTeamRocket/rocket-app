@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '/utils/pedometer_service.dart'; // new file
+import '/utils/utils.dart';
 import '/widgets/widgets.dart';
 import '/constants/constants.dart';
 
