@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../utils/utils.dart';
+import '../painters/painters.dart';
 import '/constants/constants.dart';
 
 class StepCounterWidget extends StatelessWidget {
@@ -39,7 +39,7 @@ class StepCounterWidget extends StatelessWidget {
           style: TextStyle(
             fontSize: 50.0,
             fontWeight: FontWeight.bold,
-            color: ColorConstants.white,
+            color: ColorConstants.blackColor,
           ),
         ),
       ],

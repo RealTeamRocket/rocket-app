@@ -48,7 +48,7 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: ColorConstants.deepBlue,
+        backgroundColor: ColorConstants.greyColor,
         title: Center(
           child: Text(
             widget.title,
@@ -56,7 +56,7 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
         ),
       ),
-      backgroundColor: ColorConstants.deepBlue,
+      backgroundColor: ColorConstants.white,
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
@@ -72,7 +72,7 @@ class _MyHomePageState extends State<MyHomePage> {
               style: TextStyle(
                 fontSize: 30.0,
                 fontWeight: FontWeight.bold,
-                color: ColorConstants.white,
+                color: ColorConstants.blackColor,
               ),
             ),
             const SizedBox(height: 20.0),
