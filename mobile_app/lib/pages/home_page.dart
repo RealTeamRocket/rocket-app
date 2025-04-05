@@ -20,19 +20,13 @@ class _HomePageState extends State<HomePage> {
     Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
-        children: const [
-          Text("Search"),
-          Icon(Icons.checklist),
-        ],
+        children: const [Text("Search"), Icon(Icons.checklist)],
       ),
     ),
     Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
-        children: const [
-          Text("Leaderboards"),
-          Icon(Icons.leaderboard),
-        ],
+        children: const [Text("Leaderboards"), Icon(Icons.leaderboard)],
       ),
     ),
     const ProfilePage(),
@@ -56,9 +50,7 @@ class _HomePageState extends State<HomePage> {
           ),
         ),
       ),
-      body: Center(
-        child: _pages.elementAt(_selectedIndex),
-      ),
+      body: Center(child: _pages.elementAt(_selectedIndex)),
       bottomNavigationBar: CustomMenuBar(onItemTapped: _onItemTapped),
     );
   }

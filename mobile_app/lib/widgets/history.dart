@@ -8,7 +8,8 @@ class History extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final List<double> stepsData = [5000, 7000, 8000, 6000, 7500, 9000, 8500];
-    final double averageSteps = stepsData.reduce((a, b) => a + b) / stepsData.length;
+    final double averageSteps =
+        stepsData.reduce((a, b) => a + b) / stepsData.length;
 
     return Padding(
       padding: const EdgeInsets.all(16.0),
@@ -17,7 +18,11 @@ class History extends StatelessWidget {
         children: [
           const Text(
             'History',
-            style: TextStyle(color: ColorConstants.white, fontSize: 28),
+            style: TextStyle(
+              color: ColorConstants.white,
+              fontSize: 28,
+              fontWeight: FontWeight.bold,
+            ),
           ),
           const SizedBox(height: 16),
           Expanded(
@@ -32,10 +37,21 @@ class History extends StatelessWidget {
                     sideTitles: SideTitles(
                       showTitles: true,
                       getTitlesWidget: (value, meta) {
-                        const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+                        const days = [
+                          'Mon',
+                          'Tue',
+                          'Wed',
+                          'Thu',
+                          'Fri',
+                          'Sat',
+                          'Sun',
+                        ];
                         return Text(
                           days[value.toInt() % days.length],
-                          style: const TextStyle(color: Colors.white, fontSize: 12),
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 12,
+                          ),
                         );
                       },
                     ),

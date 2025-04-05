@@ -54,10 +54,7 @@ class _RunPageState extends State<RunPage> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
           if (selectedButton == 'Steps') ...[
-            StepCounterWidget(
-              currentSteps: currentSteps,
-              dailyGoal: dailyGoal,
-            ),
+            StepCounterWidget(currentSteps: currentSteps, dailyGoal: dailyGoal),
             const SizedBox(height: 20.0),
           ] else if (selectedButton == 'Race') ...[
             Text(

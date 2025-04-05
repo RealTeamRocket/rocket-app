@@ -16,12 +16,8 @@ class _ProfilePageState extends State<ProfilePage> {
       backgroundColor: ColorConstants.deepBlue,
       body: Column(
         children: [
-          Expanded(
-            child: Profile(),
-          ),
-          Expanded(
-            child: History(),
-          ),
+          Flexible(flex: 2, child: Profile()),
+          Flexible(flex: 3, child: History()),
         ],
       ),
     );
