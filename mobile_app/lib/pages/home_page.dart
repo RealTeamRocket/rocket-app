@@ -1,11 +1,10 @@
-import 'dart:async';
 import 'package:flutter/material.dart';
+import '/utils/utils.dart';
 import '/widgets/widgets.dart';
 import '/constants/constants.dart';
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key, required this.title});
-
   final String title;
 
   @override
@@ -13,29 +12,31 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  final int dailyGoal = 2000;
-  int currentSteps = 1000;
+  final int dailyGoal = 10000;
+  int currentSteps = 0;
   String selectedButton = 'Steps';
-  Timer? _timer;
+
+  late PedometerService _pedometerService;
 
   @override
   void initState() {
     super.initState();
-    _startStepCounter();
-  }
-
-  @override
-  void dispose() {
-    _timer?.cancel();
-    super.dispose();
-  }
-
-  void _startStepCounter() {
-    _timer = Timer.periodic(Duration(seconds: 1), (timer) {
+    _pedometerService = PedometerService();
+    _pedometerService.onStepsUpdated = (steps) {
       setState(() {
-        currentSteps += 10;
+        currentSteps = steps;
       });
-    });
+    };
+
+    _pedometerService.onError = (msg) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(msg)),
+        );
+      }
+    };
+
+    _pedometerService.init();
   }
 
   void _onButtonPressed(String button) {
