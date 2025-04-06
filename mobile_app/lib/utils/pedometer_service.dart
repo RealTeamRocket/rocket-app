@@ -15,14 +15,21 @@ class PedometerService {
     _startStepCounter();
   }
 
-  Future<void> _requestActivityRecognitionPermission() async {
+  Future<bool> _requestActivityRecognitionPermission() async {
     var status = await Permission.activityRecognition.status;
+
     if (!status.isGranted) {
       status = await Permission.activityRecognition.request();
     }
+
     if (!status.isGranted) {
-      // todo: Handle denied permission as needed.
+      if (onError != null) {
+        onError!("Permission denied. Step tracking is disabled.");
+      }
+      return false;
     }
+
+    return true;
   }
 
   Future<void> _loadInitialStepData() async {
