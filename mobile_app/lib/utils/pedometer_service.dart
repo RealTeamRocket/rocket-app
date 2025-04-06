@@ -7,6 +7,7 @@ class PedometerService {
   DateTime? _initialStepDate;
   Stream<StepCount>? _stepCountStream;
   Function(int)? onStepsUpdated;
+  Function(String)? onError;
 
   Future<void> init() async {
     await _requestActivityRecognitionPermission();
@@ -75,7 +76,12 @@ class PedometerService {
   }
 
   void _onStepCountError(error) {
-    // todo: Handle the error
+    final errorMessage = "Step tracking failed: $error Please check permissions or restart the app.";
+    print(errorMessage);
+
+    if (onError != null) {
+      onError!(errorMessage);
+    }
   }
 
   bool _isSameDay(DateTime d1, DateTime d2) {

@@ -27,6 +27,15 @@ class _MyHomePageState extends State<MyHomePage> {
         currentSteps = steps;
       });
     };
+
+    _pedometerService.onError = (msg) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(msg)),
+        );
+      }
+    };
+
     _pedometerService.init();
   }
 
