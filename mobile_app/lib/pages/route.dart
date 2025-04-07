@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_osm_plugin/flutter_osm_plugin.dart';
-import 'package:latlong2/latlong.dart';
 import 'package:geolocator/geolocator.dart';
-
 
 class RoutePage extends StatefulWidget {
   const RoutePage({super.key, required this.title});
@@ -14,7 +11,7 @@ class RoutePage extends StatefulWidget {
   State<RoutePage> createState() => _RoutePageState();
 }
 
-Future<Position> _determinePosition() async{
+Future<Position> _determinePosition() async {
   bool serviceEnabled;
   LocationPermission locationPermission;
   serviceEnabled = await Geolocator.isLocationServiceEnabled();
@@ -35,44 +32,91 @@ Future<Position> _determinePosition() async{
   return await Geolocator.getCurrentPosition();
 }
 
-
-
-
 class _RoutePageState extends State<RoutePage> {
   GeoPoint? _initPosition;
+  List<GeoPoint> _routePoints = [];
+  late MapController _mapController;
 
   @override
   void initState() {
     super.initState();
     _setInitialPosition();
+    _mapController = MapController(
+      initPosition: GeoPoint(latitude: 48.61313, longitude: 9.45881),
+    );
   }
+
   Future<void> _setInitialPosition() async {
     try {
       Position position = await _determinePosition();
       setState(() {
-        _initPosition = GeoPoint(latitude: position.latitude, longitude: position.longitude);
+        _initPosition = GeoPoint(latitude: 48.61313, longitude: 9.45881);
+        _routePoints = [
+          _initPosition!,
+          GeoPoint(latitude: 48.61651, longitude: 9.4549) // Beispielzielpunkt
+        ];
       });
     } catch (e) {
       // Handle the error accordingly
       print(e);
     }
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          title: Text(widget.title),
-        ),
-        body: _initPosition == null
+      appBar: AppBar(
+        title: Text(widget.title),
+      ),
+      body: _initPosition == null
           ? Center(child: CircularProgressIndicator())
-          : OSMViewer(controller: SimpleMapController
-          (initPosition: _initPosition!,
-            markerHome: const MarkerIcon(icon: Icon(Icons.location_on))),
-          zoomOption: const ZoomOption(initZoom: 16, minZoomLevel: 11),
-        )
+          : OSMFlutter(
+        controller: _mapController,
+        osmOption: OSMOption(
+          zoomOption: ZoomOption(
+            minZoomLevel: 5,
+            maxZoomLevel: 18,
+            initZoom: 16,
+          ),
+          userLocationMarker: UserLocationMaker(
+            personMarker: MarkerIcon(
+              icon: Icon(
+                Icons.location_on,
+                color: Colors.red,
+                size: 48,
+              ),
+            ),
+            directionArrowMarker: MarkerIcon(
+              icon: Icon(
+                Icons.arrow_forward,
+                color: Colors.blue,
+                size: 48,
+              ),
+            ),
+          ),
+        ),
+        mapIsLoading: Center(child: CircularProgressIndicator()),
+        onMapIsReady: (isReady) async {
+          if (isReady && _routePoints.length >= 2) {
+            _mapController.drawRoad(
+              _routePoints[0],
+              _routePoints[1],
+              roadType: RoadType.foot,
+              roadOption: RoadOption(
+                roadColor: Colors.yellow,
+                roadWidth: 10.0,
+              ),
+            );
+          }
+        },
+        onGeoPointClicked: (geoPoint) {
+          // Behandlung des Klicks auf einen Geopunkt, falls erforderlich
+        },
+      ),
     );
   }
 }
+
 void main() {
   runApp(MaterialApp(
     title: 'Route Page',
@@ -82,5 +126,3 @@ void main() {
     home: RoutePage(title: 'Route Page'),
   ));
 }
-
-
