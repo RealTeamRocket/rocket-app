@@ -53,6 +53,7 @@ class _RoutePageState extends State<RoutePage> {
         _initPosition = GeoPoint(latitude: 48.61313, longitude: 9.45881);
         _routePoints = [
           _initPosition!,
+          GeoPoint(latitude: 48.6156, longitude: 9.45984),
           GeoPoint(latitude: 48.61651, longitude: 9.4549) // Beispielzielpunkt
         ];
       });
