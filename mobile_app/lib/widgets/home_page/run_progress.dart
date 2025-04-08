@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 
-import '../pages/pages.dart';
-import '../utils/utils.dart';
+import '../../pages/pages.dart';
+import '../menu_bar.dart';
+import '../painters/painters.dart';
 
-class _HomePageState extends State<HomePage>  {
+class _RunPageState extends State<RunPage>  {
   final int totalSteps = 2000;
   final int currentSteps = 900;
 

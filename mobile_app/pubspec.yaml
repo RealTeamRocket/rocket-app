@@ -37,6 +37,9 @@ dependencies:
   cupertino_icons: ^1.0.8
   http: ^1.3.0
   flutter_dotenv: ^5.2.1
+  pedometer: ^4.1.0
+  permission_handler: ^11.4.0
+  shared_preferences: ^2.5.3
 
 dev_dependencies:
   flutter_test:
@@ -90,5 +93,6 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/to/font-from-package
-  # assets:
-  #  - .env
+  assets:
+  # - .env
+    - assets/images/

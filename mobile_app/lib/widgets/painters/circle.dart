@@ -70,7 +70,7 @@ class CircularProgressPainter extends CustomPainter {
       text: TextSpan(
         text: 'Steps',
         style: TextStyle(
-          color: ColorConstants.white,
+          color: ColorConstants.blackColor,
           fontSize: 40.0,
           fontWeight: FontWeight.bold,
         ),
