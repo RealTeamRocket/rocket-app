@@ -29,8 +29,7 @@ class _MyAppState extends State<MyApp> {
   }
 
   Future<void> checkIfAuthenticated() async {
-    final jwt =
-        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NDQ0ODQwMDMsInVzZXJfaWQiOiI0MTI4YjY4My04YWYxLTQyNTEtOWQ0ZS03NzcwNzY4OWU2ZjUifQ._oZpBrV_lStdWF34GFFdzakROf6Z76JgWQ3nDO0N7g0";
+    final jwt = "";
     try {
       final authStatus = await api.AuthStatus.fetchAuthStatus(jwt);
       setState(() {
@@ -48,11 +47,7 @@ class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     if (isAuthenticated == null) {
       return MaterialApp(
-        home: Scaffold(
-          body: Center(
-            child: CircularProgressIndicator(),
-          ),
-        ),
+        home: Scaffold(body: Center(child: CircularProgressIndicator())),
       );
     }
 
@@ -62,9 +57,10 @@ class _MyAppState extends State<MyApp> {
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.blueGrey),
       ),
-      home: isAuthenticated!
-          ? const HomePage(title: 'Rocket App')
-          : const WelcomePage(),
+      home:
+          isAuthenticated!
+              ? const HomePage(title: 'Rocket App')
+              : const WelcomePage(),
     );
   }
 }
