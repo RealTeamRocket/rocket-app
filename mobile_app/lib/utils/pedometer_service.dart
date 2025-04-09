@@ -58,21 +58,28 @@ class PedometerService {
 
   void _onStepCount(StepCount event) async {
     DateTime eventTime = event.timeStamp;
+    final prefs = await SharedPreferences.getInstance();
 
-    /// New day check
+    /// New Day Check
     if (_initialStepDate == null || !_isSameDay(_initialStepDate!, eventTime)) {
       _initialStepCount = event.steps;
       _initialStepDate = eventTime;
-      final prefs = await SharedPreferences.getInstance();
       await prefs.setInt('initialStepCount', _initialStepCount!);
       await prefs.setString('initialStepDate', _initialStepDate!.toIso8601String());
     }
 
-    /// First reading of the day if needed
+    /// First start
     if (_initialStepCount == null) {
       _initialStepCount = event.steps;
-      final prefs = await SharedPreferences.getInstance();
       await prefs.setInt('initialStepCount', _initialStepCount!);
+    }
+
+    /// Sensor reset: e.g. after restarting device
+    if (event.steps < _initialStepCount!) {
+      _initialStepCount = event.steps;
+      _initialStepDate = eventTime;
+      await prefs.setInt('initialStepCount', _initialStepCount!);
+      await prefs.setString('initialStepDate', _initialStepDate!.toIso8601String());
     }
 
     final currentSteps = event.steps - _initialStepCount!;
