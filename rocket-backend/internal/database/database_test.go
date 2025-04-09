@@ -64,3 +64,29 @@ func TestSaveCredential(t *testing.T) {
 	assert.Equal(t, credentials.CreatedAt, savedCreds.CreatedAt, "expected created_at to match")
 	assert.Equal(t, credentials.LastLogin, savedCreds.LastLogin, "expected last_login to match")
 }
+
+func TestCheckEmail (t *testing.T) {
+	srv := &service{db: testDbInstance}
+
+	id := uuid.New()
+	username := "John"
+	email := "john@doe.com"
+	password := "securepassword"
+	createdAt :=time.Now().Format(time.RFC3339)
+	lastLogin :=time.Now().Format(time.RFC3339)
+
+	credentials := types.Credentials{
+		ID:        id,
+		Username:  username,
+		Email:     email,
+		Password:  password,
+		CreatedAt: createdAt,
+		LastLogin: lastLogin,
+	}
+
+	err := srv.SaveCredentials(credentials)
+	assert.NoError(t, err, "expected SaveCredentials to return no error")
+
+	err = srv.CheckEmail(email)
+	assert.Error(t, err, "expected CheckEmail to return an error")
+}
