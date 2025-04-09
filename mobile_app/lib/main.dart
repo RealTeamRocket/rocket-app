@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'utils/backend_api/backend_api.dart' as api;
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'pages/pages.dart';
 
@@ -21,6 +23,7 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   bool? isAuthenticated;
+  final _storage = FlutterSecureStorage();
 
   @override
   void initState() {
@@ -29,8 +32,23 @@ class _MyAppState extends State<MyApp> {
   }
 
   Future<void> checkIfAuthenticated() async {
-    final jwt = "";
     try {
+      final jwt = await _storage.read(key: 'jwt_token');
+      if (jwt == null) {
+        setState(() {
+          isAuthenticated = false;
+        });
+        return;
+      }
+
+      if (JwtDecoder.isExpired(jwt)) {
+        await _storage.delete(key: 'jwt_token');
+        setState(() {
+          isAuthenticated = false;
+        });
+        return;
+      }
+
       final authStatus = await api.AuthStatus.fetchAuthStatus(jwt);
       setState(() {
         isAuthenticated = authStatus.authenticated;

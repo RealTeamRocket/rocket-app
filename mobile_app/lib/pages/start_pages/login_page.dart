@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:mobile_app/constants/constants.dart';
 import 'package:mobile_app/pages/pages.dart';
 import 'package:mobile_app/utils/backend_api/login_api.dart';
@@ -14,6 +15,7 @@ class _LoginPageState extends State<LoginPage> {
   final _formKey = GlobalKey<FormState>();
   final _usernameController = TextEditingController();
   final _passwordController = TextEditingController();
+  final _storage = FlutterSecureStorage();
   bool _isLoading = false;
   String? _errorMessage;
 
@@ -35,9 +37,9 @@ class _LoginPageState extends State<LoginPage> {
         _usernameController.text,
         _passwordController.text,
       );
-      // Save the token and navigate to the home page
-      // For example, you can use a package like shared_preferences to save the token
-      // and Navigator to navigate to the home page
+
+      await _storage.write(key: 'jwt_token', value: loginResponse.token);
+
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => HomePage(title: 'Rocket App')),
