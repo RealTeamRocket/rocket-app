@@ -7,7 +7,7 @@ import (
 	"github.com/google/uuid"
 )
 
-func (s *Server) authHelloHandler(c *gin.Context) {
+func (s *Server) AuthHelloHandler(c *gin.Context) {
 	userID, exists := c.Get("userID")
 	if !exists {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "User not authenticated"})
@@ -29,3 +29,6 @@ func (s *Server) authHelloHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "Hello from auth", "user": cred.Username})
 }
 
+func (s *Server) Authenticated(c *gin.Context) {
+	c.JSON(http.StatusOK, gin.H{"authenticated": "true"})
+}

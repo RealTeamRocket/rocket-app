@@ -11,7 +11,7 @@ func (s *Server) RegisterRoutes() http.Handler {
 	r := gin.Default()
 
 	r.Use(cors.New(cors.Config{
-		AllowOrigins:     []string{"*"}, 
+		AllowOrigins:     []string{"*"},
 		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"},
 		AllowHeaders:     []string{"Accept", "Authorization", "Content-Type"},
 		AllowCredentials: true, // Enable cookies/auth
@@ -19,7 +19,6 @@ func (s *Server) RegisterRoutes() http.Handler {
 
 	api := r.Group("/api/v1")
 	{
-		api.GET("/", s.HelloWorldHandler)
 		api.GET("/health", s.HealthHandler)
 		api.POST("/register", s.RegisterHandler)
 		api.POST("/login", s.LoginHandler)
@@ -27,7 +26,7 @@ func (s *Server) RegisterRoutes() http.Handler {
 		protected := api.Group("/protected")
 		protected.Use(s.AuthMiddleware())
 		{
-			protected.GET("/helloWorld", s.authHelloHandler)
+			protected.GET("/", s.Authenticated)
 		}
 	}
 
