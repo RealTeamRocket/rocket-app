@@ -1,47 +1,41 @@
 import 'package:flutter/material.dart';
 import '/utils/utils.dart';
+import '../constants/color_constants.dart';
 import '/widgets/widgets.dart';
-import '/constants/constants.dart';
+import 'pages.dart';
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
+class HomePage extends StatefulWidget {
+  const HomePage({super.key, required this.title});
+
   final String title;
 
   @override
-  State<MyHomePage> createState() => _MyHomePageState();
+  State<HomePage> createState() => _HomePageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
-  final int dailyGoal = 10000;
-  int currentSteps = 0;
-  String selectedButton = 'Steps';
+class _HomePageState extends State<HomePage> {
+  int _selectedIndex = 0;
 
-  late PedometerService _pedometerService;
+  final List<Widget> _pages = <Widget>[
+    const RunPage(title: 'Run'),
+    Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: const [Text("Search"), Icon(Icons.checklist)],
+      ),
+    ),
+    Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: const [Text("Leaderboards"), Icon(Icons.leaderboard)],
+      ),
+    ),
+    const ProfilePage(),
+  ];
 
-  @override
-  void initState() {
-    super.initState();
-    _pedometerService = PedometerService();
-    _pedometerService.onStepsUpdated = (steps) {
-      setState(() {
-        currentSteps = steps;
-      });
-    };
-
-    _pedometerService.onError = (msg) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(msg)),
-        );
-      }
-    };
-
-    _pedometerService.init();
-  }
-
-  void _onButtonPressed(String button) {
+  void _onItemTapped(int index) {
     setState(() {
-      selectedButton = button;
+      _selectedIndex = index;
     });
   }
 
@@ -57,34 +51,8 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
         ),
       ),
-      backgroundColor: ColorConstants.white,
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: <Widget>[
-          if (selectedButton == 'Steps') ...[
-            StepCounterWidget(
-              currentSteps: currentSteps,
-              dailyGoal: dailyGoal,
-            ),
-            const SizedBox(height: 20.0),
-          ] else if (selectedButton == 'Race') ...[
-            Text(
-              'To be implemented',
-              style: TextStyle(
-                fontSize: 30.0,
-                fontWeight: FontWeight.bold,
-                color: ColorConstants.blackColor,
-              ),
-            ),
-            const SizedBox(height: 20.0),
-          ],
-          ButtonsWidget(
-            selectedButton: selectedButton,
-            onButtonPressed: _onButtonPressed,
-          ),
-        ],
-      ),
-      bottomNavigationBar: const CustomMenuBar(),
+      body: Center(child: _pages.elementAt(_selectedIndex)),
+      bottomNavigationBar: CustomMenuBar(onItemTapped: _onItemTapped),
     );
   }
 }

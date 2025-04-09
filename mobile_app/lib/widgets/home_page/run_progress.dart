@@ -4,7 +4,7 @@ import '../../pages/pages.dart';
 import '../menu_bar.dart';
 import '../painters/painters.dart';
 
-class MyHomePageState extends State<MyHomePage> {
+class _RunPageState extends State<RunPage>  {
   final int totalSteps = 2000;
   final int currentSteps = 900;
 
@@ -35,7 +35,6 @@ class MyHomePageState extends State<MyHomePage> {
           ],
         ),
       ),
-      bottomNavigationBar: const CustomMenuBar(),
     );
   }
 }

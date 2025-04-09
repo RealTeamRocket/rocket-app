@@ -103,7 +103,7 @@ class _LoginPageState extends State<LoginPage> {
                               //TODO: Implement login logic
                               Navigator.push(
                                 context,
-                                MaterialPageRoute(builder: (context) => MyHomePage(title: 'Step Counter')),
+                                MaterialPageRoute(builder: (context) => HomePage(title: 'Rocket App')),
                               );
                             }
                           },
