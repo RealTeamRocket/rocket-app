@@ -39,7 +39,7 @@ class StepCounterWidget extends StatelessWidget {
           style: TextStyle(
             fontSize: 50.0,
             fontWeight: FontWeight.bold,
-            color: ColorConstants.blackColor,
+            color: ColorConstants.white,
           ),
         ),
       ],

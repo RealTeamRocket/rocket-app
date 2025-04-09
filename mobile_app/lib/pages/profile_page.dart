@@ -13,7 +13,7 @@ class _ProfilePageState extends State<ProfilePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: ColorConstants.deepBlue,
+      backgroundColor: ColorConstants.primaryColor,
       body: Column(
         children: [
           Flexible(flex: 2, child: Profile()),
