@@ -1,7 +1,6 @@
 package server
 
 import (
-	"fmt"
 	"net/http"
 	"rocket-backend/internal/types"
 	"time"
@@ -84,7 +83,7 @@ func (s *Server) RegisterHandler(c *gin.Context) {
 
 	creds.ID = uuid.New()
 	creds.Password = string(hashedPassword)
-	creds.Username = fmt.Sprintf("User %s", creds.ID.String())
+	creds.Username = creds.Username
 	creds.CreatedAt = time.Now().Format(time.RFC3339)
 	creds.LastLogin = creds.CreatedAt
 

@@ -17,7 +17,7 @@ class RegisterResponse {
 }
 
 class RegisterApi {
-  static Future<RegisterResponse> register(String email, String password) async {
+  static Future<RegisterResponse> register(String email, String username, String password) async {
     final backendUrl = dotenv.get('BACKEND_URL', fallback: "http://10.0.2.2:8080");
     final response = await http.post(
       Uri.parse('$backendUrl/api/v1/register'),
@@ -26,6 +26,7 @@ class RegisterApi {
       },
       body: jsonEncode({
         'email': email,
+        'username': username,
         'password': password,
       }),
     );
