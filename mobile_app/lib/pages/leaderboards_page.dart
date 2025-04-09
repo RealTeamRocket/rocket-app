@@ -1,59 +1,59 @@
 import 'package:flutter/material.dart';
 import '../constants/color_constants.dart';
 
-class ChallengesPage extends StatefulWidget{
-  const ChallengesPage({super.key, required this.title});
+class LeaderboardsPage extends StatefulWidget{
+  const LeaderboardsPage({super.key, required this.title});
 
   final String title;
 
   @override
-  State<ChallengesPage> createState() => _ChallengesPageState();
+  State<LeaderboardsPage> createState() => _LeaderboardsPageState();
 
 }
-class _ChallengesPageState extends State<ChallengesPage> {
+class _LeaderboardsPageState extends State<LeaderboardsPage> {
 
   /// daily challenges
   final List<String> _challenges = const [
-    'Mache 10.000 Schritte',
-    'Trinke 2 Liter Wasser',
-    '30 Minuten Yoga',
-    '8 Stunden Schlaf',
+    'Do 100 Push-ups',
+    'Drink 2 liter of water',
+    'Do 30 minutes of Yoga',
+    'Sleep 8 hours',
+    'Do 100 Push-ups',
+    'Drink 2 liter of water',
+    'Do 30 minutes of Yoga',
+    'Sleep 8 hours',
   ];
+
+  List<bool> _completed = [false, false, true, false, false, false, true, false];
 
   @override
   Widget build(BuildContext context) {
 
-    final double progressValue = 0.5;
+    final double progressValue = _completed.where((c) => c).length / _completed.length;
 
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Tägliche Challenges'),
-        backgroundColor: ColorConstants.deepBlue,
-      ),
-      backgroundColor: ColorConstants.white,
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            // Liste der Challenges
-            Expanded(
-              child: ListView.builder(
-                itemCount: _challenges.length,
-                itemBuilder: (context, index) {
-                  return _buildChallengeCard(_challenges[index]);
-                },
-              ),
+    return Container(
+      color: ColorConstants.white,
+      padding: const EdgeInsets.all(16.0),
+      child: Column(
+        children: [
+          Expanded(
+            child: ListView.builder(
+              itemCount: _challenges.length,
+              itemBuilder: (context, index) {
+                return _buildChallengeCard(_challenges[index], index);
+              },
             ),
-            const SizedBox(height: 24.0),
-            _buildProgressSection(progressValue),
-          ],
-        ),
+          ),
+          const SizedBox(height: 24.0),
+          _buildProgressSection(progressValue),
+        ],
       ),
     );
 
+
   }
 
-  Widget _buildChallengeCard(String challengeText) {
+  Widget _buildChallengeCard(String challengeText, int index) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: Container(
@@ -84,13 +84,19 @@ class _ChallengesPageState extends State<ChallengesPage> {
               color: ColorConstants.deepBlue,
             ),
           ),
-          trailing: const Icon(
-            Icons.check_circle_outline,
-            color: ColorConstants.purpleColor,
+          trailing: Icon(
+            _completed[index]
+                ? Icons.check_circle
+                : Icons.radio_button_unchecked,
+            color: _completed[index]
+                ? ColorConstants.greenColor
+                : ColorConstants.greyColor,
             size: 32.0,
           ),
           onTap: () {
-            // switch state of challenge per tap or other way
+            setState(() {
+              _completed[index] = !_completed[index];
+            });
           },
         ),
       ),
@@ -100,10 +106,10 @@ class _ChallengesPageState extends State<ChallengesPage> {
   /// Progressbar
   Widget _buildProgressSection(double progressValue) {
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         Text(
-          'Fortschritt: ${(progressValue * 100).toInt()}%',
+          'Progress: ${(progressValue * 100).toInt()}%',
           style: const TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.bold,

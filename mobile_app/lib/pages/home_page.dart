@@ -24,12 +24,7 @@ class _HomePageState extends State<HomePage> {
         children: const [Text("Search"), Icon(Icons.checklist)],
       ),
     ),
-    Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: const [Text("Leaderboards"), Icon(Icons.leaderboard)],
-      ),
-    ),
+    const LeaderboardsPage(title: 'Challenges'),
     const ProfilePage(),
   ];
 
