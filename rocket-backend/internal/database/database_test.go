@@ -1,50 +1,66 @@
 package database
 
 import (
-    "context"
-    "fmt"
-    "log"
-    "testing"
+	"database/sql"
+	"os"
+	"rocket-backend/internal/types"
+	"testing"
+	"time"
 
-    "github.com/stretchr/testify/assert"
+	"github.com/google/uuid"
+	"github.com/stretchr/testify/assert"
 )
 
+var testDbInstance *sql.DB
+
 func TestMain(m *testing.M) {
-    teardown, err := mustStartPostgresContainer()
-    if err != nil {
-        log.Fatalf("could not start postgres container: %v", err)
-    }
+	testDB := SetupTestDatabase()
+	testDbInstance = testDB.DbInstance
 
-    dbAddr := fmt.Sprintf("%s:%s", host, port)
-    err = migrateDb(dbAddr)
-    if err != nil {
-        log.Fatalf("could not migrate database: %v", err)
-    }
+	defer testDB.TearDown()
 
-    m.Run()
-
-    if teardown != nil && teardown(context.Background()) != nil {
-        log.Fatalf("could not teardown postgres container: %v", err)
-    }
-}
-
-func TestNew(t *testing.T) {
-    srv := New()
-    assert.NotNil(t, srv, "New() returned nil")
+	os.Exit(m.Run())
 }
 
 func TestHealth(t *testing.T) {
-    srv := New()
+	srv := &service{db: testDbInstance}
 
-    stats := srv.Health()
+	stats := srv.Health()
 
-    assert.Equal(t, "up", stats["status"], "expected status to be up")
-    assert.NotContains(t, stats, "error", "expected error not to be present")
-    assert.Equal(t, "It's healthy", stats["message"], "expected message to be 'It's healthy'")
+	assert.Equal(t, "up", stats["status"], "expected status to be up")
+	assert.NotContains(t, stats, "error", "expected error not to be present")
+	assert.Equal(t, "It's healthy", stats["message"], "expected message to be 'It's healthy'")
 }
 
-func TestClose(t *testing.T) {
-    srv := New()
+func TestSaveCredential(t *testing.T) {
+	srv := &service{db: testDbInstance}
 
-    assert.NoError(t, srv.Close(), "expected Close() to return nil")
+	id := uuid.New()
+	username := "John"
+	email := "john@doe.com"
+	password := "securepassword"
+	createdAt :=time.Now().Format(time.RFC3339)
+	lastLogin :=time.Now().Format(time.RFC3339)
+
+	credentials := types.Credentials{
+		ID:        id,
+		Username:  username,
+		Email:     email,
+		Password:  password,
+		CreatedAt: createdAt,
+		LastLogin: lastLogin,
+	}
+
+	err := srv.SaveCredentials(credentials)
+	assert.NoError(t, err, "expected SaveCredentials to return no error")
+
+	// Verify that the credentials were saved correctly
+	savedCreds, err := srv.GetUserByEmail(email)
+	assert.NoError(t, err, "expected GetUserByEmail to return no error")
+	assert.Equal(t, credentials.ID, savedCreds.ID, "expected IDs to match")
+	assert.Equal(t, credentials.Username, savedCreds.Username, "expected usernames to match")
+	assert.Equal(t, credentials.Email, savedCreds.Email, "expected emails to match")
+	assert.Equal(t, credentials.Password, savedCreds.Password, "expected passwords to match")
+	assert.Equal(t, credentials.CreatedAt, savedCreds.CreatedAt, "expected created_at to match")
+	assert.Equal(t, credentials.LastLogin, savedCreds.LastLogin, "expected last_login to match")
 }
