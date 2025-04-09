@@ -1,5 +1,10 @@
-name: Go-test
-on: [pull_request]
+name: Build and Test Backend
+run-name: 🚀 Pipeline for Branch ${{ github.ref_name }}
+
+on:
+  pull_request:
+      paths:
+      - 'rocket-backend/**'
 
 jobs:
   build:

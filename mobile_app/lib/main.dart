@@ -3,28 +3,58 @@ import 'utils/backend_api/backend_api.dart' as api;
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'pages/pages.dart';
 
-
 void main() async {
   try {
     await dotenv.load(fileName: ".env");
   } catch (e) {
     debugPrint("Error loading .env file using fallback: $e");
   }
-  // try {
-  //   final healtStats = await api.HealthStats.fetchHealth();
-  //   debugPrint("$healtStats");
-  // } catch (e) {
-  //   debugPrint(e.toString());
-  // }
-  runApp(const MyApp());
+  runApp(MyApp());
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
 
   @override
+  _MyAppState createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  bool? isAuthenticated;
+
+  @override
+  void initState() {
+    super.initState();
+    checkIfAuthenticated();
+  }
+
+  Future<void> checkIfAuthenticated() async {
+    final jwt =
+        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NDQ0ODQwMDMsInVzZXJfaWQiOiI0MTI4YjY4My04YWYxLTQyNTEtOWQ0ZS03NzcwNzY4OWU2ZjUifQ._oZpBrV_lStdWF34GFFdzakROf6Z76JgWQ3nDO0N7g0";
+    try {
+      final authStatus = await api.AuthStatus.fetchAuthStatus(jwt);
+      setState(() {
+        isAuthenticated = authStatus.authenticated;
+      });
+    } catch (e) {
+      debugPrint('Error fetching auth status: $e');
+      setState(() {
+        isAuthenticated = false;
+      });
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final bool isAuthenticated = checkIfAuthenticated();
+    if (isAuthenticated == null) {
+      return MaterialApp(
+        home: Scaffold(
+          body: Center(
+            child: CircularProgressIndicator(),
+          ),
+        ),
+      );
+    }
 
     return MaterialApp(
       title: 'Rocket App',
@@ -32,12 +62,9 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.blueGrey),
       ),
-      home: isAuthenticated ?  const HomePage(title: 'Rocket App') : const WelcomePage(),
+      home: isAuthenticated!
+          ? const HomePage(title: 'Rocket App')
+          : const WelcomePage(),
     );
-  }
-
-  bool checkIfAuthenticated() {
-    //TODO: Implement check for JWT token in local storage
-    return false;
   }
 }
