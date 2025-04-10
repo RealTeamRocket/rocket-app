@@ -34,6 +34,9 @@ type Service interface {
 	//users
 	SaveUserProfile(user types.User) error
 	GetUserByID(userID uuid.UUID) (types.User, error)
+
+	//daily_steps
+	UpdateDailySteps(userID uuid.UUID, steps int) error
 }
 
 type service struct {
