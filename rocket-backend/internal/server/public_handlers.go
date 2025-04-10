@@ -2,10 +2,10 @@ package server
 
 import (
 	"net/http"
+	"rocket-backend/internal/auth"
 	"rocket-backend/internal/types"
 	"time"
 
-	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
@@ -39,12 +39,8 @@ func (s *Server) LoginHandler(c *gin.Context) {
 		return
 	}
 
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"user_id": storedCreds.ID,
-		"exp":     time.Now().Add(time.Hour * 72).Unix(),
-	})
-
-	tokenString, err := token.SignedString([]byte(s.jwtSecret))
+	authService := auth.NewAuthService(s.jwtSecret)
+	tokenString, err := authService.GenerateToken(storedCreds.ID)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to generate token"})
 		return
