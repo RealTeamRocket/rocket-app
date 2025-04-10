@@ -6,83 +6,92 @@ import (
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/google/uuid"
-	"github.com/stretchr/testify/assert"
+	. "github.com/onsi/ginkgo/v2"
+	. "github.com/onsi/gomega"
 )
 
-func TestGenerateToken(t *testing.T) {
-	jwtSecret := "testsecret"
-	authService := NewAuthService(jwtSecret)
-	userID := uuid.New()
+var _ = Describe("Auth Service", func() {
+	var (
+		jwtSecret   string
+		authService *AuthService
+		userID      uuid.UUID
+	)
 
-	tokenString, err := authService.GenerateToken(userID)
-	assert.NoError(t, err)
-	assert.NotEmpty(t, tokenString)
-}
-
-func TestParseToken(t *testing.T) {
-	jwtSecret := "testsecret"
-	authService := NewAuthService(jwtSecret)
-	userID := uuid.New()
-
-	tokenString, err := authService.GenerateToken(userID)
-	assert.NoError(t, err)
-
-	token, err := authService.ParseToken(tokenString)
-	assert.NoError(t, err)
-	assert.NotNil(t, token)
-	assert.True(t, token.Valid)
-}
-
-func TestValidateToken(t *testing.T) {
-	jwtSecret := "testsecret"
-	authService := NewAuthService(jwtSecret)
-	userID := uuid.New()
-
-	tokenString, err := authService.GenerateToken(userID)
-	assert.NoError(t, err)
-
-	token, err := authService.ParseToken(tokenString)
-	assert.NoError(t, err)
-	assert.NotNil(t, token)
-	assert.True(t, token.Valid)
-
-	parsedUserID, err := authService.ValidateToken(token)
-	assert.NoError(t, err)
-	assert.Equal(t, userID, parsedUserID)
-}
-
-func TestInvalidToken(t *testing.T) {
-	jwtSecret := "testsecret"
-	authService := NewAuthService(jwtSecret)
-
-	// Create an invalid token string
-	invalidTokenString := "invalid.token.string"
-
-	token, err := authService.ParseToken(invalidTokenString)
-	assert.Error(t, err)
-	assert.Nil(t, token.Claims)
-	assert.False(t, token.Valid)
-}
-
-func TestExpiredToken(t *testing.T) {
-	jwtSecret := "testsecret"
-	authService := NewAuthService(jwtSecret)
-	userID := uuid.New()
-
-	// Create a token with a short expiration time
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"user_id": userID.String(),
-		"exp":     time.Now().Add(time.Second * 1).Unix(),
+	BeforeEach(func() {
+		jwtSecret = "testsecret"
+		authService = NewAuthService(jwtSecret)
+		userID = uuid.New()
 	})
 
-	tokenString, err := token.SignedString([]byte(jwtSecret))
-	assert.NoError(t, err)
+	Describe("GenerateToken", func() {
+		It("should generate a valid token", func() {
+			tokenString, err := authService.GenerateToken(userID)
+			Expect(err).NotTo(HaveOccurred())
+			Expect(tokenString).NotTo(BeEmpty())
+		})
+	})
 
-	// Wait for the token to expire
-	time.Sleep(time.Second * 2)
+	Describe("ParseToken", func() {
+		It("should parse a valid token", func() {
+			tokenString, err := authService.GenerateToken(userID)
+			Expect(err).NotTo(HaveOccurred())
 
-	parsedToken, err := authService.ParseToken(tokenString)
-	assert.Error(t, err)
-	assert.NotNil(t, parsedToken)
-	assert.False(t, parsedToken.Valid)
+			token, err := authService.ParseToken(tokenString)
+			Expect(err).NotTo(HaveOccurred())
+			Expect(token).NotTo(BeNil())
+			Expect(token.Valid).To(BeTrue())
+		})
+	})
+
+	Describe("ValidateToken", func() {
+		It("should validate a token and extract the user ID", func() {
+			tokenString, err := authService.GenerateToken(userID)
+			Expect(err).NotTo(HaveOccurred())
+
+			token, err := authService.ParseToken(tokenString)
+			Expect(err).NotTo(HaveOccurred())
+			Expect(token).NotTo(BeNil())
+			Expect(token.Valid).To(BeTrue())
+
+			parsedUserID, err := authService.ValidateToken(token)
+			Expect(err).NotTo(HaveOccurred())
+			Expect(parsedUserID).To(Equal(userID))
+		})
+	})
+
+	Describe("InvalidToken", func() {
+		It("should return an error for an invalid token", func() {
+			invalidTokenString := "invalid.token.string"
+
+			token, err := authService.ParseToken(invalidTokenString)
+			Expect(err).To(HaveOccurred())
+			Expect(token).NotTo(BeNil())
+			Expect(token.Valid).To(BeFalse())
+		})
+	})
+
+	Describe("ExpiredToken", func() {
+		It("should return an error for an expired token", func() {
+			token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+				"user_id": userID.String(),
+				"exp":     time.Now().Add(time.Second * 1).Unix(),
+			})
+
+			tokenString, err := token.SignedString([]byte(jwtSecret))
+			Expect(err).NotTo(HaveOccurred())
+
+			// Wait for the token to expire
+			time.Sleep(time.Second * 2)
+
+			parsedToken, err := authService.ParseToken(tokenString)
+			Expect(err).To(HaveOccurred())
+			Expect(parsedToken).NotTo(BeNil())
+			Expect(parsedToken.Valid).To(BeFalse())
+		})
+	})
+})
+
+func TestServer(t *testing.T) {
+	RegisterFailHandler(Fail)
+	RunSpecs(t, "Server Suite")
 }
