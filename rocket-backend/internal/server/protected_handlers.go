@@ -32,3 +32,18 @@ func (s *Server) AuthHelloHandler(c *gin.Context) {
 func (s *Server) Authenticated(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"authenticated": "true"})
 }
+
+func (s *Server) UpdateSteps(c *gin.Context) {
+	userID, exists := c.Get("userID")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "User not authenticated"})
+		return
+	}
+
+	_, err := uuid.Parse(userID.(string))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid user ID format"})
+		return
+	}
+
+}

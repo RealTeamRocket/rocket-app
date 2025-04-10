@@ -36,7 +36,6 @@ func TestSaveCredential(t *testing.T) {
 	srv := &service{db: testDbInstance}
 
 	id := uuid.New()
-	username := "John"
 	email := "john@doe.com"
 	password := "securepassword"
 	createdAt :=time.Now().Format(time.RFC3339)
@@ -44,7 +43,6 @@ func TestSaveCredential(t *testing.T) {
 
 	credentials := types.Credentials{
 		ID:        id,
-		Username:  username,
 		Email:     email,
 		Password:  password,
 		CreatedAt: createdAt,
@@ -58,7 +56,6 @@ func TestSaveCredential(t *testing.T) {
 	savedCreds, err := srv.GetUserByEmail(email)
 	assert.NoError(t, err, "expected GetUserByEmail to return no error")
 	assert.Equal(t, credentials.ID, savedCreds.ID, "expected IDs to match")
-	assert.Equal(t, credentials.Username, savedCreds.Username, "expected usernames to match")
 	assert.Equal(t, credentials.Email, savedCreds.Email, "expected emails to match")
 	assert.Equal(t, credentials.Password, savedCreds.Password, "expected passwords to match")
 	assert.Equal(t, credentials.CreatedAt, savedCreds.CreatedAt, "expected created_at to match")
@@ -69,7 +66,6 @@ func TestCheckEmail (t *testing.T) {
 	srv := &service{db: testDbInstance}
 
 	id := uuid.New()
-	username := "John"
 	email := "john@doe.com"
 	password := "securepassword"
 	createdAt :=time.Now().Format(time.RFC3339)
@@ -77,7 +73,6 @@ func TestCheckEmail (t *testing.T) {
 
 	credentials := types.Credentials{
 		ID:        id,
-		Username:  username,
 		Email:     email,
 		Password:  password,
 		CreatedAt: createdAt,
