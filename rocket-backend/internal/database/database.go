@@ -9,6 +9,9 @@ import (
 	"strconv"
 	"time"
 
+	"rocket-backend/internal/types"
+
+	"github.com/google/uuid"
 	_ "github.com/jackc/pgx/v5/stdlib"
 	_ "github.com/joho/godotenv/autoload"
 )
@@ -22,6 +25,11 @@ type Service interface {
 	// Close terminates the database connection.
 	// It returns an error if the connection cannot be closed.
 	Close() error
+
+	SaveCredentials(creds types.Credentials) error
+	GetUserByEmail(username string) (types.Credentials, error)
+	GetUserByID(id uuid.UUID) (types.Credentials, error)
+	CheckEmail(email string) error
 }
 
 type service struct {
@@ -112,4 +120,46 @@ func (s *service) Health() map[string]string {
 func (s *service) Close() error {
 	log.Printf("Disconnected from database: %s", database)
 	return s.db.Close()
+}
+
+func (s *service) SaveCredentials(creds types.Credentials) error {
+	query := `INSERT INTO credentials (id, username, email, password, created_at, last_login) VALUES ($1, $2, $3, $4, $5, $6)`
+	_, err := s.db.Exec(query, creds.ID, creds.Username, creds.Email, creds.Password, creds.CreatedAt, creds.LastLogin)
+	if err != nil {
+		return fmt.Errorf("failed to save credentials: %w", err)
+	}
+	return nil
+}
+
+func (s *service) GetUserByEmail(email string) (types.Credentials, error) {
+	var creds types.Credentials
+	query := `SELECT id, username, email, password, created_at, last_login FROM credentials WHERE email = $1`
+	err := s.db.QueryRow(query, email).Scan(&creds.ID, &creds.Username, &creds.Email, &creds.Password, &creds.CreatedAt, &creds.LastLogin)
+	if err != nil {
+		return creds, fmt.Errorf("failed to get user by username: %w", err)
+	}
+	return creds, nil
+}
+
+func (s *service) GetUserByID(id uuid.UUID) (types.Credentials, error) {
+	var creds types.Credentials
+	query := `SELECT id, username, email, password, created_at, last_login FROM credentials WHERE id = $1`
+	err := s.db.QueryRow(query, id).Scan(&creds.ID, &creds.Username, &creds.Email, &creds.Password, &creds.CreatedAt, &creds.LastLogin)
+	if err != nil {
+		return creds, fmt.Errorf("failed to get user by ID: %w", err)
+	}
+	return creds, nil
+}
+
+func (s *service) CheckEmail(email string) error {
+	query := `SELECT COUNT(*) FROM credentials WHERE email = $1`
+	var count int
+	err := s.db.QueryRow(query, email).Scan(&count)
+	if err != nil {
+		return fmt.Errorf("failed to check email: %w", err)
+	}
+	if count > 0 {
+		return fmt.Errorf("email already exists")
+	}
+	return nil
 }

@@ -1,79 +1,29 @@
 package database
 
 import (
-	"context"
-	"log"
+	"database/sql"
+	"os"
+	"rocket-backend/internal/types"
 	"testing"
 	"time"
 
+	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
-	"github.com/testcontainers/testcontainers-go"
-	"github.com/testcontainers/testcontainers-go/modules/postgres"
-	"github.com/testcontainers/testcontainers-go/wait"
 )
 
-func mustStartPostgresContainer() (func(context.Context, ...testcontainers.TerminateOption) error, error) {
-	var (
-		dbName = "database"
-		dbPwd  = "password"
-		dbUser = "user"
-	)
-
-	dbContainer, err := postgres.Run(
-		context.Background(),
-		"postgres:latest",
-		postgres.WithDatabase(dbName),
-		postgres.WithUsername(dbUser),
-		postgres.WithPassword(dbPwd),
-		testcontainers.WithWaitStrategy(
-			wait.ForLog("database system is ready to accept connections").
-				WithOccurrence(2).
-				WithStartupTimeout(5*time.Second)),
-	)
-	if err != nil {
-		return nil, err
-	}
-
-	database = dbName
-	password = dbPwd
-	username = dbUser
-
-	dbHost, err := dbContainer.Host(context.Background())
-	if err != nil {
-		return dbContainer.Terminate, err
-	}
-
-	dbPort, err := dbContainer.MappedPort(context.Background(), "5432/tcp")
-	if err != nil {
-		return dbContainer.Terminate, err
-	}
-
-	host = dbHost
-	port = dbPort.Port()
-
-	return dbContainer.Terminate, err
-}
+var testDbInstance *sql.DB
 
 func TestMain(m *testing.M) {
-	teardown, err := mustStartPostgresContainer()
-	if err != nil {
-		log.Fatalf("could not start postgres container: %v", err)
-	}
+	testDB := SetupTestDatabase()
+	testDbInstance = testDB.DbInstance
 
-	m.Run()
+	defer testDB.TearDown()
 
-	if teardown != nil && teardown(context.Background()) != nil {
-		log.Fatalf("could not teardown postgres container: %v", err)
-	}
-}
-
-func TestNew(t *testing.T) {
-	srv := New()
-	assert.NotNil(t, srv, "New() returned nil")
+	os.Exit(m.Run())
 }
 
 func TestHealth(t *testing.T) {
-	srv := New()
+	srv := &service{db: testDbInstance}
 
 	stats := srv.Health()
 
@@ -82,8 +32,61 @@ func TestHealth(t *testing.T) {
 	assert.Equal(t, "It's healthy", stats["message"], "expected message to be 'It's healthy'")
 }
 
-func TestClose(t *testing.T) {
-	srv := New()
+func TestSaveCredential(t *testing.T) {
+	srv := &service{db: testDbInstance}
 
-	assert.NoError(t, srv.Close(), "expected Close() to return nil")
+	id := uuid.New()
+	username := "John"
+	email := "john@doe.com"
+	password := "securepassword"
+	createdAt :=time.Now().Format(time.RFC3339)
+	lastLogin :=time.Now().Format(time.RFC3339)
+
+	credentials := types.Credentials{
+		ID:        id,
+		Username:  username,
+		Email:     email,
+		Password:  password,
+		CreatedAt: createdAt,
+		LastLogin: lastLogin,
+	}
+
+	err := srv.SaveCredentials(credentials)
+	assert.NoError(t, err, "expected SaveCredentials to return no error")
+
+	// Verify that the credentials were saved correctly
+	savedCreds, err := srv.GetUserByEmail(email)
+	assert.NoError(t, err, "expected GetUserByEmail to return no error")
+	assert.Equal(t, credentials.ID, savedCreds.ID, "expected IDs to match")
+	assert.Equal(t, credentials.Username, savedCreds.Username, "expected usernames to match")
+	assert.Equal(t, credentials.Email, savedCreds.Email, "expected emails to match")
+	assert.Equal(t, credentials.Password, savedCreds.Password, "expected passwords to match")
+	assert.Equal(t, credentials.CreatedAt, savedCreds.CreatedAt, "expected created_at to match")
+	assert.Equal(t, credentials.LastLogin, savedCreds.LastLogin, "expected last_login to match")
+}
+
+func TestCheckEmail (t *testing.T) {
+	srv := &service{db: testDbInstance}
+
+	id := uuid.New()
+	username := "John"
+	email := "john@doe.com"
+	password := "securepassword"
+	createdAt :=time.Now().Format(time.RFC3339)
+	lastLogin :=time.Now().Format(time.RFC3339)
+
+	credentials := types.Credentials{
+		ID:        id,
+		Username:  username,
+		Email:     email,
+		Password:  password,
+		CreatedAt: createdAt,
+		LastLogin: lastLogin,
+	}
+
+	err := srv.SaveCredentials(credentials)
+	assert.NoError(t, err, "expected SaveCredentials to return no error")
+
+	err = srv.CheckEmail(email)
+	assert.Error(t, err, "expected CheckEmail to return an error")
 }

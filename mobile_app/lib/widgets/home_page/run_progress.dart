@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 import '../../pages/pages.dart';
-import '../menu_bar.dart';
 import '../painters/painters.dart';
 
 class _RunPageState extends State<RunPage>  {

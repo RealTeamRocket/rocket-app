@@ -17,7 +17,7 @@ class CircularProgressPainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     final Paint backgroundPaint =
         Paint()
-          ..color = ColorConstants.greyColor
+          ..color = ColorConstants.secoundaryColor
           ..strokeWidth = strokeWidth
           ..style = PaintingStyle.stroke
           ..strokeCap = StrokeCap.round;
@@ -70,7 +70,7 @@ class CircularProgressPainter extends CustomPainter {
       text: TextSpan(
         text: 'Steps',
         style: TextStyle(
-          color: ColorConstants.blackColor,
+          color: ColorConstants.white,
           fontSize: 40.0,
           fontWeight: FontWeight.bold,
         ),

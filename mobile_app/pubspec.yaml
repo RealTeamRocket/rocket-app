@@ -38,8 +38,10 @@ dependencies:
   http: ^1.3.0
   flutter_dotenv: ^5.2.1
   pedometer: ^4.1.0
-  permission_handler: ^11.4.0
+  permission_handler: ^12.0.0
   shared_preferences: ^2.5.3
+  flutter_secure_storage: ^9.2.4
+  jwt_decoder: ^2.0.1
 
 dev_dependencies:
   flutter_test:
@@ -94,5 +96,5 @@ flutter:
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/to/font-from-package
   assets:
-  # - .env
+    - .env
     - assets/images/
