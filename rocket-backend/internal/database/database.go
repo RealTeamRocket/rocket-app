@@ -18,6 +18,8 @@ import (
 
 // Service represents a service that interacts with a database.
 type Service interface {
+	ExecuteRawSQL(query string) (sql.Result, error)
+	QueryRow(query string, args ...interface{}) *sql.Row
 	// Health returns a map of health status information.
 	// The keys and values in the map are service-specific.
 	Health() map[string]string
@@ -59,6 +61,7 @@ func New() Service {
 		return dbInstance
 	}
 	connStr := fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=disable&search_path=%s", username, password, host, port, database, schema)
+	fmt.Printf("Connection String is this: %s \n", connStr)
 	db, err := sql.Open("pgx", connStr)
 	if err != nil {
 		log.Fatal(err)
@@ -67,6 +70,29 @@ func New() Service {
 		db: db,
 	}
 	return dbInstance
+}
+
+func NewWithConfig(connStr string) Service {
+	// Reuse Connection
+	if dbInstance != nil {
+		return dbInstance
+	}
+	db, err := sql.Open("pgx", connStr)
+	if err != nil {
+		log.Fatal(err)
+	}
+	dbInstance = &service{
+		db: db,
+	}
+	return dbInstance
+}
+
+func (s *service) ExecuteRawSQL(query string) (sql.Result, error) {
+	return s.db.Exec(query)
+}
+
+func (s *service) QueryRow(query string, args ...interface{}) *sql.Row {
+	return s.db.QueryRow(query, args...)
 }
 
 // Health checks the health of the database connection by pinging the database.
