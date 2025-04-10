@@ -124,7 +124,7 @@ func migrateDb(dbAddr string) error {
 	if !ok {
 		return fmt.Errorf("failed to get path")
 	}
-	pathToMigrationFiles := filepath.Join(filepath.Dir(path), "../../migrations")
+	pathToMigrationFiles := filepath.Join(filepath.Dir(path), "../../test-migrations")
 
 	databaseURL := fmt.Sprintf("postgres://%s:%s@%s/%s?sslmode=disable", DbUser, DbPass, dbAddr, DbName)
 	m, err := migrate.New(fmt.Sprintf("file:%s", pathToMigrationFiles), databaseURL)

@@ -10,16 +10,16 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-type testContext struct {
+type CredentialsTestContext struct {
 	srv *service
 }
 
-func (c *testContext) beforeEach() {
+func (c *CredentialsTestContext) beforeEach() {
 	// Setup: Create an instance of the service, potentially connecting to a test DB
 	c.srv = &service{db: testDbInstance}
 }
 
-func (c *testContext) afterEach() {
+func (c *CredentialsTestContext) afterEach() {
 	// Teardown: Clean up resources after the test (e.g., remove test data, reset states)
 	// Example: Delete test credentials if needed
 	_, err := c.srv.db.Exec("DELETE FROM credentials")
@@ -29,9 +29,9 @@ func (c *testContext) afterEach() {
 	}
 }
 
-func testCase(test func(t *testing.T, c *testContext)) func(*testing.T) {
+func credentialsTestCase(test func(t *testing.T, c *CredentialsTestContext)) func(*testing.T) {
 	return func(t *testing.T) {
-		context := &testContext{}
+		context := &CredentialsTestContext{}
 		context.beforeEach()
 		defer context.afterEach()
 		test(t, context)
@@ -39,7 +39,7 @@ func testCase(test func(t *testing.T, c *testContext)) func(*testing.T) {
 }
 
 func TestSaveCredential(t *testing.T) {
-	t.Run("TestSaveCredential", testCase(func(t *testing.T, c *testContext) {
+	t.Run("TestSaveCredential", credentialsTestCase(func(t *testing.T, c *CredentialsTestContext) {
 		id := uuid.New()
 		email := "john@doe.com"
 		password := "securepassword"
@@ -69,7 +69,7 @@ func TestSaveCredential(t *testing.T) {
 }
 
 func TestCheckEmail(t *testing.T) {
-	t.Run("TestCheckEmail", testCase(func(t *testing.T, c *testContext) {
+	t.Run("TestCheckEmail", credentialsTestCase(func(t *testing.T, c *CredentialsTestContext) {
 		id := uuid.New()
 		email := "john@doe.com"
 		password := "securepassword"
