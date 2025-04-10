@@ -1,29 +1,44 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_osm_plugin/flutter_osm_plugin.dart';
-import 'package:geolocator/geolocator.dart';
+import 'package:location/location.dart';
 
-
-class Tracking extends MapController{
+class Tracking{
   List<GeoPoint> _routePoints = [];
-  late MapController _mapController;
+  final Location location = Location();
 
-  void startTracking() {
-    _mapController.enableTracking();
-  }
+  void startTracking() async {
+    bool _serviceEnabled;
+    PermissionStatus _permissionGranted;
+    LocationData _locationData;
 
-  void stopTracking() {
-    _mapController.disabledTracking();
-    print("Tracking gestoppt. Aufgezeichnete Punkte: $_routePoints");
-  }
+    _serviceEnabled = await location.serviceEnabled();
+    if (!_serviceEnabled) {
+      _serviceEnabled = await location.requestService();
+      if (!_serviceEnabled) {
+        return;
+      }
+    }
 
-  void addPoint(GeoPoint point) {
-    _routePoints.add(point);
-    print("Punkt hinzugefügt: $point");
-  }
-  void getCurrentPosition() async {
-    Position position = await Geolocator.getCurrentPosition();
-    GeoPoint currentPoint = GeoPoint(latitude: position.latitude, longitude: position.longitude);
-    addPoint(currentPoint);
+    _permissionGranted = await location.hasPermission();
+
+    if(_permissionGranted == PermissionStatus.denied) {
+      _permissionGranted = await location.requestPermission();
+      if (_permissionGranted != PermissionStatus.granted) {
+        return;
+      }
+    }
+    location.enableBackgroundMode(enable: true);
+    /**
+     * The following code should be in one .dart where all background activities are handled
+     *
+     */
+    location.onLocationChanged.listen((LocationData currentLocation) {
+      GeoPoint point = GeoPoint(
+        latitude: currentLocation.latitude!,
+        longitude: currentLocation.longitude!,
+      );
+      _routePoints.add(point);
+    });
+
   }
 }
 
