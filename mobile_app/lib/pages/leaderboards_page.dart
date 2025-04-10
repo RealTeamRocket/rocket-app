@@ -1,19 +1,18 @@
 import 'package:flutter/material.dart';
 import '../constants/color_constants.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
 
-class LeaderboardsPage extends StatefulWidget{
+class LeaderboardsPage extends StatefulWidget {
   const LeaderboardsPage({super.key, required this.title});
 
   final String title;
 
   @override
   State<LeaderboardsPage> createState() => _LeaderboardsPageState();
-
 }
-class _LeaderboardsPageState extends State<LeaderboardsPage> {
 
-  /// daily challenges
-  final List<String> _challenges = const [
+class _LeaderboardsPageState extends State<LeaderboardsPage> {
+  final List<String> _challenges = [
     'Do 100 Push-ups',
     'Drink 2 liter of water',
     'Do 30 minutes of Yoga',
@@ -24,15 +23,21 @@ class _LeaderboardsPageState extends State<LeaderboardsPage> {
     'Sleep 8 hours',
   ];
 
-  List<bool> _completed = [false, false, true, false, false, false, true, false];
+  int _completedCount = 0;
+  int _initialChallengeCount = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _initialChallengeCount = _challenges.length;
+  }
 
   @override
   Widget build(BuildContext context) {
-
-    final double progressValue = _completed.where((c) => c).length / _completed.length;
+    double progressValue = _initialChallengeCount == 0 ? 0 : _completedCount / _initialChallengeCount;
 
     return Container(
-      color: ColorConstants.white,
+      color: ColorConstants.deepBlue,
       padding: const EdgeInsets.all(16.0),
       child: Column(
         children: [
@@ -40,7 +45,52 @@ class _LeaderboardsPageState extends State<LeaderboardsPage> {
             child: ListView.builder(
               itemCount: _challenges.length,
               itemBuilder: (context, index) {
-                return _buildChallengeCard(_challenges[index], index);
+                return Slidable(
+                  key: Key(_challenges[index]),
+
+                  /// swipe to the right
+                  startActionPane: ActionPane(
+                    motion: const StretchMotion(),
+                    extentRatio: 0.25,
+                    children: [
+                      SlidableAction(
+                        onPressed: (_) {
+                          setState(() {
+                            _completedCount++;
+                            _challenges.removeAt(index);
+                          });
+                        },
+                        backgroundColor: ColorConstants.greenColor,
+                        foregroundColor: Colors.white,
+                        icon: Icons.check,
+                        label: 'Done',
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                    ],
+                  ),
+
+                  /// swipe to the left
+                  endActionPane: ActionPane(
+                    motion: const StretchMotion(),
+                    extentRatio: 0.25,
+                    children: [
+                      SlidableAction(
+                        onPressed: (_) {
+                          setState(() {
+                            _challenges.removeAt(index);
+                          });
+                        },
+                        backgroundColor: Colors.redAccent,
+                        foregroundColor: Colors.white,
+                        icon: Icons.close,
+                        label: 'Skip',
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                    ],
+                  ),
+
+                  child: _buildChallengeCard(_challenges[index]),
+                );
               },
             ),
           ),
@@ -49,19 +99,19 @@ class _LeaderboardsPageState extends State<LeaderboardsPage> {
         ],
       ),
     );
-
-
   }
 
-  Widget _buildChallengeCard(String challengeText, int index) {
+  /// challenge Cards
+  Widget _buildChallengeCard(String challengeText) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: Container(
         decoration: BoxDecoration(
-          color: ColorConstants.white,
+          color: ColorConstants.greyColor,
           borderRadius: BorderRadius.circular(16.0),
           border: Border.all(
-            color: ColorConstants.greyColor.withValues(alpha: 0.3),
+            color: ColorConstants.purpleColor.withValues(alpha: 0.3),
+            width: 2.5,
           ),
           boxShadow: [
             BoxShadow(
@@ -81,29 +131,14 @@ class _LeaderboardsPageState extends State<LeaderboardsPage> {
             style: const TextStyle(
               fontSize: 18.0,
               fontWeight: FontWeight.w600,
-              color: ColorConstants.deepBlue,
+              color: ColorConstants.white,
             ),
           ),
-          trailing: Icon(
-            _completed[index]
-                ? Icons.check_circle
-                : Icons.radio_button_unchecked,
-            color: _completed[index]
-                ? ColorConstants.greenColor
-                : ColorConstants.greyColor,
-            size: 32.0,
-          ),
-          onTap: () {
-            setState(() {
-              _completed[index] = !_completed[index];
-            });
-          },
         ),
       ),
     );
   }
 
-  /// Progressbar
   Widget _buildProgressSection(double progressValue) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.center,
@@ -113,18 +148,27 @@ class _LeaderboardsPageState extends State<LeaderboardsPage> {
           style: const TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.bold,
-            color: ColorConstants.deepBlue,
+            color: ColorConstants.white,
           ),
         ),
         const SizedBox(height: 8.0),
-        ClipRRect(
-          borderRadius: BorderRadius.circular(20.0),
-          child: LinearProgressIndicator(
-            value: progressValue,
-            minHeight: 12.0,
-            backgroundColor: ColorConstants.greyColor.withValues(alpha: 0.3),
-            valueColor: const AlwaysStoppedAnimation<Color>(
-              ColorConstants.greenColor,
+        Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(20.0),
+            border: Border.all(
+              color: ColorConstants.white,
+              width: 2.0,
+            ),
+          ),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(20.0),
+            child: LinearProgressIndicator(
+              value: progressValue,
+              minHeight: 12.0,
+              backgroundColor: ColorConstants.deepBlue.withValues(alpha: 0.3),
+              valueColor: const AlwaysStoppedAnimation<Color>(
+                ColorConstants.greenColor,
+              ),
             ),
           ),
         ),
@@ -132,5 +176,3 @@ class _LeaderboardsPageState extends State<LeaderboardsPage> {
     );
   }
 }
-
-
