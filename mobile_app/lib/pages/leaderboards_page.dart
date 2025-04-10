@@ -61,11 +61,11 @@ class _LeaderboardsPageState extends State<LeaderboardsPage> {
           color: ColorConstants.white,
           borderRadius: BorderRadius.circular(16.0),
           border: Border.all(
-            color: ColorConstants.greyColor.withOpacity(0.3),
+            color: ColorConstants.greyColor.withValues(alpha: 0.3),
           ),
           boxShadow: [
             BoxShadow(
-              color: ColorConstants.greyColor.withOpacity(0.2),
+              color: ColorConstants.greyColor.withValues(alpha: 0.2),
               blurRadius: 6.0,
               offset: const Offset(0, 3),
             ),
@@ -122,7 +122,7 @@ class _LeaderboardsPageState extends State<LeaderboardsPage> {
           child: LinearProgressIndicator(
             value: progressValue,
             minHeight: 12.0,
-            backgroundColor: ColorConstants.greyColor.withOpacity(0.3),
+            backgroundColor: ColorConstants.greyColor.withValues(alpha: 0.3),
             valueColor: const AlwaysStoppedAnimation<Color>(
               ColorConstants.greenColor,
             ),
