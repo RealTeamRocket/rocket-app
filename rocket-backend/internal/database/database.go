@@ -4,12 +4,12 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
-	"log"
 	"os"
 	"strconv"
 	"time"
 
 	"rocket-backend/internal/types"
+	"rocket-backend/pkg/logger"
 
 	"github.com/google/uuid"
 	_ "github.com/jackc/pgx/v5/stdlib"
@@ -64,7 +64,7 @@ func New() Service {
 	fmt.Printf("Connection String is this: %s \n", connStr)
 	db, err := sql.Open("pgx", connStr)
 	if err != nil {
-		log.Fatal(err)
+		logger.Fatal(err)
 	}
 	dbInstance = &service{
 		db: db,
@@ -79,7 +79,7 @@ func NewWithConfig(connStr string) Service {
 	}
 	db, err := sql.Open("pgx", connStr)
 	if err != nil {
-		log.Fatal(err)
+		logger.Fatal(err)
 	}
 	dbInstance = &service{
 		db: db,
@@ -108,7 +108,7 @@ func (s *service) Health() map[string]string {
 	if err != nil {
 		stats["status"] = "down"
 		stats["error"] = fmt.Sprintf("db down: %v", err)
-		log.Fatalf("db down: %v", err) // Log the error and terminate the program
+		logger.Fatal("db down: %v", err)
 		return stats
 	}
 
@@ -151,6 +151,6 @@ func (s *service) Health() map[string]string {
 // If the connection is successfully closed, it returns nil.
 // If an error occurs while closing the connection, it returns the error.
 func (s *service) Close() error {
-	log.Printf("Disconnected from database: %s", database)
+	logger.Debug("Disconnected from database: %s", database)
 	return s.db.Close()
 }

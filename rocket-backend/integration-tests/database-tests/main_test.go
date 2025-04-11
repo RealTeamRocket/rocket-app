@@ -1,25 +1,25 @@
 package database_tests
 
 import (
-    "context"
-    "database/sql"
-    "errors"
-    "fmt"
-    "log"
-    "os"
-    "path/filepath"
-    "runtime"
-    "testing"
-    "time"
+	"context"
+	"database/sql"
+	"errors"
+	"fmt"
+	"os"
+	"path/filepath"
+	"rocket-backend/pkg/logger"
+	"runtime"
+	"testing"
+	"time"
 
-    "github.com/golang-migrate/migrate/v4"
-    _ "github.com/golang-migrate/migrate/v4/database/postgres" // used by migrator
-    _ "github.com/golang-migrate/migrate/v4/source/file"       // used by migrator
-    _ "github.com/jackc/pgx/v5/stdlib"
-    . "github.com/onsi/ginkgo/v2"
-    . "github.com/onsi/gomega"
-    "github.com/testcontainers/testcontainers-go"
-    "github.com/testcontainers/testcontainers-go/wait"
+	"github.com/golang-migrate/migrate/v4"
+	_ "github.com/golang-migrate/migrate/v4/database/postgres" // used by migrator
+	_ "github.com/golang-migrate/migrate/v4/source/file"       // used by migrator
+	_ "github.com/jackc/pgx/v5/stdlib"
+	. "github.com/onsi/ginkgo/v2"
+	. "github.com/onsi/gomega"
+	"github.com/testcontainers/testcontainers-go"
+	"github.com/testcontainers/testcontainers-go/wait"
 )
 
 var testDbInstance *sql.DB
@@ -60,13 +60,13 @@ func SetupTestDatabase() *TestDatabase {
 
     container, dbInstance, dbAddr, err := createContainer(ctx)
     if err != nil {
-        log.Fatal("failed to setup test", err)
+        logger.Fatal("failed to setup test", err)
     }
 
     // migrate db schema
     err = migrateDb(dbAddr)
     if err != nil {
-        log.Fatal("failed to perform db migration", err)
+        logger.Fatal("failed to perform db migration", err)
     }
 
     return &TestDatabase{
@@ -131,11 +131,11 @@ func createContainer(ctx context.Context) (testcontainers.Container, *sql.DB, st
             break
         }
 
-        log.Println("waiting for db to be ready...")
+        logger.Debug("waiting for db to be ready...")
         time.Sleep(time.Second)
     }
 
-    log.Println("postgres container ready and running at port:", p.Port())
+    logger.Info("postgres container ready and running at port:", p.Port())
 
     return container, db, dbAddr, nil
 }
@@ -160,7 +160,7 @@ func migrateDb(dbAddr string) error {
         return err
     }
 
-    log.Println("migration done")
+    logger.Debug("migration done")
 
     return nil
 }
