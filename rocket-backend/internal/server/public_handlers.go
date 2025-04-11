@@ -31,7 +31,7 @@ func (s *Server) LoginHandler(c *gin.Context) {
 
 	storedCreds, err := s.db.GetUserByEmail(creds.Email)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Invalid username or password"})
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid username or password"})
 		return
 	}
 	if err := bcrypt.CompareHashAndPassword([]byte(storedCreds.Password), []byte(creds.Password)); err != nil {
