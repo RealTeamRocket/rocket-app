@@ -1,6 +1,7 @@
 package auth
 
 import (
+	"rocket-backend/internal/auth"
 	"testing"
 	"time"
 
@@ -13,13 +14,13 @@ import (
 var _ = Describe("Auth Service", func() {
 	var (
 		jwtSecret   string
-		authService *AuthService
+		authService *auth.AuthService
 		userID      uuid.UUID
 	)
 
 	BeforeEach(func() {
 		jwtSecret = "testsecret"
-		authService = NewAuthService(jwtSecret)
+		authService = auth.NewAuthService(jwtSecret)
 		userID = uuid.New()
 	})
 
