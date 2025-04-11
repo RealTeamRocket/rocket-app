@@ -16,26 +16,36 @@ func NewTermLogger() *TermLogger {
 }
 
 func (t *TermLogger) Debug(v ...interface{}) {
-	t.logger.SetPrefix("DEBUG: ")
-	t.logger.Println(v...)
+	toPrint := make([]interface{}, 0, len(v)+1)
+	toPrint = append(toPrint, "[DEBUG] ")
+	toPrint = append(toPrint, v...)
+	t.logger.Println(toPrint...)
 }
 
 func (t *TermLogger) Info(v ...interface{}) {
-	t.logger.SetPrefix("INFO: ")
-	t.logger.Println(v...)
+	toPrint := make([]interface{}, 0, len(v)+1)
+	toPrint = append(toPrint, "[INFO] ")
+	toPrint = append(toPrint, v...)
+	t.logger.Println(toPrint...)
 }
 
 func (t *TermLogger) Warn(v ...interface{}) {
-	t.logger.SetPrefix("WARN: ")
-	t.logger.Println(v...)
+	toPrint := make([]interface{}, 0, len(v)+1)
+	toPrint = append(toPrint, "[WARN] ")
+	toPrint = append(toPrint, v...)
+	t.logger.Println(toPrint...)
 }
 
 func (t *TermLogger) Error(v ...interface{}) {
-	t.logger.SetPrefix("ERROR: ")
-	t.logger.Println(v...)
+	toPrint := make([]interface{}, 0, len(v)+1)
+	toPrint = append(toPrint, "[ERROR] ")
+	toPrint = append(toPrint, v...)
+	t.logger.Println(toPrint...)
 }
 
 func (t *TermLogger) Fatal(v ...interface{}) {
-	t.logger.SetPrefix("FATAL: ")
-	t.logger.Fatalln(v...)
+	toPrint := make([]interface{}, 0, len(v)+1)
+	toPrint = append(toPrint, "[FATAL] ")
+	toPrint = append(toPrint, v...)
+	t.logger.Fatalln(toPrint...)
 }
