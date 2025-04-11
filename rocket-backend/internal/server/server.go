@@ -39,3 +39,11 @@ func NewServer() *http.Server {
 
 	return server
 }
+
+func NewServerWithDB(db database.Service, port int, jwtSecret string) *Server {
+    return &Server{
+        port:      port,
+        db:        db, // Inject the passed DB implementation.
+        jwtSecret: jwtSecret,
+    }
+}
