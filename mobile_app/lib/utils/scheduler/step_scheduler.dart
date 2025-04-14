@@ -3,7 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'backend_api/daily_steps_api.dart';
+import '../backend_api/daily_steps_api.dart';
 
 // HEADLESS TASK
 @pragma('vm:entry-point')

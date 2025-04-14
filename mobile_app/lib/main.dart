@@ -1,6 +1,6 @@
 import 'package:background_fetch/background_fetch.dart';
 import 'package:flutter/material.dart';
-import 'package:mobile_app/utils/step_scheduler.dart';
+import 'package:mobile_app/utils/scheduler/step_scheduler.dart';
 import 'utils/backend_api/backend_api.dart' as api;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
