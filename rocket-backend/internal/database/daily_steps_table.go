@@ -25,13 +25,15 @@ func (s *service) UpdateDailySteps(userID uuid.UUID, steps int) error {
 			return fmt.Errorf("failed to insert daily steps: %w", err)
 		}
 	} else {
-		// If an entry exists, update the steps
-		queryUpdate := `UPDATE daily_steps SET steps_taken = $1 WHERE user_id = $2 AND date = $3`
-		_, err := s.db.Exec(queryUpdate, steps, userID, currentDate)
-		if err != nil {
-			// Log and return error if the update fails
-			fmt.Printf("Error updating daily steps: %v\n", err)
-			return fmt.Errorf("failed to update daily steps: %w", err)
+		// If an entry exists, update the steps only if the new steps are greater than the existing steps
+		if steps > existingSteps {
+			queryUpdate := `UPDATE daily_steps SET steps_taken = $1 WHERE user_id = $2 AND date = $3`
+			_, err := s.db.Exec(queryUpdate, steps, userID, currentDate)
+			if err != nil {
+				// Log and return error if the update fails
+				fmt.Printf("Error updating daily steps: %v\n", err)
+				return fmt.Errorf("failed to update daily steps: %w", err)
+			}
 		}
 	}
 
