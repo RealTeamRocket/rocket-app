@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:pedometer/pedometer.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -125,7 +126,7 @@ class PedometerService {
       await _uploadDailySteps();
       _scheduleDailyUpload();
     });
-    print("Daily upload scheduled in ${timeUntilUpload.inMinutes} minutes.");
+    debugPrint("Daily upload scheduled in ${timeUntilUpload.inMinutes} minutes.");
   }
 
   /// Send to server
@@ -137,10 +138,10 @@ class PedometerService {
         return;
       }
       await DailyStepsApi.sendDailySteps(_currentSteps, jwt);
-      print("Daily steps uploaded successfully: $_currentSteps steps.");
+      debugPrint("Daily steps uploaded successfully: $_currentSteps steps.");
     } catch (e) {
       onError?.call("Error uploading daily steps: $e");
-      print("Error uploading daily steps: $e");
+      debugPrint("Error uploading daily steps: $e");
     }
   }
 }
