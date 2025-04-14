@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_osm_plugin/flutter_osm_plugin.dart';
 import 'package:geolocator/geolocator.dart';
 
+import '../utils/tracking.dart';
+
+
 class RoutePage extends StatefulWidget {
   const RoutePage({super.key, required this.title});
 
@@ -34,11 +37,14 @@ Future<Position> _determinePosition() async {
 
 class _RoutePageState extends State<RoutePage> {
   GeoPoint? _initPosition;
-  List<GeoPoint> _routePoints = [];
+  final Tracking _tracking = Tracking();
+  List<GeoPoint> get _routePoints => _tracking.routePoints;
   late MapController _mapController;
+
 
   @override
   void initState() {
+    _tracking.startTracking();
     super.initState();
     _setInitialPosition();
     _mapController = MapController(
@@ -50,12 +56,7 @@ class _RoutePageState extends State<RoutePage> {
     try {
       Position position = await _determinePosition();
       setState(() {
-        _initPosition = GeoPoint(latitude: 48.61313, longitude: 9.45881);
-        _routePoints = [
-          _initPosition!,
-          GeoPoint(latitude: 48.6156, longitude: 9.45984),
-          GeoPoint(latitude: 48.61651, longitude: 9.4549) // Beispielzielpunkt
-        ];
+
       });
     } catch (e) {
       // Handle the error accordingly
@@ -100,9 +101,10 @@ class _RoutePageState extends State<RoutePage> {
         onMapIsReady: (isReady) async {
           if (isReady && _routePoints.length >= 2) {
             _mapController.drawRoad(
-              _routePoints[0],
-              _routePoints[1],
+              _routePoints.first, // Startpunkt
+              _routePoints.last,  // Endpunkt
               roadType: RoadType.foot,
+              intersectPoint: _routePoints.sublist(1, _routePoints.length - 1), // Zwischenpunkte
               roadOption: RoadOption(
                 roadColor: Colors.yellow,
                 roadWidth: 10.0,

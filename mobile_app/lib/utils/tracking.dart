@@ -1,14 +1,23 @@
+// ignore_for_file: no_leading_underscores_for_local_identifiers
+
 import 'package:flutter_osm_plugin/flutter_osm_plugin.dart';
 import 'package:location/location.dart';
 
 class Tracking{
-  List<GeoPoint> _routePoints = [];
+  List<GeoPoint> routePoints = [];
   final Location location = Location();
 
   void startTracking() async {
+
+    /**
+     * This are 3 test points to show how the route will look like
+     */
+    routePoints.add(GeoPoint(latitude: 48.61313, longitude: 9.45881));
+    routePoints.add(GeoPoint(latitude: 48.6156, longitude: 9.45984));
+    routePoints.add(GeoPoint(latitude: 48.61651, longitude: 9.4549));
+
     bool _serviceEnabled;
     PermissionStatus _permissionGranted;
-    LocationData _locationData;
 
     _serviceEnabled = await location.serviceEnabled();
     if (!_serviceEnabled) {
@@ -32,19 +41,21 @@ class Tracking{
      *
      */
     location.onLocationChanged.listen((LocationData currentLocation) {
+      if (currentLocation.longitude == null || currentLocation.latitude == null) {
+        return;
+      }
       GeoPoint point = GeoPoint(
         latitude: currentLocation.latitude!,
         longitude: currentLocation.longitude!,
       );
-      _routePoints.add(point);
+      routePoints.add(point);
     });
-
   }
 }
 
 
 /**
- * location 8.0.0 Maybe need to use that instead of geolocator for background location
+ * location 8.0.0 Maybe need to use that instead of 'Geo-locator' for background location
  * https://pub.dev/packages/location
  *
  * Also this class will send the List into the Route class so there the points can be used to create a route
