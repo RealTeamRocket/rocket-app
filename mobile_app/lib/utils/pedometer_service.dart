@@ -13,16 +13,12 @@ class PedometerService {
   Stream<StepCount>? _stepCountStream;
   Function(int)? onStepsUpdated;
   Function(String)? onError;
-  final _storage = FlutterSecureStorage();
-  Timer? _dailyUploadTimer;
-  int _currentSteps = 0;
 
 
   Future<void> init() async {
     await _requestActivityRecognitionPermission();
     await _loadInitialStepData();
     _startStepCounter();
-    _scheduleDailyUpload();
   }
 
   Future<bool> _requestActivityRecognitionPermission() async {
@@ -93,8 +89,7 @@ class PedometerService {
     }
 
     final currentSteps = event.steps - _initialStepCount!;
-
-    _currentSteps = currentSteps;
+    await prefs.setInt('currentSteps', currentSteps);
 
     if (onStepsUpdated != null) {
       onStepsUpdated!(currentSteps);
@@ -103,7 +98,7 @@ class PedometerService {
 
   void _onStepCountError(error) {
     final errorMessage = "Step tracking failed: $error Please check permissions or restart the app.";
-    print(errorMessage);
+    debugPrint(errorMessage);
 
     if (onError != null) {
       onError!(errorMessage);
@@ -112,36 +107,5 @@ class PedometerService {
 
   bool _isSameDay(DateTime d1, DateTime d2) {
     return d1.year == d2.year && d1.month == d2.month && d1.day == d2.day;
-  }
-
-  void _scheduleDailyUpload() {
-    DateTime now = DateTime.now();
-    DateTime scheduledTime = DateTime(now.year, now.month, now.day, 23, 30);
-    if (now.isAfter(scheduledTime)) {
-      scheduledTime = scheduledTime.add(Duration(days: 1));
-    }
-    Duration timeUntilUpload = scheduledTime.difference(now);
-    _dailyUploadTimer?.cancel();
-    _dailyUploadTimer = Timer(timeUntilUpload, () async {
-      await _uploadDailySteps();
-      _scheduleDailyUpload();
-    });
-    debugPrint("Daily upload scheduled in ${timeUntilUpload.inMinutes} minutes.");
-  }
-
-  /// Send to server
-  Future<void> _uploadDailySteps() async {
-    try {
-      final jwt = await _storage.read(key: 'jwt_token');
-      if (jwt == null) {
-        onError?.call("JWT token not found. Cannot upload steps.");
-        return;
-      }
-      await DailyStepsApi.sendDailySteps(_currentSteps, jwt);
-      debugPrint("Daily steps uploaded successfully: $_currentSteps steps.");
-    } catch (e) {
-      onError?.call("Error uploading daily steps: $e");
-      debugPrint("Error uploading daily steps: $e");
-    }
   }
 }

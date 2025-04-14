@@ -33,7 +33,7 @@ class StepScheduler {
     // Configure Background Fetch
     await BackgroundFetch.configure(
       BackgroundFetchConfig(
-        minimumFetchInterval: 60,
+        minimumFetchInterval: 1,
         stopOnTerminate: false,
         startOnBoot: true,
         enableHeadless: true,
