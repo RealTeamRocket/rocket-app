@@ -33,14 +33,18 @@ class StepScheduler {
     // Configure Background Fetch
     await BackgroundFetch.configure(
       BackgroundFetchConfig(
-        minimumFetchInterval: 1,
+        minimumFetchInterval: 15,
         stopOnTerminate: false,
         startOnBoot: true,
         enableHeadless: true,
+        requiresBatteryNotLow: false,
+        requiresCharging: false,
+        requiresStorageNotLow: false,
+        requiresDeviceIdle: false,
       ),
       (String taskId) async {
-        debugPrint("[BackgroundFetch] Event received: $taskId");
-        if (taskId == "stepSchedulerTask") {
+        debugPrint("[BackgroundFetch] Event received: $taskId at ${DateTime.now()}");
+        if (taskId == "flutter_background_fetch") {
           try {
             await sendData();
           } catch (e) {

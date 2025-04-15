@@ -15,6 +15,7 @@ void main() async {
   }
   runApp(MyApp());
   BackgroundFetch.registerHeadlessTask(backgroundFetchHeadlessTask);
+  StepScheduler.initialize();
 }
 
 class MyApp extends StatefulWidget {
@@ -32,7 +33,6 @@ class _MyAppState extends State<MyApp> {
   void initState() {
     super.initState();
     checkIfAuthenticated();
-    StepScheduler.initialize();
   }
 
   Future<void> checkIfAuthenticated() async {
