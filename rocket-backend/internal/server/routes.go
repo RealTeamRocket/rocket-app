@@ -27,6 +27,7 @@ func (s *Server) RegisterRoutes() http.Handler {
 		protected.Use(s.AuthMiddleware())
 		{
 			protected.GET("/", s.Authenticated)
+			protected.POST("/updateSteps", s.UpdateSteps)
 		}
 	}
 
