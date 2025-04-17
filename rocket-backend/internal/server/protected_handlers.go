@@ -60,3 +60,45 @@ func (s *Server) UpdateSteps(c *gin.Context) {
 
 	c.JSON(http.StatusOK,  gin.H{"message": "Daily Steps saved"})
 }
+
+func (s *Server) UpdateSettings(c *gin.Context) {
+	if c.Request.ContentLength > 10*1024*1024 {
+		c.JSON(http.StatusRequestEntityTooLarge, gin.H{"error": "Request size too large"})
+		return
+	}
+
+	var settingsDTO types.SettingsDTO
+	if err := c.ShouldBindJSON(&settingsDTO); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request"})
+		return
+	}
+	// TODO
+
+
+}
+
+func (s *Server) GetSettings(c *gin.Context) {
+	userID, exists := c.Get("userID")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "User not authenticated"})
+		return
+	}
+
+	userUUID, err := uuid.Parse(userID.(string))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid user ID format"})
+		return
+	}
+
+	settings, err := s.db.GetSettingsByUserID(userUUID)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error fetching settings"})
+		return
+	}
+	if settings == nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "settings for user where not found"})
+		return
+	}
+
+	c.JSON(http.StatusOK, settings)
+}

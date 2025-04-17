@@ -9,3 +9,8 @@ type RegisterDTO struct {
 type UpdateStepsDTO struct {
 	Steps int `json:"steps"`
 }
+
+type SettingsDTO struct {
+	StepGoal int `json:"dailySteps"`
+	ProfImg string `json:"profImg"`
+}
