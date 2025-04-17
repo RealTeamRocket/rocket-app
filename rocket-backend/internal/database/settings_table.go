@@ -9,11 +9,11 @@ import (
 	"github.com/google/uuid"
 )
 
-func (s *service) UpdateSettings(settings types.Settigns) error {
+func (s *service) UpdateSettings(userId uuid.UUID, settings types.SettingsDTO) error {
 	query := `UPDATE settings
 	          SET profile_image = $1, step_goal = $2
 	          WHERE user_id = $3`
-	_, err := s.db.Exec(query, settings.ProfileImage, settings.StepGoal, settings.UserId)
+	_, err := s.db.Exec(query, settings.ProfImg, settings.StepGoal, userId)
 	if err != nil {
 		logger.Error("Failed to update settings", err)
 		return fmt.Errorf("failed to update settings: %w", err)
@@ -21,7 +21,7 @@ func (s *service) UpdateSettings(settings types.Settigns) error {
 	return nil
 }
 
-func (s *service) CreateSettings(settings types.Settigns) error {
+func (s *service) CreateSettings(settings types.Settings) error {
 	query := `INSERT INTO settings (id, user_id, profile_image, step_goal)
 	          VALUES ($1, $2, $3, $4)`
 	_, err := s.db.Exec(query, settings.ID, settings.UserId, settings.ProfileImage, settings.StepGoal)
@@ -32,12 +32,12 @@ func (s *service) CreateSettings(settings types.Settigns) error {
 	return nil
 }
 
-func (s *service) GetSettingsByUserID(userID uuid.UUID) (*types.Settigns, error) {
+func (s *service) GetSettingsByUserID(userID uuid.UUID) (*types.Settings, error) {
 	query := `SELECT id, user_id, profile_image, step_goal
 	          FROM settings
 	          WHERE user_id = $1`
 
-	var settings types.Settigns
+	var settings types.Settings
 	err := s.db.QueryRow(query, userID).Scan(
 		&settings.ID,
 		&settings.UserId,

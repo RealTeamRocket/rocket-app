@@ -42,7 +42,9 @@ type Service interface {
 
 
 	// settings
-	GetSettingsByUserID(userID uuid.UUID) (*types.Settigns, error)
+	GetSettingsByUserID(userID uuid.UUID) (*types.Settings, error)
+	CreateSettings(settings types.Settings) error
+	UpdateSettings(userId uuid.UUID, settings types.SettingsDTO) error
 }
 
 type service struct {

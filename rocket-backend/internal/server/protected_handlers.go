@@ -67,12 +67,31 @@ func (s *Server) UpdateSettings(c *gin.Context) {
 		return
 	}
 
+	userID, exists := c.Get("userID")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "User not authenticated"})
+		return
+	}
+
+	userUUID, err := uuid.Parse(userID.(string))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid user ID format"})
+		return
+	}
+
 	var settingsDTO types.SettingsDTO
 	if err := c.ShouldBindJSON(&settingsDTO); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request"})
 		return
 	}
-	// TODO
+
+	err = s.db.UpdateSettings(userUUID, settingsDTO)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Faied to update settings"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "settings updated successfully"})
 
 
 }

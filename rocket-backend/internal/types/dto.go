@@ -11,6 +11,6 @@ type UpdateStepsDTO struct {
 }
 
 type SettingsDTO struct {
-	StepGoal int `json:"dailySteps"`
+	StepGoal int `json:"stepGoal"`
 	ProfImg string `json:"profImg"`
 }
