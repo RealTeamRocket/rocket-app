@@ -107,6 +107,13 @@ func (s *Server) UpdateSettings(c *gin.Context) {
 			return
 		}
 
+		// Check the content type
+		mimeType := http.DetectContentType(imageData)
+		if mimeType != "image/jpeg" && mimeType != "image/png" {
+			c.JSON(http.StatusUnsupportedMediaType, gin.H{"error": "Only JPEG (.jpg, .jpeg) and PNG (.png) images are allowed"})
+			return
+		}
+
 		// Save image
 		imageID, err = s.db.SaveImage(header.Filename, imageData)
 		if err != nil {
