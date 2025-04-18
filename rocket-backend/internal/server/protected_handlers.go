@@ -77,6 +77,7 @@ func (s *Server) UpdateSettings(c *gin.Context) {
 		return
 	}
 
+	// maximus is 10mb
 	if err := c.Request.ParseMultipartForm(10 << 20); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Failed to parse form"})
 		return
@@ -173,7 +174,16 @@ func (s *Server) GetUserImage(c *gin.Context) {
 		return
 	}
 
+	// Detect content type from image data
+	mimeType := http.DetectContentType(img.Data)
+
+	// Only allow JPEG or PNG
+	if mimeType != "image/jpeg" && mimeType != "image/png" {
+		c.JSON(http.StatusUnsupportedMediaType, gin.H{"error": "Unsupported image type"})
+		return
+	}
+
 	c.Header("Content-Disposition", fmt.Sprintf("inline; filename=\"%s\"", img.Name))
-	c.Header("Content-Type", "image/jpeg")
-	c.Data(http.StatusOK, "image/jpeg", img.Data)
+	c.Header("Content-Type", mimeType)
+	c.Data(http.StatusOK, mimeType, img.Data)
 }
