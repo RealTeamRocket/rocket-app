@@ -1,6 +1,8 @@
 package server
 
 import (
+	"encoding/json"
+	"io"
 	"net/http"
 	"rocket-backend/internal/types"
 
@@ -62,11 +64,6 @@ func (s *Server) UpdateSteps(c *gin.Context) {
 }
 
 func (s *Server) UpdateSettings(c *gin.Context) {
-	if c.Request.ContentLength > 10*1024*1024 {
-		c.JSON(http.StatusRequestEntityTooLarge, gin.H{"error": "Request size too large"})
-		return
-	}
-
 	userID, exists := c.Get("userID")
 	if !exists {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "User not authenticated"})
@@ -79,21 +76,51 @@ func (s *Server) UpdateSettings(c *gin.Context) {
 		return
 	}
 
+	if err := c.Request.ParseMultipartForm(10 << 20); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Failed to parse form"})
+		return
+	}
+
+	settingsJSON := c.PostForm("settings")
 	var settingsDTO types.SettingsDTO
-	if err := c.ShouldBindJSON(&settingsDTO); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request"})
+	if err := json.Unmarshal([]byte(settingsJSON), &settingsDTO); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid settings format"})
 		return
 	}
 
-	err = s.db.UpdateSettings(userUUID, settingsDTO)
+	file, header, err := c.Request.FormFile("image")
+	if err != nil && err != http.ErrMissingFile {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Failed to read image"})
+		return
+	}
+
+	var imageID uuid.UUID
+	if err == nil {
+		defer file.Close()
+
+		// Read image into bytes
+		imageData, err := io.ReadAll(file)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to read image data"})
+			return
+		}
+
+		// Save image
+		imageID, err = s.db.SaveImage(header.Filename, imageData)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to save image"})
+			return
+		}
+	}
+
+	// Save settings
+	err = s.db.UpdateSettings(userUUID, settingsDTO, imageID)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Faied to update settings"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update settings"})
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"message": "settings updated successfully"})
-
-
+	c.JSON(http.StatusOK, gin.H{"message": "Settings updated successfully"})
 }
 
 func (s *Server) GetSettings(c *gin.Context) {

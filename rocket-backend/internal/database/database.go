@@ -40,11 +40,13 @@ type Service interface {
 	// daily_steps
 	UpdateDailySteps(userID uuid.UUID, steps int) error
 
-
 	// settings
 	GetSettingsByUserID(userID uuid.UUID) (*types.Settings, error)
 	CreateSettings(settings types.Settings) error
-	UpdateSettings(userId uuid.UUID, settings types.SettingsDTO) error
+	UpdateSettings(userId uuid.UUID, settings types.SettingsDTO, imageID uuid.UUID) error
+
+	// images
+	SaveImage(filename string, data []byte) (uuid.UUID, error)
 }
 
 type service struct {

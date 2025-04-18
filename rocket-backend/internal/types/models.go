@@ -18,8 +18,8 @@ type User struct {
 }
 
 type Settings struct {
-	ID           uuid.UUID `json:"id"`
-	UserId       uuid.UUID `json:"user_id"`
-	ProfileImage string    `json:"profile_image"`
-	StepGoal     int       `json:"step_goal"`
+	ID       uuid.UUID `json:"id"`
+	UserId   uuid.UUID `json:"user_id"`
+	ImageId  uuid.UUID `json:"image_id"`
+	StepGoal int       `json:"step_goal"`
 }

@@ -106,12 +106,12 @@ func (s *Server) RegisterHandler(c *gin.Context) {
 	settings.ID = uuid.New()
 	settings.UserId = user.ID
 	settings.StepGoal = 10000
-	settings.ProfileImage = ""
 
 	err = s.db.CreateSettings(settings)
 	if err != nil {
 		logger.Error("Failed to create settings for user", "user_id", user.ID, "error", err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create settings"})
+		return
 	}
 
 	c.JSON(http.StatusOK, gin.H{"message": "User registered successfully"})
