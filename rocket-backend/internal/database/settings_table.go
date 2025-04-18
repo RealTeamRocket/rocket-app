@@ -13,7 +13,7 @@ func (s *service) UpdateSettings(userId uuid.UUID, settings types.SettingsDTO) e
 	query := `UPDATE settings
 	          SET profile_image = $1, step_goal = $2
 	          WHERE user_id = $3`
-	_, err := s.db.Exec(query, settings.ProfImg, settings.StepGoal, userId)
+	_, err := s.db.Exec(query, settings.ProfileImage, settings.StepGoal, userId)
 	if err != nil {
 		logger.Error("Failed to update settings", err)
 		return fmt.Errorf("failed to update settings: %w", err)

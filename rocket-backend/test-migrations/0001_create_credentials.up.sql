@@ -21,3 +21,10 @@ CREATE TABLE daily_steps (
     date DATE NOT NULL,  -- The date on which the steps were recorded
     UNIQUE (user_id, date)  -- Ensures one entry per user per day
 );
+
+CREATE TABLE settings (
+    id UUID PRIMARY KEY,
+    user_id UUID NOT NULL,
+    profile_image VARCHAR(225),
+    step_goal INT DEFAULT 100000
+);
