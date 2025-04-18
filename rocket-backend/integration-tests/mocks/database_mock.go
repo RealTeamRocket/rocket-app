@@ -19,7 +19,9 @@ type MockDB struct {
 	SaveUserProfileFunc     func(user types.User) error
 	GetSettingsByUserIDFunc func(userID uuid.UUID) (*types.Settings, error)
 	CreateSettingsFunc      func(settings types.Settings) error
-	UpdateSettingsFunc 		func(userId uuid.UUID, settings types.SettingsDTO) error
+	UpdateSettingsFunc      func(userId uuid.UUID, settings types.SettingsDTO, imageID uuid.UUID) error
+	SaveImageFunc           func(filename string, data []byte) (uuid.UUID, error)
+	GetUserImageFunc        func(userID uuid.UUID) (*types.UserImage, error)
 }
 
 func (m *MockDB) ExecuteRawSQL(query string) (sql.Result, error) {
@@ -97,9 +99,23 @@ func (m *MockDB) CreateSettings(settings types.Settings) error {
 	return nil
 }
 
-func (m *MockDB) UpdateSettings(userId uuid.UUID, settings types.SettingsDTO) error {
+func (m *MockDB) UpdateSettings(userId uuid.UUID, settings types.SettingsDTO, imageID uuid.UUID) error {
 	if m.UpdateSettingsFunc != nil {
-		return m.UpdateSettingsFunc(userId, settings)
+		return m.UpdateSettingsFunc(userId, settings, imageID)
 	}
 	return nil
+}
+
+func (m *MockDB) SaveImage(filename string, data []byte) (uuid.UUID, error) {
+	if m.SaveImageFunc != nil {
+		return m.SaveImageFunc(filename, data)
+	}
+	return uuid.Nil, nil
+}
+
+func (m *MockDB) GetUserImage(userID uuid.UUID) (*types.UserImage, error) {
+	if m.GetUserImageFunc != nil {
+		return m.GetUserImageFunc(userID)
+	}
+	return nil, nil
 }
