@@ -23,3 +23,9 @@ type Settings struct {
 	ImageId  uuid.UUID `json:"image_id"`
 	StepGoal int       `json:"step_goal"`
 }
+
+type UserImage struct {
+	ID   uuid.UUID `json:"id"`
+	Name string    `json:"name"`
+	Data []byte    `json:"data"`
+}

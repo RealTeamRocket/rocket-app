@@ -47,6 +47,7 @@ type Service interface {
 
 	// images
 	SaveImage(filename string, data []byte) (uuid.UUID, error)
+	GetUserImage(userID uuid.UUID) (*types.UserImage, error)
 }
 
 type service struct {

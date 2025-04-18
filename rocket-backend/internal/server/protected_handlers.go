@@ -2,6 +2,7 @@ package server
 
 import (
 	"encoding/json"
+	"fmt"
 	"io"
 	"net/http"
 	"rocket-backend/internal/types"
@@ -60,7 +61,7 @@ func (s *Server) UpdateSteps(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK,  gin.H{"message": "Daily Steps saved"})
+	c.JSON(http.StatusOK, gin.H{"message": "Daily Steps saved"})
 }
 
 func (s *Server) UpdateSettings(c *gin.Context) {
@@ -147,4 +148,32 @@ func (s *Server) GetSettings(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, settings)
+}
+
+func (s *Server) GetUserImage(c *gin.Context) {
+	userID, exists := c.Get("userID")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "User not authenticated"})
+		return
+	}
+
+	userUUID, err := uuid.Parse(userID.(string))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid user ID format"})
+		return
+	}
+
+	img, err := s.db.GetUserImage(userUUID)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve image"})
+		return
+	}
+	if img == nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "No image found for user"})
+		return
+	}
+
+	c.Header("Content-Disposition", fmt.Sprintf("inline; filename=\"%s\"", img.Name))
+	c.Header("Content-Type", "image/jpeg")
+	c.Data(http.StatusOK, "image/jpeg", img.Data)
 }
