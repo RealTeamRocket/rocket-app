@@ -1,3 +1,5 @@
+CREATE EXTENSION IF NOT EXISTS pgcrypto;
+
 --TABLE for credentials
 CREATE TABLE credentials (
     id UUID  PRIMARY KEY,
@@ -20,4 +22,17 @@ CREATE TABLE daily_steps (
     steps_taken INT NOT NULL,  -- Number of steps taken on that day
     date DATE NOT NULL,  -- The date on which the steps were recorded
     UNIQUE (user_id, date)  -- Ensures one entry per user per day
+);
+
+CREATE TABLE image_store (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    image_name VARCHAR(255) NOT NULL,
+    image_data BYTEA NOT NULL
+);
+
+CREATE TABLE settings (
+    id UUID PRIMARY KEY,
+    user_id UUID NOT NULL,
+    image_id UUID,
+    step_goal INT DEFAULT 100000
 );

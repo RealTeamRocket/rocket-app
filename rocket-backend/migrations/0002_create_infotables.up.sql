@@ -16,6 +16,22 @@ CREATE TABLE daily_steps (
     UNIQUE (user_id, date)  -- Ensures one entry per user per day
 );
 
+CREATE TABLE image_store (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    image_name VARCHAR(255) NOT NULL,
+    image_data BYTEA NOT NULL
+);
+
+CREATE TABLE settings (
+    id UUID PRIMARY KEY,
+    user_id UUID NOT NULL,
+    image_id UUID,
+    step_goal INT DEFAULT 100000,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (image_id) REFERENCES image_store(id) ON DELETE CASCADE
+);
+
+
 -- CREATE TABLE runs (
 -- username VARCHAR(255) NOT NULL REFERENCES users(username),
 -- duration TIME NOT NULL,

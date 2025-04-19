@@ -25,6 +25,10 @@ vendor/
 # Uncomment the next line if you're not using a vendored dependency set.
 # pkg/
 
+# Go related directories
+test-migrations/
+integration-tests/
+
 # Temporary files and logs
 *.log
 tmp/
@@ -39,4 +43,3 @@ coverage.out
 .DS_Store
 Thumbs.db
 .cache/
-

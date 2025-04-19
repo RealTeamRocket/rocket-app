@@ -2,6 +2,7 @@ package database
 
 import (
 	"fmt"
+	"rocket-backend/pkg/logger"
 	"time"
 
 	"github.com/google/uuid"
@@ -21,7 +22,7 @@ func (s *service) UpdateDailySteps(userID uuid.UUID, steps int) error {
 		_, err := s.db.Exec(queryInsert, id, userID, steps, currentDate)
 		if err != nil {
 			// Log and return error if the insert fails
-			fmt.Printf("Error inserting daily steps: %v\n", err)
+			logger.Error("Error inserting daily steps: %v\n", err)
 			return fmt.Errorf("failed to insert daily steps: %w", err)
 		}
 	} else {
@@ -31,7 +32,7 @@ func (s *service) UpdateDailySteps(userID uuid.UUID, steps int) error {
 			_, err := s.db.Exec(queryUpdate, steps, userID, currentDate)
 			if err != nil {
 				// Log and return error if the update fails
-				fmt.Printf("Error updating daily steps: %v\n", err)
+				logger.Error("Error updating daily steps: %v\n", err)
 				return fmt.Errorf("failed to update daily steps: %w", err)
 			}
 		}

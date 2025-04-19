@@ -16,3 +16,16 @@ type User struct {
 	Email        string    `json:"email"`
 	RocketPoints int       `json:"rocket_points"`
 }
+
+type Settings struct {
+	ID       uuid.UUID `json:"id"`
+	UserId   uuid.UUID `json:"user_id"`
+	ImageId  uuid.UUID `json:"image_id"`
+	StepGoal int       `json:"step_goal"`
+}
+
+type UserImage struct {
+	ID   uuid.UUID `json:"id"`
+	Name string    `json:"name"`
+	Data []byte    `json:"data"`
+}
