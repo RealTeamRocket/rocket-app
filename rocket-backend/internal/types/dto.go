@@ -13,3 +13,7 @@ type UpdateStepsDTO struct {
 type SettingsDTO struct {
 	StepGoal int `json:"stepGoal"`
 }
+
+type GetImageDTO struct {
+    UserID string `json:"user_id" binding:"required,uuid"`
+}

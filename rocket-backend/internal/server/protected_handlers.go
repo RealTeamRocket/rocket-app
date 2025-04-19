@@ -159,15 +159,15 @@ func (s *Server) GetSettings(c *gin.Context) {
 }
 
 func (s *Server) GetUserImage(c *gin.Context) {
-	userID, exists := c.Get("userID")
-	if !exists {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "User not authenticated"})
+	var req types.GetImageDTO
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "user_id is required and must be a UUID"})
 		return
 	}
 
-	userUUID, err := uuid.Parse(userID.(string))
+	userUUID, err := uuid.Parse(req.UserID)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid user ID format"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid user_id format"})
 		return
 	}
 
@@ -181,10 +181,7 @@ func (s *Server) GetUserImage(c *gin.Context) {
 		return
 	}
 
-	// Detect content type from image data
 	mimeType := http.DetectContentType(img.Data)
-
-	// Only allow JPEG or PNG
 	if mimeType != "image/jpeg" && mimeType != "image/png" {
 		c.JSON(http.StatusUnsupportedMediaType, gin.H{"error": "Unsupported image type"})
 		return
