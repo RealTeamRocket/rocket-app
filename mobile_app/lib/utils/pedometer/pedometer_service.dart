@@ -1,6 +1,9 @@
+import 'package:flutter/cupertino.dart';
 import 'package:pedometer/pedometer.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'dart:async';
+
 
 class PedometerService {
   int? _initialStepCount;
@@ -8,6 +11,7 @@ class PedometerService {
   Stream<StepCount>? _stepCountStream;
   Function(int)? onStepsUpdated;
   Function(String)? onError;
+
 
   Future<void> init() async {
     await _requestActivityRecognitionPermission();
@@ -58,24 +62,32 @@ class PedometerService {
 
   void _onStepCount(StepCount event) async {
     DateTime eventTime = event.timeStamp;
+    final prefs = await SharedPreferences.getInstance();
 
-    /// New day check
+    /// New Day Check
     if (_initialStepDate == null || !_isSameDay(_initialStepDate!, eventTime)) {
       _initialStepCount = event.steps;
       _initialStepDate = eventTime;
-      final prefs = await SharedPreferences.getInstance();
       await prefs.setInt('initialStepCount', _initialStepCount!);
       await prefs.setString('initialStepDate', _initialStepDate!.toIso8601String());
     }
 
-    /// First reading of the day if needed
+    /// First start
     if (_initialStepCount == null) {
       _initialStepCount = event.steps;
-      final prefs = await SharedPreferences.getInstance();
       await prefs.setInt('initialStepCount', _initialStepCount!);
     }
 
+    /// Sensor reset: e.g. after restarting device
+    if (event.steps < _initialStepCount!) {
+      _initialStepCount = event.steps;
+      _initialStepDate = eventTime;
+      await prefs.setInt('initialStepCount', _initialStepCount!);
+      await prefs.setString('initialStepDate', _initialStepDate!.toIso8601String());
+    }
+
     final currentSteps = event.steps - _initialStepCount!;
+    await prefs.setInt('currentSteps', currentSteps);
 
     if (onStepsUpdated != null) {
       onStepsUpdated!(currentSteps);
@@ -84,7 +96,7 @@ class PedometerService {
 
   void _onStepCountError(error) {
     final errorMessage = "Step tracking failed: $error Please check permissions or restart the app.";
-    print(errorMessage);
+    debugPrint(errorMessage);
 
     if (onError != null) {
       onError!(errorMessage);

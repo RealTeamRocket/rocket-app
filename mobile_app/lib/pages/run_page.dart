@@ -48,7 +48,7 @@ class _RunPageState extends State<RunPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: ColorConstants.white,
+      backgroundColor: ColorConstants.primaryColor,
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[

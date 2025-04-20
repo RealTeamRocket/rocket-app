@@ -21,22 +21,22 @@ class _CustomMenuBarState extends State<CustomMenuBar> {
         BottomNavigationBarItem(
           icon: Icon(Icons.home),
           label: 'Home',
-          backgroundColor: ColorConstants.greyColor,
+          backgroundColor: ColorConstants.secoundaryColor,
         ),
         BottomNavigationBarItem(
           icon: Icon(Icons.checklist),
           label: 'Search',
-          backgroundColor: ColorConstants.greyColor,
+          backgroundColor: ColorConstants.secoundaryColor,
         ),
         BottomNavigationBarItem(
           icon: Icon(Icons.leaderboard),
           label: 'Leaderboards',
-          backgroundColor: ColorConstants.greyColor,
+          backgroundColor: ColorConstants.secoundaryColor,
         ),
         BottomNavigationBarItem(
           icon: Icon(Icons.person),
           label: 'Profile',
-          backgroundColor: ColorConstants.greyColor,
+          backgroundColor: ColorConstants.secoundaryColor,
         ),
       ],
       currentIndex: _currentIndex,

@@ -1,0 +1,42 @@
+# Configuration files that are not needed inside the image
+.air.toml
+.env
+.env.template
+
+# Git related files and directories
+.git
+.gitignore
+.gitattributes
+
+# Project documentation and auxiliary files
+README.md
+LICENSE*
+Makefile
+goreleaser.yml
+
+# Build and output directories (adjust these as needed)
+bin/
+build/
+dist/
+vendor/
+
+# Go module cache (if you use Go modules, these are recreated on build)
+# Note: You may not want to exclude the "vendor" directory if you're vendorizing dependencies.
+# Uncomment the next line if you're not using a vendored dependency set.
+# pkg/
+
+# Temporary files and logs
+*.log
+tmp/
+*.tmp
+coverage.out
+
+# Editor and IDE settings
+.vscode/
+.idea/
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+.cache/
+

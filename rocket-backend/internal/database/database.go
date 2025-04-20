@@ -4,17 +4,22 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
-	"log"
 	"os"
 	"strconv"
 	"time"
 
+	"rocket-backend/internal/types"
+	"rocket-backend/pkg/logger"
+
+	"github.com/google/uuid"
 	_ "github.com/jackc/pgx/v5/stdlib"
 	_ "github.com/joho/godotenv/autoload"
 )
 
 // Service represents a service that interacts with a database.
 type Service interface {
+	ExecuteRawSQL(query string) (sql.Result, error)
+	QueryRow(query string, args ...interface{}) *sql.Row
 	// Health returns a map of health status information.
 	// The keys and values in the map are service-specific.
 	Health() map[string]string
@@ -22,6 +27,18 @@ type Service interface {
 	// Close terminates the database connection.
 	// It returns an error if the connection cannot be closed.
 	Close() error
+
+	// credentails
+	SaveCredentials(creds types.Credentials) error
+	GetUserByEmail(username string) (types.Credentials, error)
+	CheckEmail(email string) error
+
+	//users
+	SaveUserProfile(user types.User) error
+	GetUserByID(userID uuid.UUID) (types.User, error)
+
+	//daily_steps
+	UpdateDailySteps(userID uuid.UUID, steps int) error
 }
 
 type service struct {
@@ -44,14 +61,38 @@ func New() Service {
 		return dbInstance
 	}
 	connStr := fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=disable&search_path=%s", username, password, host, port, database, schema)
+	fmt.Printf("Connection String is this: %s \n", connStr)
 	db, err := sql.Open("pgx", connStr)
 	if err != nil {
-		log.Fatal(err)
+		logger.Fatal(err)
 	}
 	dbInstance = &service{
 		db: db,
 	}
 	return dbInstance
+}
+
+func NewWithConfig(connStr string) Service {
+	// Reuse Connection
+	if dbInstance != nil {
+		return dbInstance
+	}
+	db, err := sql.Open("pgx", connStr)
+	if err != nil {
+		logger.Fatal(err)
+	}
+	dbInstance = &service{
+		db: db,
+	}
+	return dbInstance
+}
+
+func (s *service) ExecuteRawSQL(query string) (sql.Result, error) {
+	return s.db.Exec(query)
+}
+
+func (s *service) QueryRow(query string, args ...interface{}) *sql.Row {
+	return s.db.QueryRow(query, args...)
 }
 
 // Health checks the health of the database connection by pinging the database.
@@ -67,7 +108,7 @@ func (s *service) Health() map[string]string {
 	if err != nil {
 		stats["status"] = "down"
 		stats["error"] = fmt.Sprintf("db down: %v", err)
-		log.Fatalf("db down: %v", err) // Log the error and terminate the program
+		logger.Fatal("db down: %v", err)
 		return stats
 	}
 
@@ -110,6 +151,6 @@ func (s *service) Health() map[string]string {
 // If the connection is successfully closed, it returns nil.
 // If an error occurs while closing the connection, it returns the error.
 func (s *service) Close() error {
-	log.Printf("Disconnected from database: %s", database)
+	logger.Debug("Disconnected from database: %s", database)
 	return s.db.Close()
 }

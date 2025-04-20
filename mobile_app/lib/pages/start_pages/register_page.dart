@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'login_page.dart';
 import 'package:mobile_app/constants/constants.dart';
+import 'package:mobile_app/utils/backend_api/register_api.dart';
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({super.key});
@@ -15,6 +16,8 @@ class _RegisterPageState extends State<RegisterPage> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
+  bool _isLoading = false;
+  String? _errorMessage;
 
   @override
   void dispose() {
@@ -34,6 +37,37 @@ class _RegisterPageState extends State<RegisterPage> {
       return 'Please enter a valid email address';
     }
     return null;
+  }
+
+  Future<void> _register() async {
+    setState(() {
+      _isLoading = true;
+      _errorMessage = null;
+    });
+
+    try {
+      final registerResponse = await RegisterApi.register(
+        _emailController.text,
+        _usernameController.text,
+        _passwordController.text,
+      );
+      // Show success message and navigate to the login page
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(registerResponse.message)),
+      );
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => LoginPage()),
+      );
+    } catch (e) {
+      setState(() {
+        _errorMessage = e.toString();
+      });
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
   }
 
   @override
@@ -133,27 +167,29 @@ class _RegisterPageState extends State<RegisterPage> {
                         backgroundColor: ColorConstants.white,
                       ),
                       onPressed: () {
-                        //TODO: Implement registration logic
                         if (_formKey.currentState!.validate()) {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => LoginPage(),
-                            ),
-                          );
+                          _register();
                         } else {
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(content: Text('Please fill out the form correctly')),
                           );
                         }
                       },
-                      child: Text(
-                        'Register',
-                        style: TextStyle(
-                          color: ColorConstants.blackColor
+                      child: _isLoading
+                          ? CircularProgressIndicator()
+                          : Text(
+                              'Register',
+                              style: TextStyle(color: ColorConstants.blackColor),
+                            ),
+                    ),
+                    if (_errorMessage != null)
+                      Padding(
+                        padding: const EdgeInsets.only(top: 20),
+                        child: Text(
+                          _errorMessage!,
+                          style: TextStyle(color: Colors.red),
                         ),
                       ),
-                    ),
                   ],
                 ),
               ),

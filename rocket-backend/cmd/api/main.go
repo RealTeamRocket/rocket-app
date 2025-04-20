@@ -3,13 +3,13 @@ package main
 import (
 	"context"
 	"fmt"
-	"log"
 	"net/http"
 	"os/signal"
 	"syscall"
 	"time"
 
 	"rocket-backend/internal/server"
+	"rocket-backend/pkg/logger"
 )
 
 func gracefulShutdown(apiServer *http.Server, done chan bool) {
@@ -20,17 +20,17 @@ func gracefulShutdown(apiServer *http.Server, done chan bool) {
 	// Listen for the interrupt signal.
 	<-ctx.Done()
 
-	log.Println("shutting down gracefully, press Ctrl+C again to force")
+	logger.Debug("shutting down gracefully, press Ctrl+C again to force")
 
 	// The context is used to inform the server it has 5 seconds to finish
 	// the request it is currently handling
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	if err := apiServer.Shutdown(ctx); err != nil {
-		log.Printf("Server forced to shutdown with error: %v", err)
+		logger.Error("Server forced to shutdown with error:", err)
 	}
 
-	log.Println("Server exiting")
+	logger.Debug("Server exiting")
 
 	// Notify the main goroutine that the shutdown is complete
 	done <- true
@@ -48,10 +48,10 @@ func main() {
 
 	err := server.ListenAndServe()
 	if err != nil && err != http.ErrServerClosed {
-		panic(fmt.Sprintf("http server error: %s", err))
+		logger.Fatal(fmt.Sprintf("http server error: %s", err))
 	}
 
 	// Wait for the graceful shutdown to complete
 	<-done
-	log.Println("Graceful shutdown complete.")
+	logger.Debug("Graceful shutdown complete.")
 }

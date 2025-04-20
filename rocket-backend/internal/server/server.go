@@ -13,17 +13,19 @@ import (
 )
 
 type Server struct {
-	port int
-
-	db database.Service
+	port      int
+	db        database.Service
+	jwtSecret string
 }
 
 func NewServer() *http.Server {
 	port, _ := strconv.Atoi(os.Getenv("PORT"))
+	jwtSecret := os.Getenv("JWT_SECRET")
+
 	NewServer := &Server{
 		port: port,
-
 		db: database.New(),
+		jwtSecret: jwtSecret,
 	}
 
 	// Declare Server config
@@ -36,4 +38,12 @@ func NewServer() *http.Server {
 	}
 
 	return server
+}
+
+func NewServerWithDB(db database.Service, port int, jwtSecret string) *Server {
+    return &Server{
+        port:      port,
+        db:        db, // Inject the passed DB implementation.
+        jwtSecret: jwtSecret,
+    }
 }

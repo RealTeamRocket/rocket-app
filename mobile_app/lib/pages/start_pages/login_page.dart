@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:mobile_app/constants/constants.dart';
 import 'package:mobile_app/pages/pages.dart';
+import 'package:mobile_app/utils/backend_api/login_api.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -13,12 +15,44 @@ class _LoginPageState extends State<LoginPage> {
   final _formKey = GlobalKey<FormState>();
   final _usernameController = TextEditingController();
   final _passwordController = TextEditingController();
+  final _storage = FlutterSecureStorage();
+  bool _isLoading = false;
+  String? _errorMessage;
 
   @override
   void dispose() {
     _usernameController.dispose();
     _passwordController.dispose();
     super.dispose();
+  }
+
+  Future<void> _login() async {
+    setState(() {
+      _isLoading = true;
+      _errorMessage = null;
+    });
+
+    try {
+      final loginResponse = await LoginApi.login(
+        _usernameController.text,
+        _passwordController.text,
+      );
+
+      await _storage.write(key: 'jwt_token', value: loginResponse.token);
+
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => HomePage(title: 'Rocket App')),
+      );
+    } catch (e) {
+      setState(() {
+        _errorMessage = 'Failed to login: $e';
+      });
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
   }
 
   @override
@@ -59,7 +93,7 @@ class _LoginPageState extends State<LoginPage> {
                     TextFormField(
                       controller: _usernameController,
                       decoration: InputDecoration(
-                        hintText: 'Username',
+                        hintText: 'Email',
                         filled: true,
                         fillColor: Colors.white.withValues(alpha: 0.8),
                       ),
@@ -89,7 +123,7 @@ class _LoginPageState extends State<LoginPage> {
                     SizedBox(height: 40.0),
                     Center(
                       child: SizedBox(
-                        width: 200.0, // Set the desired width here
+                        width: 200.0,
                         child: ElevatedButton(
                           style: ElevatedButton.styleFrom(
                             backgroundColor: ColorConstants.white,
@@ -100,20 +134,28 @@ class _LoginPageState extends State<LoginPage> {
                           ),
                           onPressed: () {
                             if (_formKey.currentState!.validate()) {
-                              //TODO: Implement login logic
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(builder: (context) => HomePage(title: 'Rocket App')),
-                              );
+                              _login();
                             }
                           },
-                          child: Text(
-                            'Login',
-                            style: TextStyle(
-                              fontSize: 18.0,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
+                          child: _isLoading
+                              ? CircularProgressIndicator()
+                              : Text(
+                                  'Login',
+                                  style: TextStyle(
+                                    fontSize: 18.0,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                        ),
+                      ),
+                    ),
+                    if (_errorMessage != null)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 20),
+                      child: Center(
+                        child: Text(
+                          _errorMessage!,
+                          style: TextStyle(color: Colors.red),
                         ),
                       ),
                     ),
