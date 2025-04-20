@@ -1,0 +1,12 @@
+[
+  {
+    "id": "challenge_1",
+    "text": "Solve the maze in under 2 minutes",
+    "points": 50
+  },
+  {
+    "id": "challenge_2",
+    "text": "Decode the cipher message",
+    "points": 30
+  }
+]
