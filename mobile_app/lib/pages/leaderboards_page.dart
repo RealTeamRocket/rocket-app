@@ -37,7 +37,7 @@ class _LeaderboardsPageState extends State<LeaderboardsPage> {
     double progressValue = _initialChallengeCount == 0 ? 0 : _completedCount / _initialChallengeCount;
 
     return Container(
-      color: ColorConstants.deepBlue,
+      color: ColorConstants.primaryColor,
       padding: const EdgeInsets.all(16.0),
       child: Column(
         children: [
@@ -107,7 +107,7 @@ class _LeaderboardsPageState extends State<LeaderboardsPage> {
       padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: Container(
         decoration: BoxDecoration(
-          color: ColorConstants.greyColor,
+          color: ColorConstants.secoundaryColor,
           borderRadius: BorderRadius.circular(16.0),
           border: Border.all(
             color: ColorConstants.purpleColor.withValues(alpha: 0.3),
@@ -115,7 +115,7 @@ class _LeaderboardsPageState extends State<LeaderboardsPage> {
           ),
           boxShadow: [
             BoxShadow(
-              color: ColorConstants.greyColor.withValues(alpha: 0.2),
+              color: ColorConstants.secoundaryColor.withValues(alpha: 0.2),
               blurRadius: 6.0,
               offset: const Offset(0, 3),
             ),
@@ -165,7 +165,7 @@ class _LeaderboardsPageState extends State<LeaderboardsPage> {
             child: LinearProgressIndicator(
               value: progressValue,
               minHeight: 12.0,
-              backgroundColor: ColorConstants.deepBlue.withValues(alpha: 0.3),
+              backgroundColor: ColorConstants.primaryColor.withValues(alpha: 0.3),
               valueColor: const AlwaysStoppedAnimation<Color>(
                 ColorConstants.greenColor,
               ),
