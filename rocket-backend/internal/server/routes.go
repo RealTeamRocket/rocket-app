@@ -28,6 +28,10 @@ func (s *Server) RegisterRoutes() http.Handler {
 		{
 			protected.GET("/", s.Authenticated)
 			protected.POST("/updateSteps", s.UpdateSteps)
+
+			protected.POST("/settings/update", s.UpdateSettings)
+			protected.GET("/settings", s.GetSettings)
+			protected.POST("/image", s.GetUserImage)
 			protected.GET("/challanges/generate")
 		}
 	}
