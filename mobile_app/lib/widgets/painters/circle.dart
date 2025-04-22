@@ -17,7 +17,7 @@ class CircularProgressPainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     final Paint backgroundPaint =
         Paint()
-          ..color = ColorConstants.greyColor
+          ..color = ColorConstants.secoundaryColor
           ..strokeWidth = strokeWidth
           ..style = PaintingStyle.stroke
           ..strokeCap = StrokeCap.round;

@@ -1,46 +1,40 @@
-import 'dart:async';
 import 'package:flutter/material.dart';
+import '../constants/color_constants.dart';
 import '/widgets/widgets.dart';
-import '/constants/constants.dart';
+import 'pages.dart';
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
+class HomePage extends StatefulWidget {
+  const HomePage({super.key, required this.title});
 
   final String title;
 
   @override
-  State<MyHomePage> createState() => _MyHomePageState();
+  State<HomePage> createState() => _HomePageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
-  final int dailyGoal = 2000;
-  int currentSteps = 1000;
-  String selectedButton = 'Steps';
-  Timer? _timer;
+class _HomePageState extends State<HomePage> {
+  int _selectedIndex = 0;
 
-  @override
-  void initState() {
-    super.initState();
-    _startStepCounter();
-  }
+  final List<Widget> _pages = <Widget>[
+    const RunPage(title: 'Run'),
+    Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: const [Text("Search"), Icon(Icons.checklist)],
+      ),
+    ),
+    Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: const [Text("Leaderboards"), Icon(Icons.leaderboard)],
+      ),
+    ),
+    const ProfilePage(),
+  ];
 
-  @override
-  void dispose() {
-    _timer?.cancel();
-    super.dispose();
-  }
-
-  void _startStepCounter() {
-    _timer = Timer.periodic(Duration(seconds: 1), (timer) {
-      setState(() {
-        currentSteps += 10;
-      });
-    });
-  }
-
-  void _onButtonPressed(String button) {
+  void _onItemTapped(int index) {
     setState(() {
-      selectedButton = button;
+      _selectedIndex = index;
     });
   }
 
@@ -48,7 +42,7 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: ColorConstants.deepBlue,
+        backgroundColor: ColorConstants.secoundaryColor,
         title: Center(
           child: Text(
             widget.title,
@@ -56,34 +50,8 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
         ),
       ),
-      backgroundColor: ColorConstants.deepBlue,
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: <Widget>[
-          if (selectedButton == 'Steps') ...[
-            StepCounterWidget(
-              currentSteps: currentSteps,
-              dailyGoal: dailyGoal,
-            ),
-            const SizedBox(height: 20.0),
-          ] else if (selectedButton == 'Race') ...[
-            Text(
-              'To be implemented',
-              style: TextStyle(
-                fontSize: 30.0,
-                fontWeight: FontWeight.bold,
-                color: ColorConstants.white,
-              ),
-            ),
-            const SizedBox(height: 20.0),
-          ],
-          ButtonsWidget(
-            selectedButton: selectedButton,
-            onButtonPressed: _onButtonPressed,
-          ),
-        ],
-      ),
-      bottomNavigationBar: const CustomMenuBar(),
+      body: Center(child: _pages.elementAt(_selectedIndex)),
+      bottomNavigationBar: CustomMenuBar(onItemTapped: _onItemTapped),
     );
   }
 }

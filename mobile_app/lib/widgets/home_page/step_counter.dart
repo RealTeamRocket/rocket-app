@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../utils/utils.dart';
+import '../painters/painters.dart';
 import '/constants/constants.dart';
 
 class StepCounterWidget extends StatelessWidget {
