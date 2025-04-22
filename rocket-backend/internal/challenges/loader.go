@@ -1,4 +1,4 @@
-package challanges
+package challenges
 
 import (
 	"encoding/json"

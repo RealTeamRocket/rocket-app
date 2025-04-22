@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"rocket-backend/internal/challenges"
 	"rocket-backend/internal/types"
 
 	"github.com/gin-gonic/gin"
@@ -190,4 +191,14 @@ func (s *Server) GetUserImage(c *gin.Context) {
 	c.Header("Content-Disposition", fmt.Sprintf("inline; filename=\"%s\"", img.Name))
 	c.Header("Content-Type", mimeType)
 	c.Data(http.StatusOK, mimeType, img.Data)
+}
+
+func (s *Server) getDailyChallenges(c *gin.Context) {
+
+	dailies, err := challenges.GetDailies()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error genarating challanges"})
+		return
+	}
+	c.JSON(http.StatusOK, dailies)
 }

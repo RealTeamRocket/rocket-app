@@ -1,0 +1,77 @@
+[
+  {
+    "id": "challenge_1",
+    "text": "Drink 2 liters of water today",
+    "points": 20
+  },
+  {
+    "id": "challenge_2",
+    "text": "Take 10,000 steps in a day",
+    "points": 30
+  },
+  {
+    "id": "challenge_3",
+    "text": "Do a 10-minute stretching session",
+    "points": 15
+  },
+  {
+    "id": "challenge_4",
+    "text": "Complete 30 push-ups (can be broken into sets)",
+    "points": 25
+  },
+  {
+    "id": "challenge_5",
+    "text": "Run, cycle, or swim for 30 minutes",
+    "points": 40
+  },
+  {
+    "id": "challenge_6",
+    "text": "Do a 10-minute guided meditation post-workout",
+    "points": 20
+  },
+  {
+    "id": "challenge_7",
+    "text": "Eat a healthy protein-rich meal (share a photo)",
+    "points": 25
+  },
+  {
+    "id": "challenge_8",
+    "text": "Hold a plank for 1 minute",
+    "points": 20
+  },
+  {
+    "id": "challenge_9",
+    "text": "Avoid added sugars for one day",
+    "points": 35
+  },
+  {
+    "id": "challenge_10",
+    "text": "Complete 50 squats today",
+    "points": 30
+  },
+  {
+    "id": "challenge_11",
+    "text": "Wake up before 7:00 AM and log your first activity",
+    "points": 30
+  },
+  {
+    "id": "challenge_12",
+    "text": "Do a proper cool-down routine after your workout",
+    "points": 15
+  },
+  {
+    "id": "challenge_13",
+    "text": "Go for a walk or jog in a park or natural area",
+    "points": 20
+  },
+  {
+    "id": "challenge_14",
+    "text": "Log every meal and activity today in the app",
+    "points": 30
+  },
+  {
+    "id": "challenge_15",
+    "text": "Do a 10-minute dance workout",
+    "points": 25
+  }
+]
