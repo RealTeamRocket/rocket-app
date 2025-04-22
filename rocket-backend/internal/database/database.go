@@ -33,12 +33,21 @@ type Service interface {
 	GetUserByEmail(username string) (types.Credentials, error)
 	CheckEmail(email string) error
 
-	//users
+	// users
 	SaveUserProfile(user types.User) error
 	GetUserByID(userID uuid.UUID) (types.User, error)
 
-	//daily_steps
+	// daily_steps
 	UpdateDailySteps(userID uuid.UUID, steps int) error
+
+	// settings
+	GetSettingsByUserID(userID uuid.UUID) (*types.Settings, error)
+	CreateSettings(settings types.Settings) error
+	UpdateSettings(userId uuid.UUID, settings types.SettingsDTO, imageID uuid.UUID) error
+
+	// images
+	SaveImage(filename string, data []byte) (uuid.UUID, error)
+	GetUserImage(userID uuid.UUID) (*types.UserImage, error)
 }
 
 type service struct {
