@@ -31,6 +31,22 @@ CREATE TABLE settings (
     FOREIGN KEY (image_id) REFERENCES image_store(id) ON DELETE CASCADE
 );
 
+CREATE TABLE challenges (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    description TEXT NOT NULL,
+    points_reward INT NOT NULL
+);
+
+CREATE TABLE user_challenges (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID NOT NULL,
+    challenge_id UUID NOT NULL,
+    date DATE NOT NULL,
+    is_completed BOOLEAN DEFAULT FALSE,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (challenge_id) REFERENCES challenges(id) ON DELETE CASCADE,
+    UNIQUE (user_id, challenge_id, date)
+);
 
 -- CREATE TABLE runs (
 -- username VARCHAR(255) NOT NULL REFERENCES users(username),

@@ -193,12 +193,25 @@ func (s *Server) GetUserImage(c *gin.Context) {
 	c.Data(http.StatusOK, mimeType, img.Data)
 }
 
-func (s *Server) getDailyChallenges(c *gin.Context) {
-
-	dailies, err := challenges.GetDailies()
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error genarating challanges"})
+func (s *Server) GetDailyChallenges(c *gin.Context) {
+	userID, exists := c.Get("userID")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "User not authenticated"})
 		return
 	}
+
+	userUUID, err := uuid.Parse(userID.(string))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid user ID format"})
+		return
+	}
+
+	challengeManager := challenges.NewChallengeManager(s.db)
+	dailies, err := challengeManager.GetDailies(userUUID)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error generating challenges"})
+		return
+	}
+
 	c.JSON(http.StatusOK, dailies)
 }

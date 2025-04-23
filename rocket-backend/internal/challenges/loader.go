@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"os"
 	"sync"
+
 	"rocket-backend/internal/types"
 )
 
@@ -13,7 +14,7 @@ var (
 	loadErr     error
 )
 
-func loadChallenges(path string) ([]types.Challenge, error) {
+func LoadChallengesFromFile(path string) ([]types.Challenge, error) {
 	once.Do(func() {
 		var file *os.File
 		file, loadErr = os.Open(path)

@@ -2,39 +2,97 @@ package challenges
 
 import (
 	"fmt"
-	"math/rand"
 	"os"
 	"path/filepath"
+	"rocket-backend/internal/database"
 	"rocket-backend/internal/types"
 	"rocket-backend/pkg/logger"
-	"time"
+
+	"github.com/google/uuid"
 )
 
-func GetDailies() ([]types.Challenge, error) {
+type ChallengeManager struct {
+	db database.Service
+}
+
+func NewChallengeManager(db database.Service) *ChallengeManager {
+	return &ChallengeManager{db: db}
+}
+
+func (cm *ChallengeManager) GetDailies(userID uuid.UUID) ([]types.Challenge, error) {
+	// Ensure challenges are loaded into the database
+	err := cm.ensureChallengesLoaded()
+	if err != nil {
+		logger.Error("Failed to ensure challenges are loaded", err)
+		return nil, err
+	}
+
+	// Fetch daily challenges for the user
+	dailies, err := cm.db.GetUserDailyChallenges(userID)
+	if err != nil {
+		logger.Error("Failed to fetch user daily challenges", err)
+		return nil, err
+	}
+
+	// If no challenges are assigned yet, assign new ones
+	if len(dailies) == 0 {
+		allChallenges, err := cm.db.GetAllChallenges()
+		if err != nil {
+			return nil, err
+		}
+
+		if len(allChallenges) < 5 {
+			logger.Warn("Less than 5 challenges available, returning all")
+			return nil, fmt.Errorf("not enough challenges available: got %d, need at least 5", len(allChallenges))
+		}
+
+		// Shuffle and pick 5 random challenges
+		shuffledChallenges := database.ShuffleChallenges(allChallenges)
+		dailyChallenges := shuffledChallenges[:5]
+
+		err = cm.db.AssignChallengesToUser(userID, dailyChallenges)
+		if err != nil {
+			return nil, err
+		}
+
+		return dailyChallenges, nil
+	}
+
+	return dailies, nil
+}
+
+func (cm *ChallengeManager) ensureChallengesLoaded() error {
+	existingChallenges, err := cm.db.GetAllChallenges()
+	if err != nil {
+		logger.Error("Failed to fetch challenges from database", err)
+		return err
+	}
+
+	if len(existingChallenges) > 0 {
+		return nil
+	}
+
 	wd, err := os.Getwd()
 	if err != nil {
 		logger.Error("Unable to get working directory", err)
-		return nil, err
+		return err
 	}
 
 	filePath := filepath.Join(wd, "internal", "challenges", "challenges.json")
-	challenges, err := loadChallenges(filePath)
+	challenges, err := LoadChallengesFromFile(filePath)
 	if err != nil {
-		logger.Error("File not found", err)
-		return nil, err
+		logger.Error("Failed to load challenges from file", err)
+		return err
 	}
 
-	if len(challenges) < 5 {
-		logger.Warn("Less than 5 challenges available, returning all")
-		return nil, fmt.Errorf("not enough challenges available: got %d, need at least 5", len(challenges))
+	for _, challenge := range challenges {
+		err := cm.db.InsertChallenge(challenge)
+		if err != nil {
+			logger.Error("Failed to insert challenge into database", err)
+			return err
+		}
 	}
 
-	// Shuffle logic
-	source := rand.NewSource(time.Now().UnixNano())
-	rng := rand.New(source)
-	rng.Shuffle(len(challenges), func(i, j int) {
-		challenges[i], challenges[j] = challenges[j], challenges[i]
-	})
-
-	return challenges[:5], nil
+	logger.Info("Challenges successfully loaded into the database.")
+	return nil
 }

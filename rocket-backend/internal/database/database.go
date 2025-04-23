@@ -48,6 +48,13 @@ type Service interface {
 	// images
 	SaveImage(filename string, data []byte) (uuid.UUID, error)
 	GetUserImage(userID uuid.UUID) (*types.UserImage, error)
+
+	// challenges
+	GetAllChallenges() ([]types.Challenge, error)
+	AssignChallengesToUser(userID uuid.UUID, challenges []types.Challenge) error
+	GetUserDailyChallenges(userID uuid.UUID) ([]types.Challenge, error)
+	ResetDailyChallenges() error
+	InsertChallenge(challenge types.Challenge) error
 }
 
 type service struct {

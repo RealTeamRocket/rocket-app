@@ -1,76 +1,76 @@
 [
   {
-    "id": "challenge_1",
+    "id": "550e8400-e29b-41d4-a716-446655440000",
     "text": "Drink 2 liters of water today",
     "points": 20
   },
   {
-    "id": "challenge_2",
+    "id": "550e8400-e29b-41d4-a716-446655440001",
     "text": "Take 10,000 steps in a day",
     "points": 30
   },
   {
-    "id": "challenge_3",
+    "id": "550e8400-e29b-41d4-a716-446655440002",
     "text": "Do a 10-minute stretching session",
     "points": 15
   },
   {
-    "id": "challenge_4",
+    "id": "550e8400-e29b-41d4-a716-446655440003",
     "text": "Complete 30 push-ups (can be broken into sets)",
     "points": 25
   },
   {
-    "id": "challenge_5",
+    "id": "550e8400-e29b-41d4-a716-446655440004",
     "text": "Run, cycle, or swim for 30 minutes",
     "points": 40
   },
   {
-    "id": "challenge_6",
+    "id": "550e8400-e29b-41d4-a716-446655440005",
     "text": "Do a 10-minute guided meditation post-workout",
     "points": 20
   },
   {
-    "id": "challenge_7",
+    "id": "550e8400-e29b-41d4-a716-446655440006",
     "text": "Eat a healthy protein-rich meal (share a photo)",
     "points": 25
   },
   {
-    "id": "challenge_8",
+    "id": "550e8400-e29b-41d4-a716-446655440007",
     "text": "Hold a plank for 1 minute",
     "points": 20
   },
   {
-    "id": "challenge_9",
+    "id": "550e8400-e29b-41d4-a716-446655440008",
     "text": "Avoid added sugars for one day",
     "points": 35
   },
   {
-    "id": "challenge_10",
+    "id": "550e8400-e29b-41d4-a716-446655440009",
     "text": "Complete 50 squats today",
     "points": 30
   },
   {
-    "id": "challenge_11",
+    "id": "550e8400-e29b-41d4-a716-44665544000a",
     "text": "Wake up before 7:00 AM and log your first activity",
     "points": 30
   },
   {
-    "id": "challenge_12",
+    "id": "550e8400-e29b-41d4-a716-44665544000b",
     "text": "Do a proper cool-down routine after your workout",
     "points": 15
   },
   {
-    "id": "challenge_13",
+    "id": "550e8400-e29b-41d4-a716-44665544000c",
     "text": "Go for a walk or jog in a park or natural area",
     "points": 20
   },
   {
-    "id": "challenge_14",
+    "id": "550e8400-e29b-41d4-a716-44665544000d",
     "text": "Log every meal and activity today in the app",
     "points": 30
   },
   {
-    "id": "challenge_15",
+    "id": "550e8400-e29b-41d4-a716-44665544000e",
     "text": "Do a 10-minute dance workout",
     "points": 25
   }
