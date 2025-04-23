@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mobile_app/pages/settings_page.dart';
 import 'utils/backend_api/backend_api.dart' as api;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
@@ -79,6 +80,9 @@ class _MyAppState extends State<MyApp> {
           isAuthenticated!
               ? const HomePage(title: 'Rocket App')
               : const WelcomePage(),
+      routes: {
+        '/settings': (context) => SettingsPage(),
+      },
     );
   }
 }
