@@ -5,7 +5,7 @@ on:
     branches:
       - main
     paths:
-      - 'backend/**'  
+      - 'rocket-backend/**'  
   workflow_dispatch:
 
 jobs:
@@ -24,7 +24,7 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PAT }}
 
-      # Set up Docker Buildx (ermöglicht Multi-Architektur-Builds)
+      # Set up Docker Buildx
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
 
@@ -32,6 +32,6 @@ jobs:
       - name: Build and Push Docker Image
         uses: docker/build-push-action@v4
         with:
-          context: ./backend # Pfad zu deinem Backend-Code
+          context: ./rocket-backend
           push: true
           tags: ${{ secrets.DOCKER_USERNAME }}/rocket-backend:latest
