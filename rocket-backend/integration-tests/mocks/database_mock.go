@@ -22,6 +22,11 @@ type MockDB struct {
 	UpdateSettingsFunc      func(userId uuid.UUID, settings types.SettingsDTO, imageID uuid.UUID) error
 	SaveImageFunc           func(filename string, data []byte) (uuid.UUID, error)
 	GetUserImageFunc        func(userID uuid.UUID) (*types.UserImage, error)
+	GetAllChallengesFunc        func() ([]types.Challenge, error)
+	AssignChallengesToUserFunc  func(userID uuid.UUID, challenges []types.Challenge) error
+	GetUserDailyChallengesFunc  func(userID uuid.UUID) ([]types.Challenge, error)
+	ResetDailyChallengesFunc    func() error
+	InsertChallengeFunc         func(challenge types.Challenge) error
 }
 
 func (m *MockDB) ExecuteRawSQL(query string) (sql.Result, error) {
@@ -118,4 +123,39 @@ func (m *MockDB) GetUserImage(userID uuid.UUID) (*types.UserImage, error) {
 		return m.GetUserImageFunc(userID)
 	}
 	return nil, nil
+}
+
+func (m *MockDB) GetAllChallenges() ([]types.Challenge, error) {
+	if m.GetAllChallengesFunc != nil {
+		return m.GetAllChallengesFunc()
+	}
+	return nil, nil
+}
+
+func (m *MockDB) AssignChallengesToUser(userID uuid.UUID, challenges []types.Challenge) error {
+	if m.AssignChallengesToUserFunc != nil {
+		return m.AssignChallengesToUserFunc(userID, challenges)
+	}
+	return nil
+}
+
+func (m *MockDB) GetUserDailyChallenges(userID uuid.UUID) ([]types.Challenge, error) {
+	if m.GetUserDailyChallengesFunc != nil {
+		return m.GetUserDailyChallengesFunc(userID)
+	}
+	return nil, nil
+}
+
+func (m *MockDB) ResetDailyChallenges() error {
+	if m.ResetDailyChallengesFunc != nil {
+		return m.ResetDailyChallengesFunc()
+	}
+	return nil
+}
+
+func (m *MockDB) InsertChallenge(challenge types.Challenge) error {
+	if m.InsertChallengeFunc != nil {
+		return m.InsertChallengeFunc(challenge)
+	}
+	return nil
 }
