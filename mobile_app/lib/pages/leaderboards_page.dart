@@ -123,12 +123,6 @@ class _LeaderboardsPageState extends State<LeaderboardsPage> {
       await ChallengesApi.markAsDone(jwt, challenge.id, challenge.points);
       // await _loadChallenges(); // only needed if we want to use only backend to sync/show challenges
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Challenge done!'),
-          duration: const Duration(seconds: 2),
-        ),
-      );
     } catch (e) {
       debugPrint('Failure at completing challenge: $e');
     }
@@ -155,18 +149,30 @@ class _LeaderboardsPageState extends State<LeaderboardsPage> {
             ),
           ],
         ),
-        child: ListTile(
-          contentPadding: const EdgeInsets.symmetric(
-            horizontal: 20.0,
-            vertical: 16.0,
-          ),
-          title: Text(
-            challenge.text,
-            style: const TextStyle(
-              fontSize: 18.0,
-              fontWeight: FontWeight.w600,
-              color: ColorConstants.white,
-            ),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 16.0),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Expanded(
+                child: Text(
+                  challenge.text,
+                  style: const TextStyle(
+                    fontSize: 18.0,
+                    fontWeight: FontWeight.w600,
+                    color: ColorConstants.white,
+                  ),
+                ),
+              ),
+              Text(
+                '+${challenge.points} RP',
+                style: const TextStyle(
+                  fontSize: 16.0,
+                  fontWeight: FontWeight.bold,
+                  color: ColorConstants.greenColor,
+                ),
+              ),
+            ],
           ),
         ),
       ),
