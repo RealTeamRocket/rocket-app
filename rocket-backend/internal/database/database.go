@@ -36,6 +36,7 @@ type Service interface {
 	// users
 	SaveUserProfile(user types.User) error
 	GetUserByID(userID uuid.UUID) (types.User, error)
+	UpdateRocketPoints(userID uuid.UUID, rocketPoints int) error
 
 	// daily_steps
 	UpdateDailySteps(userID uuid.UUID, steps int) error

@@ -215,3 +215,25 @@ func (s *Server) GetDailyChallenges(c *gin.Context) {
 
 	c.JSON(http.StatusOK, dailies)
 }
+
+func (s *Server) CompleteChallange(c *gin.Context) {
+	userID, exists := c.Get("userID")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "User not authenticated"})
+		return
+	}
+
+	userUUID, err := uuid.Parse(userID.(string))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid user ID format"})
+		return
+	}
+
+	var pointsDTO types.CompleteChallangesDTO
+	if err := c.ShouldBindJSON(&pointsDTO); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request body"})
+		return
+	}
+
+	s.db.UpdateRocketPoints(userUUID, pointsDTO.RocketPoints)
+}

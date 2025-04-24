@@ -15,5 +15,9 @@ type SettingsDTO struct {
 }
 
 type GetImageDTO struct {
-    UserID string `json:"user_id" binding:"required,uuid"`
+	UserID string `json:"user_id" binding:"required,uuid"`
+}
+
+type CompleteChallangesDTO struct {
+	RocketPoints int `json:"rocket_points" binding:"required"`
 }

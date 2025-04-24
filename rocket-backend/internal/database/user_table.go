@@ -30,3 +30,12 @@ func (s *service) GetUserByID(userID uuid.UUID) (types.User, error) {
 	}
 	return user, nil
 }
+
+func (s *service) UpdateRocketPoints(userID uuid.UUID, rocketPoints int) error {
+	query := `UPDATE users SET rocketpoints = rocketpoints + $2 WHERE id = $1`
+	_, err := s.db.Exec(query, userID, rocketPoints)
+	if err != nil {
+		return fmt.Errorf("failed to update rocket points: %w", err)
+	}
+	return nil
+}
