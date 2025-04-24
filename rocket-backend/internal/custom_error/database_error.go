@@ -9,4 +9,7 @@ var (
 	ErrFailedToRetrieveData = errors.New("failed to retrieve data")
 	ErrUserNotFound         = errors.New("user not found")
 	ErrFailedToUpdate       = errors.New("failed to update data")
+	ErrChallengeNotFound    = errors.New("challenge not found")
+	ErrImageNotFound        = errors.New("image not found")
+	ErrSettingsNotFound     = errors.New("settings not found")
 )

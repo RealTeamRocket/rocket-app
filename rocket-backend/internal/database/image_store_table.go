@@ -3,6 +3,7 @@ package database
 import (
 	"database/sql"
 	"fmt"
+	"rocket-backend/internal/custom_error"
 	"rocket-backend/internal/types"
 	"rocket-backend/pkg/logger"
 
@@ -18,7 +19,8 @@ func (s *service) SaveImage(filename string, data []byte) (uuid.UUID, error) {
 	`, id, filename, data)
 
 	if err != nil {
-		return uuid.Nil, err
+		logger.Error("Failed to save image", err)
+		return uuid.Nil, fmt.Errorf("%w: %v", custom_error.ErrFailedToSave, err)
 	}
 
 	return id, nil
@@ -46,10 +48,10 @@ func (s *service) GetUserImage(userID uuid.UUID) (*types.UserImage, error) {
 	if err != nil {
 		if err == sql.ErrNoRows {
 			logger.Warn("No image found for user:", userID)
-			return nil, nil
+			return nil, fmt.Errorf("%w: %v", custom_error.ErrImageNotFound, err)
 		}
 		logger.Error("Failed to get user image", err)
-		return nil, fmt.Errorf("failed to get user image: %w", err)
+		return nil, fmt.Errorf("%w: %v", custom_error.ErrFailedToRetrieveData, err)
 	}
 
 	return &img, nil

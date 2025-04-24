@@ -3,6 +3,7 @@ package database
 import (
 	"fmt"
 	"math/rand"
+	"rocket-backend/internal/custom_error"
 	"rocket-backend/internal/types"
 	"rocket-backend/pkg/logger"
 	"time"
@@ -16,7 +17,7 @@ func (s *service) GetAllChallenges() ([]types.Challenge, error) {
 	rows, err := s.db.Query(query)
 	if err != nil {
 		logger.Error("Failed to fetch challenges from database", err)
-		return nil, fmt.Errorf("failed to fetch challenges: %w", err)
+		return nil, fmt.Errorf("%w: %v", custom_error.ErrFailedToRetrieveData, err)
 	}
 	defer rows.Close()
 
@@ -24,14 +25,14 @@ func (s *service) GetAllChallenges() ([]types.Challenge, error) {
 		var challenge types.Challenge
 		if err := rows.Scan(&challenge.ID, &challenge.Text, &challenge.Points); err != nil {
 			logger.Error("Failed to scan challenge row", err)
-			return nil, fmt.Errorf("failed to scan challenge row: %w", err)
+			return nil, fmt.Errorf("%w: %v", custom_error.ErrDatabaseQuery, err)
 		}
 		challenges = append(challenges, challenge)
 	}
 
 	if err := rows.Err(); err != nil {
 		logger.Error("Error iterating over challenge rows", err)
-		return nil, fmt.Errorf("error iterating over challenge rows: %w", err)
+		return nil, fmt.Errorf("%w: %v", custom_error.ErrDatabaseQuery, err)
 	}
 
 	return challenges, nil
@@ -48,7 +49,7 @@ func (s *service) AssignChallengesToUser(userID uuid.UUID, challenges []types.Ch
 		_, err := s.db.Exec(query, userID, challenge.ID)
 		if err != nil {
 			logger.Error("Failed to assign challenge to user", err)
-			return fmt.Errorf("failed to assign challenge to user: %w", err)
+			return fmt.Errorf("%w: %v", custom_error.ErrFailedToSave, err)
 		}
 	}
 
@@ -66,7 +67,7 @@ func (s *service) GetUserDailyChallenges(userID uuid.UUID) ([]types.Challenge, e
 	rows, err := s.db.Query(query, userID)
 	if err != nil {
 		logger.Error("Failed to fetch user daily challenges", err)
-		return nil, fmt.Errorf("failed to fetch user daily challenges: %w", err)
+		return nil, fmt.Errorf("%w: %v", custom_error.ErrFailedToRetrieveData, err)
 	}
 	defer rows.Close()
 
@@ -74,14 +75,14 @@ func (s *service) GetUserDailyChallenges(userID uuid.UUID) ([]types.Challenge, e
 		var challenge types.Challenge
 		if err := rows.Scan(&challenge.ID, &challenge.Text, &challenge.Points); err != nil {
 			logger.Error("Failed to scan user challenge row", err)
-			return nil, fmt.Errorf("failed to scan user challenge row: %w", err)
+			return nil, fmt.Errorf("%w: %v", custom_error.ErrDatabaseQuery, err)
 		}
 		challenges = append(challenges, challenge)
 	}
 
 	if err := rows.Err(); err != nil {
 		logger.Error("Error iterating over user challenge rows", err)
-		return nil, fmt.Errorf("error iterating over user challenge rows: %w", err)
+		return nil, fmt.Errorf("%w: %v", custom_error.ErrDatabaseQuery, err)
 	}
 
 	return challenges, nil
@@ -91,7 +92,7 @@ func (s *service) ResetDailyChallenges() error {
 	_, err := s.db.Exec(`DELETE FROM user_challenges WHERE date < CURRENT_DATE`)
 	if err != nil {
 		logger.Error("Failed to delete old challenges", err)
-		return fmt.Errorf("failed to delete old challenges: %w", err)
+		return fmt.Errorf("%w: %v", custom_error.ErrFailedToUpdate, err)
 	}
 
 	// Fetch all users
@@ -100,7 +101,7 @@ func (s *service) ResetDailyChallenges() error {
 	rows, err := s.db.Query(query)
 	if err != nil {
 		logger.Error("Failed to fetch user IDs", err)
-		return fmt.Errorf("failed to fetch user IDs: %w", err)
+		return fmt.Errorf("%w: %v", custom_error.ErrFailedToRetrieveData, err)
 	}
 	defer rows.Close()
 
@@ -108,14 +109,14 @@ func (s *service) ResetDailyChallenges() error {
 		var userID uuid.UUID
 		if err := rows.Scan(&userID); err != nil {
 			logger.Error("Failed to scan user ID", err)
-			return fmt.Errorf("failed to scan user ID: %w", err)
+			return fmt.Errorf("%w: %v", custom_error.ErrDatabaseQuery, err)
 		}
 		userIDs = append(userIDs, userID)
 	}
 
 	if err := rows.Err(); err != nil {
 		logger.Error("Error iterating over user IDs", err)
-		return fmt.Errorf("error iterating over user IDs: %w", err)
+		return fmt.Errorf("%w: %v", custom_error.ErrDatabaseQuery, err)
 	}
 
 	// Assign new challenges to each user
@@ -159,7 +160,7 @@ func (s *service) InsertChallenge(challenge types.Challenge) error {
 	_, err := s.db.Exec(query, challenge.ID, challenge.Text, challenge.Points)
 	if err != nil {
 		logger.Error("Failed to insert challenge into database", err)
-		return fmt.Errorf("failed to insert challenge: %w", err)
+		return fmt.Errorf("%w: %v", custom_error.ErrFailedToSave, err)
 	}
 
 	return nil
@@ -175,7 +176,7 @@ func (s *service) CompleteChallenge(UserID uuid.UUID, dto types.CompleteChalleng
 	_, err := s.db.Exec(query, UserID, dto.ChallengeID)
 	if err != nil {
 		logger.Error("Failed to mark challenge as completed", err)
-		return fmt.Errorf("failed to mark challenge as completed: %w", err)
+		return fmt.Errorf("%w: %v", custom_error.ErrFailedToUpdate, err)
 	}
 
 	return nil

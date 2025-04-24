@@ -215,7 +215,13 @@ func (s *Server) GetDailyChallenges(c *gin.Context) {
 	challengeManager := challenges.NewChallengeManager(s.db)
 	dailies, err := challengeManager.GetDailies(userUUID)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error generating challenges"})
+		if errors.Is(err, custom_error.ErrChallengeNotFound) {
+			c.JSON(http.StatusNotFound, gin.H{"error": "Not enough challenges available"})
+		} else if errors.Is(err, custom_error.ErrFailedToRetrieveData) {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve challenges"})
+		} else {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal server error"})
+		}
 		return
 	}
 
@@ -253,9 +259,13 @@ func (s *Server) CompleteChallenge(c *gin.Context) {
 
 	err = s.db.CompleteChallenge(userUUID, pointsDTO)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to complete challenge"})
+		if errors.Is(err, custom_error.ErrFailedToUpdate) {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to complete challenge"})
+		} else {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal server error"})
+		}
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"message": "Updated points correctly"})
+	c.JSON(http.StatusOK, gin.H{"message": "Challenge completed successfully"})
 }
