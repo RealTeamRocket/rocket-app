@@ -77,13 +77,14 @@ class _LeaderboardsPageState extends State<LeaderboardsPage> {
                       SlidableAction(
                         onPressed: (_) {
                           setState(() {
+                            _completedCount++;
                             _challenges.removeAt(index);
                           });
                         },
-                        backgroundColor: Colors.redAccent,
+                        backgroundColor: ColorConstants.greenColor,
                         foregroundColor: Colors.white,
-                        icon: Icons.close,
-                        label: 'Skip',
+                        icon: Icons.check,
+                        label: 'Done',
                         borderRadius: BorderRadius.circular(16),
                       ),
                     ],
