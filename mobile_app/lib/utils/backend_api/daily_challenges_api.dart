@@ -44,4 +44,24 @@ class ChallengesApi {
         .map((e) => Challenge.fromJson(e as Map<String, dynamic>))
         .toList();
   }
+
+  static Future<void> markAsDone(String jwt, String challengeId, int rocketPoints) async {
+    final backendUrl = dotenv.get('BACKEND_URL', fallback: "http://10.0.2.2:8080");
+
+    final response = await http.post(
+      Uri.parse('$backendUrl/api/v1/protected/challenges/complete'),
+      headers: {
+        'Authorization': 'Bearer $jwt',
+        'Content-Type': 'application/json',
+      },
+      body: jsonEncode({
+        'challenge_id': challengeId,
+        'rocket_points': rocketPoints,
+      }),
+    );
+
+    if (response.statusCode != 200) {
+      throw Exception('Failed to mark challenge as done: ${response.statusCode}');
+    }
+  }
 }

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import '../constants/color_constants.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+
 import '../utils/backend_api/daily_challenges_api.dart';
 
 class LeaderboardsPage extends StatefulWidget {
@@ -18,30 +18,12 @@ class _LeaderboardsPageState extends State<LeaderboardsPage> {
   List<Challenge> _challenges = [];
   int _completedCount = 0;
   int _initialChallengeCount = 0;
-  DateTime? _lastFetchedDate;
 
 
   @override
   void initState() {
     super.initState();
-    _loadLastFetchedDate().then((_) {
-      if (_shouldRefetch()) {
-        _loadChallenges();
-      }
-    });
-  }
-
-  Future<void> _saveLastFetchedDate(DateTime date) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString('lastFetchedDate', date.toIso8601String());
-  }
-
-  Future<void> _loadLastFetchedDate() async {
-    final prefs = await SharedPreferences.getInstance();
-    final dateString = prefs.getString('lastFetchedDate');
-    if (dateString != null) {
-      _lastFetchedDate = DateTime.tryParse(dateString);
-    }
+    _loadChallenges();
   }
 
   Future<void> _loadChallenges() async {
@@ -56,19 +38,9 @@ class _LeaderboardsPageState extends State<LeaderboardsPage> {
         _challenges = challenges;
         _initialChallengeCount = challenges.length;
       });
-      await _saveLastFetchedDate(DateTime.now());
     } catch (e) {
       debugPrint('Error loading challenges: $e');
     }
-  }
-
-  bool _shouldRefetch() {
-    if (_lastFetchedDate == null) return true;
-
-    final now = DateTime.now();
-    return now.year != _lastFetchedDate!.year ||
-        now.month != _lastFetchedDate!.month ||
-        now.day != _lastFetchedDate!.day;
   }
 
   @override
@@ -97,8 +69,7 @@ class _LeaderboardsPageState extends State<LeaderboardsPage> {
                         onPressed: (_) {
                           setState(() {
                             _completedCount++;
-                            markChallengeAsDone(challenge.id);
-                            _challenges.removeAt(index);
+                            markChallengeAsDone(challenge);
                           });
                         },
                         backgroundColor: ColorConstants.greenColor,
@@ -119,8 +90,7 @@ class _LeaderboardsPageState extends State<LeaderboardsPage> {
                         onPressed: (_) {
                           setState(() {
                             _completedCount++;
-                            markChallengeAsDone(challenge.id);
-                            _challenges.removeAt(index);
+                            markChallengeAsDone(challenge);
                           });
                         },
                         backgroundColor: ColorConstants.greenColor,
@@ -144,14 +114,23 @@ class _LeaderboardsPageState extends State<LeaderboardsPage> {
     );
   }
 
-  void markChallengeAsDone(String challengeId) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Marked as done: $challengeId'),
-        duration: const Duration(seconds: 2),
-      ),
-    );
-    // TODO: API-Call with challenge-ID
+  Future<void> markChallengeAsDone(Challenge challenge) async {
+    final jwt = await FlutterSecureStorage().read(key: 'jwt_token');
+    if (jwt == null) return;
+
+    try {
+      await ChallengesApi.markAsDone(jwt, challenge.id, challenge.points);
+      await _loadChallenges();
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Challenge done!'),
+          duration: const Duration(seconds: 2),
+        ),
+      );
+    } catch (e) {
+      debugPrint('Failure at completing challenge: $e');
+    }
   }
 
 
