@@ -12,6 +12,7 @@ import (
 type MockDB struct {
 	GetUserByIDFunc            func(userID uuid.UUID) (types.User, error)
 	UpdateDailyStepsFunc       func(userID uuid.UUID, steps int) error
+	UpdateRocketPointsFunc     func(userID uuid.UUID, rocketPoints int) error
 	HealthFunc                 func() map[string]string
 	GetUserByEmailFunc         func(email string) (types.Credentials, error)
 	CheckEmailFunc             func(email string) error
@@ -27,6 +28,7 @@ type MockDB struct {
 	GetUserDailyChallengesFunc func(userID uuid.UUID) ([]types.Challenge, error)
 	ResetDailyChallengesFunc   func() error
 	InsertChallengeFunc        func(challenge types.Challenge) error
+	CompleteChallengeFunc      func(userID uuid.UUID, dto types.CompleteChallengesDTO) error
 }
 
 func (m *MockDB) ExecuteRawSQL(query string) (sql.Result, error) {
@@ -86,6 +88,13 @@ func (m *MockDB) GetUserByID(userID uuid.UUID) (types.User, error) {
 func (m *MockDB) UpdateDailySteps(userID uuid.UUID, steps int) error {
 	if m.UpdateDailyStepsFunc != nil {
 		return m.UpdateDailyStepsFunc(userID, steps)
+	}
+	return nil
+}
+
+func (m *MockDB) UpdateRocketPoints(userID uuid.UUID, rocketPoints int) error {
+	if m.UpdateRocketPointsFunc != nil {
+		return m.UpdateRocketPointsFunc(userID, rocketPoints)
 	}
 	return nil
 }
@@ -156,6 +165,13 @@ func (m *MockDB) ResetDailyChallenges() error {
 func (m *MockDB) InsertChallenge(challenge types.Challenge) error {
 	if m.InsertChallengeFunc != nil {
 		return m.InsertChallengeFunc(challenge)
+	}
+	return nil
+}
+
+func (m *MockDB) CompleteChallenge(userID uuid.UUID, dto types.CompleteChallengesDTO) error {
+	if m.CompleteChallengeFunc != nil {
+		return m.CompleteChallengeFunc(userID, dto)
 	}
 	return nil
 }
