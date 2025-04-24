@@ -3,7 +3,6 @@ package server
 import (
 	"net/http"
 	"strings"
-	"fmt"
 	"os"
 
 	_ "github.com/joho/godotenv/autoload"
