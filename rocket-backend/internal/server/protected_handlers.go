@@ -2,10 +2,12 @@ package server
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
 	"rocket-backend/internal/challenges"
+	"rocket-backend/internal/custom_error"
 	"rocket-backend/internal/types"
 
 	"github.com/gin-gonic/gin"
@@ -27,7 +29,11 @@ func (s *Server) AuthHelloHandler(c *gin.Context) {
 
 	cred, err := s.db.GetUserByID(userUUID)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve user"})
+		if errors.Is(err, custom_error.ErrFailedToRetrieveData) {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve user"})
+		} else {
+			c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
+		}
 		return
 	}
 
@@ -235,18 +241,21 @@ func (s *Server) CompleteChallenge(c *gin.Context) {
 		return
 	}
 
-
 	err = s.db.UpdateRocketPoints(userUUID, pointsDTO.RocketPoints)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal server errror"})
+		if errors.Is(err, custom_error.ErrFailedToUpdate) {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update rocket points"})
+		} else {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal server error"})
+		}
 		return
 	}
 
 	err = s.db.CompleteChallenge(userUUID, pointsDTO)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal server errror"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to complete challenge"})
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"message": "updated points correctly"})
+	c.JSON(http.StatusOK, gin.H{"message": "Updated points correctly"})
 }
