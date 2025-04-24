@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import '../constants/color_constants.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
+
+import '../utils/backend_api/daily_challenges_api.dart';
 
 class LeaderboardsPage extends StatefulWidget {
   const LeaderboardsPage({super.key, required this.title});
@@ -12,24 +15,31 @@ class LeaderboardsPage extends StatefulWidget {
 }
 
 class _LeaderboardsPageState extends State<LeaderboardsPage> {
-  final List<String> _challenges = [
-    'Do 100 Push-ups',
-    'Drink 2 liter of water',
-    'Do 30 minutes of Yoga',
-    'Sleep 8 hours',
-    'Do 100 Push-ups',
-    'Drink 2 liter of water',
-    'Do 30 minutes of Yoga',
-    'Sleep 8 hours',
-  ];
-
+  List<Challenge> _challenges = [];
   int _completedCount = 0;
   int _initialChallengeCount = 0;
 
   @override
   void initState() {
     super.initState();
-    _initialChallengeCount = _challenges.length;
+    _loadChallenges();
+  }
+
+  Future<void> _loadChallenges() async {
+    try {
+      final jwt = await FlutterSecureStorage().read(key: 'jwt_token');
+      if (jwt == null) {
+        throw Exception('JWT not found');
+      }
+
+      final challenges = await ChallengesApi.fetchChallenges(jwt);
+      setState(() {
+        _challenges = challenges;
+        _initialChallengeCount = challenges.length;
+      });
+    } catch (e) {
+      debugPrint('Error loading challenges: $e');
+    }
   }
 
   @override
@@ -45,8 +55,9 @@ class _LeaderboardsPageState extends State<LeaderboardsPage> {
             child: ListView.builder(
               itemCount: _challenges.length,
               itemBuilder: (context, index) {
+                final challenge = _challenges[index];
                 return Slidable(
-                  key: Key(_challenges[index]),
+                  key: Key(challenge.id),
 
                   /// swipe to the right
                   startActionPane: ActionPane(
@@ -57,7 +68,7 @@ class _LeaderboardsPageState extends State<LeaderboardsPage> {
                         onPressed: (_) {
                           setState(() {
                             _completedCount++;
-                            markChallengeAsDone(_challenges[index]);
+                            markChallengeAsDone(challenge.id);
                             _challenges.removeAt(index);
                           });
                         },
@@ -79,7 +90,7 @@ class _LeaderboardsPageState extends State<LeaderboardsPage> {
                         onPressed: (_) {
                           setState(() {
                             _completedCount++;
-                            markChallengeAsDone(_challenges[index]);
+                            markChallengeAsDone(challenge.id);
                             _challenges.removeAt(index);
                           });
                         },
@@ -92,7 +103,7 @@ class _LeaderboardsPageState extends State<LeaderboardsPage> {
                     ],
                   ),
 
-                  child: _buildChallengeCard(_challenges[index]),
+                  child: _buildChallengeCard(challenge),
                 );
               },
             ),
@@ -104,10 +115,10 @@ class _LeaderboardsPageState extends State<LeaderboardsPage> {
     );
   }
 
-  void markChallengeAsDone(String challengeText) {
+  void markChallengeAsDone(String challengeId) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text('Marked as done: $challengeText'),
+        content: Text('Marked as done: $challengeId'),
         duration: const Duration(seconds: 2),
       ),
     );
@@ -117,7 +128,7 @@ class _LeaderboardsPageState extends State<LeaderboardsPage> {
 
 
   /// challenge Cards
-  Widget _buildChallengeCard(String challengeText) {
+  Widget _buildChallengeCard(Challenge challenge) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: Container(
@@ -142,7 +153,7 @@ class _LeaderboardsPageState extends State<LeaderboardsPage> {
             vertical: 16.0,
           ),
           title: Text(
-            challengeText,
+            challenge.text,
             style: const TextStyle(
               fontSize: 18.0,
               fontWeight: FontWeight.w600,
