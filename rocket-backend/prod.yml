@@ -65,6 +65,18 @@ services:
     networks:
       - blueprint
 
+  migrate:
+    image: migrate/migrate
+    networks:
+      - blueprint
+    volumes:
+      - ./migrations:/migrations
+    entrypoint: ["/bin/sh", "-c"]
+    command: ["migrate -path /migrations -database postgres://${BLUEPRINT_DB_USERNAME}:${BLUEPRINT_DB_PASSWORD}@postgres:5432/${BLUEPRINT_DB_DATABASE}?sslmode=disable up"]
+    depends_on:
+      postgres:
+        condition: service_healthy
+
 volumes:
   psql_volume_bp:
 
