@@ -16,9 +16,6 @@ class LeaderboardsPage extends StatefulWidget {
 
 class _LeaderboardsPageState extends State<LeaderboardsPage> {
   List<Challenge> _challenges = [];
-  int _completedCount = 0;
-  int _initialChallengeCount = 0;
-
 
   @override
   void initState() {
@@ -36,7 +33,6 @@ class _LeaderboardsPageState extends State<LeaderboardsPage> {
       final challenges = await ChallengesApi.fetchChallenges(jwt);
       setState(() {
         _challenges = challenges;
-        _initialChallengeCount = challenges.length;
       });
     } catch (e) {
       debugPrint('Error loading challenges: $e');
@@ -45,7 +41,10 @@ class _LeaderboardsPageState extends State<LeaderboardsPage> {
 
   @override
   Widget build(BuildContext context) {
-    double progressValue = _initialChallengeCount == 0 ? 0 : _completedCount / _initialChallengeCount;
+    const int totalChallenges = 5;
+    double progressValue = totalChallenges == 0
+        ? 0
+        : ((totalChallenges - _challenges.length) / totalChallenges).clamp(0.0, 1.0);
 
     return Container(
       color: ColorConstants.primaryColor,
@@ -67,10 +66,11 @@ class _LeaderboardsPageState extends State<LeaderboardsPage> {
                     children: [
                       SlidableAction(
                         onPressed: (_) {
+                          final challengeToMark = challenge;
                           setState(() {
-                            _completedCount++;
-                            markChallengeAsDone(challenge);
+                            _challenges.remove(challengeToMark);
                           });
+                          markChallengeAsDone(challengeToMark);
                         },
                         backgroundColor: ColorConstants.greenColor,
                         foregroundColor: Colors.white,
@@ -88,10 +88,11 @@ class _LeaderboardsPageState extends State<LeaderboardsPage> {
                     children: [
                       SlidableAction(
                         onPressed: (_) {
+                          final challengeToMark = challenge;
                           setState(() {
-                            _completedCount++;
-                            markChallengeAsDone(challenge);
+                            _challenges.remove(challengeToMark);
                           });
+                          markChallengeAsDone(challengeToMark);
                         },
                         backgroundColor: ColorConstants.greenColor,
                         foregroundColor: Colors.white,
@@ -120,7 +121,7 @@ class _LeaderboardsPageState extends State<LeaderboardsPage> {
 
     try {
       await ChallengesApi.markAsDone(jwt, challenge.id, challenge.points);
-      await _loadChallenges();
+      // await _loadChallenges(); // only needed if we want to use only backend to sync/show challenges
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
