@@ -2,10 +2,10 @@ package database_tests
 
 import (
 	"fmt"
-	"rocket-backend/internal/database"
 	"github.com/google/uuid"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
+	"rocket-backend/internal/database"
 )
 
 var _ = Describe("Image store table tests", func() {

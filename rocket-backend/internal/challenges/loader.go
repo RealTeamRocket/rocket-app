@@ -11,9 +11,9 @@ import (
 )
 
 var (
-	once        sync.Once
-	cached      []types.Challenge
-	loadErr     error
+	once    sync.Once
+	cached  []types.Challenge
+	loadErr error
 )
 
 func LoadChallengesFromFile(path string) ([]types.Challenge, error) {

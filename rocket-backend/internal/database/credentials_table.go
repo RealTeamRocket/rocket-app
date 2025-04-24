@@ -2,9 +2,9 @@ package database
 
 import (
 	"fmt"
+	"rocket-backend/internal/custom_error"
 	"rocket-backend/internal/types"
 	"rocket-backend/pkg/logger"
-	"rocket-backend/internal/custom_error"
 
 	_ "github.com/jackc/pgx/v5/stdlib"
 	_ "github.com/joho/godotenv/autoload"

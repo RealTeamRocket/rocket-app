@@ -10,23 +10,23 @@ import (
 )
 
 type MockDB struct {
-	GetUserByIDFunc         func(userID uuid.UUID) (types.User, error)
-	UpdateDailyStepsFunc    func(userID uuid.UUID, steps int) error
-	HealthFunc              func() map[string]string
-	GetUserByEmailFunc      func(email string) (types.Credentials, error)
-	CheckEmailFunc          func(email string) error
-	SaveCredentialsFunc     func(creds types.Credentials) error
-	SaveUserProfileFunc     func(user types.User) error
-	GetSettingsByUserIDFunc func(userID uuid.UUID) (*types.Settings, error)
-	CreateSettingsFunc      func(settings types.Settings) error
-	UpdateSettingsFunc      func(userId uuid.UUID, settings types.SettingsDTO, imageID uuid.UUID) error
-	SaveImageFunc           func(filename string, data []byte) (uuid.UUID, error)
-	GetUserImageFunc        func(userID uuid.UUID) (*types.UserImage, error)
-	GetAllChallengesFunc        func() ([]types.Challenge, error)
-	AssignChallengesToUserFunc  func(userID uuid.UUID, challenges []types.Challenge) error
-	GetUserDailyChallengesFunc  func(userID uuid.UUID) ([]types.Challenge, error)
-	ResetDailyChallengesFunc    func() error
-	InsertChallengeFunc         func(challenge types.Challenge) error
+	GetUserByIDFunc            func(userID uuid.UUID) (types.User, error)
+	UpdateDailyStepsFunc       func(userID uuid.UUID, steps int) error
+	HealthFunc                 func() map[string]string
+	GetUserByEmailFunc         func(email string) (types.Credentials, error)
+	CheckEmailFunc             func(email string) error
+	SaveCredentialsFunc        func(creds types.Credentials) error
+	SaveUserProfileFunc        func(user types.User) error
+	GetSettingsByUserIDFunc    func(userID uuid.UUID) (*types.Settings, error)
+	CreateSettingsFunc         func(settings types.Settings) error
+	UpdateSettingsFunc         func(userId uuid.UUID, settings types.SettingsDTO, imageID uuid.UUID) error
+	SaveImageFunc              func(filename string, data []byte) (uuid.UUID, error)
+	GetUserImageFunc           func(userID uuid.UUID) (*types.UserImage, error)
+	GetAllChallengesFunc       func() ([]types.Challenge, error)
+	AssignChallengesToUserFunc func(userID uuid.UUID, challenges []types.Challenge) error
+	GetUserDailyChallengesFunc func(userID uuid.UUID) ([]types.Challenge, error)
+	ResetDailyChallengesFunc   func() error
+	InsertChallengeFunc        func(challenge types.Challenge) error
 }
 
 func (m *MockDB) ExecuteRawSQL(query string) (sql.Result, error) {
