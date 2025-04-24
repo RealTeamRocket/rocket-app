@@ -15,7 +15,7 @@ class LeaderboardsPage extends StatefulWidget {
   State<LeaderboardsPage> createState() => _LeaderboardsPageState();
 }
 
-class _LeaderboardsPageState extends State<LeaderboardsPage> {
+class _LeaderboardsPageState extends State<LeaderboardsPage> with SingleTickerProviderStateMixin {
   List<Challenge> _challenges = [];
 
   @override
@@ -223,38 +223,62 @@ class _LeaderboardsPageState extends State<LeaderboardsPage> {
 
   void showPointsOverlay(String points) {
     final overlay = Overlay.of(context);
-    final overlayEntry = OverlayEntry(
-      builder: (context) => Positioned(
-        top: MediaQuery.of(context).size.height / 2 - 20,
-        left: MediaQuery.of(context).size.width / 2 - 50,
-        child: Material(
-          color: Colors.transparent,
-          child: AnimatedOpacity(
-            duration: const Duration(milliseconds: 800),
-            opacity: 1.0,
-            child: Text(
-              '+$points RP',
-              style: const TextStyle(
-                fontSize: 32,
-                fontWeight: FontWeight.bold,
-                color: ColorConstants.greenColor,
-                shadows: [
-                  Shadow(
-                    blurRadius: 6.0,
-                    color: Colors.black38,
-                    offset: Offset(2, 2),
+    late OverlayEntry overlayEntry;
+
+    final controller = AnimationController(
+      vsync: Navigator.of(context),
+      duration: const Duration(milliseconds: 800),
+    );
+
+    final opacityAnimation = Tween<double>(begin: 1.0, end: 0.0).animate(
+      CurvedAnimation(parent: controller, curve: Curves.easeOut),
+    );
+
+    final slideAnimation = Tween<Offset>(begin: Offset.zero, end: const Offset(0, -0.5)).animate(
+      CurvedAnimation(parent: controller, curve: Curves.easeOut),
+    );
+
+    overlayEntry = OverlayEntry(
+      builder: (context) {
+        return Positioned.fill(
+          child: IgnorePointer(
+            child: Center(
+              child: AnimatedBuilder(
+                animation: controller,
+                builder: (context, child) => Opacity(
+                  opacity: opacityAnimation.value,
+                  child: Transform.translate(
+                    offset: slideAnimation.value * 100, // Moves ~50px upward
+                    child: child,
                   ),
-                ],
+                ),
+                child: Text(
+                  '+$points RP',
+                  style: const TextStyle(
+                    fontSize: 32,
+                    fontWeight: FontWeight.bold,
+                    color: ColorConstants.greenColor,
+                    shadows: [
+                      Shadow(
+                        blurRadius: 6.0,
+                        color: Colors.black38,
+                        offset: Offset(2, 2),
+                      ),
+                    ],
+                  ),
+                ),
               ),
             ),
           ),
-        ),
-      ),
+        );
+      },
     );
 
     overlay.insert(overlayEntry);
+    controller.forward();
 
-    Future.delayed(const Duration(seconds: 1), () {
+    Future.delayed(const Duration(milliseconds: 900), () {
+      controller.dispose();
       overlayEntry.remove();
     });
   }
