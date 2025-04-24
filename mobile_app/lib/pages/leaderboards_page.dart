@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import '../constants/color_constants.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
@@ -66,10 +67,12 @@ class _LeaderboardsPageState extends State<LeaderboardsPage> {
                     children: [
                       SlidableAction(
                         onPressed: (_) {
+                          HapticFeedback.mediumImpact();
                           final challengeToMark = challenge;
                           setState(() {
                             _challenges.remove(challengeToMark);
                           });
+                          showPointsOverlay(challengeToMark.points.toString());
                           markChallengeAsDone(challengeToMark);
                         },
                         backgroundColor: ColorConstants.greenColor,
@@ -88,10 +91,12 @@ class _LeaderboardsPageState extends State<LeaderboardsPage> {
                     children: [
                       SlidableAction(
                         onPressed: (_) {
+                          HapticFeedback.mediumImpact();
                           final challengeToMark = challenge;
                           setState(() {
                             _challenges.remove(challengeToMark);
                           });
+                          showPointsOverlay(challengeToMark.points.toString());
                           markChallengeAsDone(challengeToMark);
                         },
                         backgroundColor: ColorConstants.greenColor,
@@ -214,5 +219,43 @@ class _LeaderboardsPageState extends State<LeaderboardsPage> {
         ),
       ],
     );
+  }
+
+  void showPointsOverlay(String points) {
+    final overlay = Overlay.of(context);
+    final overlayEntry = OverlayEntry(
+      builder: (context) => Positioned(
+        top: MediaQuery.of(context).size.height / 2 - 20,
+        left: MediaQuery.of(context).size.width / 2 - 50,
+        child: Material(
+          color: Colors.transparent,
+          child: AnimatedOpacity(
+            duration: const Duration(milliseconds: 800),
+            opacity: 1.0,
+            child: Text(
+              '+$points RP',
+              style: const TextStyle(
+                fontSize: 32,
+                fontWeight: FontWeight.bold,
+                color: ColorConstants.greenColor,
+                shadows: [
+                  Shadow(
+                    blurRadius: 6.0,
+                    color: Colors.black38,
+                    offset: Offset(2, 2),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+
+    overlay.insert(overlayEntry);
+
+    Future.delayed(const Duration(seconds: 1), () {
+      overlayEntry.remove();
+    });
   }
 }
