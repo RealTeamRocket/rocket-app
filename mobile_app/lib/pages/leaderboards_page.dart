@@ -57,6 +57,7 @@ class _LeaderboardsPageState extends State<LeaderboardsPage> {
                         onPressed: (_) {
                           setState(() {
                             _completedCount++;
+                            markChallengeAsDone(_challenges[index]);
                             _challenges.removeAt(index);
                           });
                         },
@@ -78,6 +79,7 @@ class _LeaderboardsPageState extends State<LeaderboardsPage> {
                         onPressed: (_) {
                           setState(() {
                             _completedCount++;
+                            markChallengeAsDone(_challenges[index]);
                             _challenges.removeAt(index);
                           });
                         },
@@ -101,6 +103,18 @@ class _LeaderboardsPageState extends State<LeaderboardsPage> {
       ),
     );
   }
+
+  void markChallengeAsDone(String challengeText) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Marked as done: $challengeText'),
+        duration: const Duration(seconds: 2),
+      ),
+    );
+
+    // TODO: API-Call with challenge-ID
+  }
+
 
   /// challenge Cards
   Widget _buildChallengeCard(String challengeText) {
