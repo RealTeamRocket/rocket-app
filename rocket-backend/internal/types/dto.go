@@ -1,5 +1,7 @@
 package types
 
+import "github.com/google/uuid"
+
 type RegisterDTO struct {
 	Email    string `json:"email"`
 	Username string `json:"username"`
@@ -18,6 +20,7 @@ type GetImageDTO struct {
 	UserID string `json:"user_id" binding:"required,uuid"`
 }
 
-type CompleteChallangesDTO struct {
-	RocketPoints int `json:"rocket_points" binding:"required"`
+type CompleteChallengesDTO struct {
+	ChallengeID  uuid.UUID `json:"challenge_id" binding:"required"`
+	RocketPoints int       `json:"rocket_points" binding:"required"`
 }

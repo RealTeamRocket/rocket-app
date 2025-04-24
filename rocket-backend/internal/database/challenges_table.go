@@ -164,3 +164,19 @@ func (s *service) InsertChallenge(challenge types.Challenge) error {
 
 	return nil
 }
+
+func (s *service) CompleteChallenge(UserID uuid.UUID, dto types.CompleteChallengesDTO) error {
+	query := `
+		UPDATE user_challenges
+		SET is_completed = TRUE
+		WHERE user_id = $1 AND challenge_id = $2 AND date = CURRENT_DATE
+	`
+
+	_, err := s.db.Exec(query, UserID, dto.ChallengeID)
+	if err != nil {
+		logger.Error("Failed to mark challenge as completed", err)
+		return fmt.Errorf("failed to mark challenge as completed: %w", err)
+	}
+
+	return nil
+}

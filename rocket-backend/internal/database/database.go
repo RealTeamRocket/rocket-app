@@ -56,6 +56,7 @@ type Service interface {
 	GetUserDailyChallenges(userID uuid.UUID) ([]types.Challenge, error)
 	ResetDailyChallenges() error
 	InsertChallenge(challenge types.Challenge) error
+	CompleteChallenge(UserID uuid.UUID, dto types.CompleteChallengesDTO) error
 }
 
 type service struct {

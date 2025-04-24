@@ -216,7 +216,7 @@ func (s *Server) GetDailyChallenges(c *gin.Context) {
 	c.JSON(http.StatusOK, dailies)
 }
 
-func (s *Server) CompleteChallange(c *gin.Context) {
+func (s *Server) CompleteChallenge(c *gin.Context) {
 	userID, exists := c.Get("userID")
 	if !exists {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "User not authenticated"})
@@ -229,11 +229,24 @@ func (s *Server) CompleteChallange(c *gin.Context) {
 		return
 	}
 
-	var pointsDTO types.CompleteChallangesDTO
+	var pointsDTO types.CompleteChallengesDTO
 	if err := c.ShouldBindJSON(&pointsDTO); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request body"})
 		return
 	}
 
-	s.db.UpdateRocketPoints(userUUID, pointsDTO.RocketPoints)
+
+	err = s.db.UpdateRocketPoints(userUUID, pointsDTO.RocketPoints)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal server errror"})
+		return
+	}
+
+	err = s.db.CompleteChallenge(userUUID, pointsDTO)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal server errror"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "updated points correctly"})
 }
