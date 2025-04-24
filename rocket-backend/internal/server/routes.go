@@ -18,6 +18,7 @@ func (s *Server) RegisterRoutes() http.Handler {
 	}))
 
 	api := r.Group("/api/v1")
+	api.Use(s.APIKeyMiddleware())
 	{
 		api.GET("/health", s.HealthHandler)
 		api.POST("/register", s.RegisterHandler)

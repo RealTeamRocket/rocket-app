@@ -3,7 +3,8 @@ package server
 import (
 	"net/http"
 	"strings"
-
+	_ "github.com/joho/godotenv"
+	"os"
 	"rocket-backend/internal/auth"
 
 	"github.com/gin-gonic/gin"
@@ -44,6 +45,27 @@ func (s *Server) AuthMiddleware() gin.HandlerFunc {
 		}
 
 		c.Set("userID", userUUID.String())
+		c.Next()
+	}
+}
+
+func (s *Server) APIKeyMiddleware() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		// Lade den API-Key aus den Umgebungsvariablen
+		expectedAPIKey := os.Getenv("API_KEY")
+
+		// Hole den API-Key aus dem Header
+		apiKey := c.GetHeader("X-API-KEY")
+
+		// Vergleiche den API-Key
+		if apiKey != expectedAPIKey {
+			c.JSON(http.StatusForbidden, gin.H{
+				"error": "Invalid or missing API key",
+			})
+			c.Abort()
+			return
+		}
+
 		c.Next()
 	}
 }
