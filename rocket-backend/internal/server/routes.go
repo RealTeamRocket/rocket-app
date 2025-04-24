@@ -9,16 +9,15 @@ import (
 
 func (s *Server) RegisterRoutes() http.Handler {
 	r := gin.Default()
-
+	r.Use(s.APIKeyMiddleware())
 	r.Use(cors.New(cors.Config{
 		AllowOrigins:     []string{"*"},
 		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"},
-		AllowHeaders:     []string{"Accept", "Authorization", "Content-Type"},
+		AllowHeaders:     []string{"Accept", "Authorization", "Content-Type", "X-API-KEY"},
 		AllowCredentials: true, // Enable cookies/auth
 	}))
 
 	api := r.Group("/api/v1")
-	api.Use(s.APIKeyMiddleware())
 	{
 		api.GET("/health", s.HealthHandler)
 		api.POST("/register", s.RegisterHandler)
