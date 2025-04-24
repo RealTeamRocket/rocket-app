@@ -25,7 +25,7 @@ class Challenge {
 class ChallengesApi {
   static Future<List<Challenge>> fetchChallenges(String jwt) async {
     final backendUrl = dotenv.get('BACKEND_URL', fallback: 'http://10.0.2.2:8080');
-    final uri = Uri.parse('$backendUrl/api/v1/protected/dailies');
+    final uri = Uri.parse('$backendUrl/api/v1/protected/challenges/new');
     final response = await http.get(
       uri,
       headers: {'Authorization': 'Bearer $jwt'},
