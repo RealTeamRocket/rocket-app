@@ -40,10 +40,10 @@ func (s *service) GetAllChallenges() ([]types.Challenge, error) {
 
 func (s *service) AssignChallengesToUser(userID uuid.UUID, challenges []types.Challenge) error {
 	query := `
-		INSERT INTO user_challenges (user_id, challenge_id, date)
-		VALUES ($1, $2, CURRENT_DATE)
-		ON CONFLICT (user_id, challenge_id, date) DO NOTHING
-	`
+    INSERT INTO user_challenges (user_id, challenge_id, date)
+    VALUES ($1, $2, CURRENT_DATE)
+    ON CONFLICT (user_id, challenge_id, date) DO NOTHING
+    `
 
 	for _, challenge := range challenges {
 		_, err := s.db.Exec(query, userID, challenge.ID)
@@ -62,7 +62,7 @@ func (s *service) GetUserDailyChallenges(userID uuid.UUID) ([]types.Challenge, e
 		SELECT c.id, c.description AS text, c.points_reward AS points
 		FROM user_challenges uc
 		JOIN challenges c ON uc.challenge_id = c.id
-		WHERE uc.user_id = $1 AND uc.date = CURRENT_DATE
+		WHERE uc.user_id = $1 AND uc.date = CURRENT_DATE AND uc.is_completed = FALSE
 	`
 	rows, err := s.db.Query(query, userID)
 	if err != nil {
@@ -176,6 +176,37 @@ func (s *service) CompleteChallenge(UserID uuid.UUID, dto types.CompleteChalleng
 	_, err := s.db.Exec(query, UserID, dto.ChallengeID)
 	if err != nil {
 		logger.Error("Failed to mark challenge as completed", err)
+		return fmt.Errorf("%w: %v", custom_error.ErrFailedToUpdate, err)
+	}
+
+	return nil
+}
+
+func (s *service) IsNewDayForUser(userID uuid.UUID) (bool, error) {
+	query := `
+    SELECT COUNT(*)
+    FROM user_challenges
+    WHERE user_id = $1 AND date = CURRENT_DATE
+    `
+	var count int
+	err := s.db.QueryRow(query, userID).Scan(&count)
+	if err != nil {
+		logger.Error("Failed to check if it's a new day for the user", err)
+		return false, fmt.Errorf("%w: %v", custom_error.ErrDatabaseQuery, err)
+	}
+
+	// If no challenges exist for the current day, it's a new day
+	return count == 0, nil
+}
+
+func (s *service) CleanUpChallengesForUser(userID uuid.UUID) error {
+	query := `
+    DELETE FROM user_challenges
+    WHERE user_id = $1 AND date < CURRENT_DATE
+    `
+	_, err := s.db.Exec(query, userID)
+	if err != nil {
+		logger.Error("Failed to clean up old challenges for the user", err)
 		return fmt.Errorf("%w: %v", custom_error.ErrFailedToUpdate, err)
 	}
 

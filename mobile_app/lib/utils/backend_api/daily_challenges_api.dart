@@ -35,9 +35,7 @@ class ChallengesApi {
       throw Exception('Failed to fetch challenges: ${response.statusCode}');
     }
 
-    /// JSON parsing
-    final body = jsonDecode(response.body) as Map<String, dynamic>;
-    final items = body['challenges'] as List<dynamic>? ?? [];
+    final items = jsonDecode(response.body) as List<dynamic>;
 
     /// map into list of challenges
     return items

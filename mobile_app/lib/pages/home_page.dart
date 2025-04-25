@@ -23,7 +23,7 @@ class _HomePageState extends State<HomePage> {
         children: const [Text("Search"), Icon(Icons.checklist)],
       ),
     ),
-    const LeaderboardsPage(title: 'Challenges'),
+    const ChallengePage(title: 'Challenges'),
     const ProfilePage(),
   ];
 

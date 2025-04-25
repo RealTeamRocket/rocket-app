@@ -21,45 +21,59 @@ func NewChallengeManager(db database.Service) *ChallengeManager {
 }
 
 func (cm *ChallengeManager) GetDailies(userID uuid.UUID) ([]types.Challenge, error) {
-	// Ensure challenges are loaded into the database
-	err := cm.ensureChallengesLoaded()
-	if err != nil {
-		logger.Error("Failed to ensure challenges are loaded", err)
-		return nil, fmt.Errorf("%w: %v", custom_error.ErrFailedToRetrieveData, err)
-	}
+    // Ensure challenges are loaded into the database
+    err := cm.ensureChallengesLoaded()
+    if err != nil {
+        logger.Error("Failed to ensure challenges are loaded", err)
+        return nil, fmt.Errorf("%w: %v", custom_error.ErrFailedToRetrieveData, err)
+    }
 
-	// Fetch daily challenges for the user
-	dailies, err := cm.db.GetUserDailyChallenges(userID)
-	if err != nil {
-		logger.Error("Failed to fetch user daily challenges", err)
-		return nil, fmt.Errorf("%w: %v", custom_error.ErrFailedToRetrieveData, err)
-	}
+    // Check if it's a new day and clean up old challenges
+    isNewDay, err := cm.db.IsNewDayForUser(userID)
+    if err != nil {
+        logger.Error("Failed to check if it's a new day for the user", err)
+        return nil, fmt.Errorf("%w: %v", custom_error.ErrFailedToRetrieveData, err)
+    }
 
-	// If no challenges are assigned yet, assign new ones
-	if len(dailies) == 0 {
-		allChallenges, err := cm.db.GetAllChallenges()
-		if err != nil {
-			return nil, fmt.Errorf("%w: %v", custom_error.ErrFailedToRetrieveData, err)
-		}
+    if isNewDay {
+        // Clean up old challenges for the user
+        err := cm.db.CleanUpChallengesForUser(userID)
+        if err != nil {
+            logger.Error("Failed to clean up old challenges for the user", err)
+            return nil, fmt.Errorf("%w: %v", custom_error.ErrFailedToUpdate, err)
+        }
 
-		if len(allChallenges) < 5 {
-			logger.Warn("Less than 5 challenges available, returning all")
-			return nil, fmt.Errorf("%w: not enough challenges available: got %d, need at least 5", custom_error.ErrChallengeNotFound, len(allChallenges))
-		}
+        // Assign new challenges for the user
+        allChallenges, err := cm.db.GetAllChallenges()
+        if err != nil {
+            return nil, fmt.Errorf("%w: %v", custom_error.ErrFailedToRetrieveData, err)
+        }
 
-		// Shuffle and pick 5 random challenges
-		shuffledChallenges := database.ShuffleChallenges(allChallenges)
-		dailyChallenges := shuffledChallenges[:5]
+        if len(allChallenges) < 5 {
+            logger.Warn("Less than 5 challenges available, returning all")
+            return nil, fmt.Errorf("%w: not enough challenges available: got %d, need at least 5", custom_error.ErrChallengeNotFound, len(allChallenges))
+        }
 
-		err = cm.db.AssignChallengesToUser(userID, dailyChallenges)
-		if err != nil {
-			return nil, fmt.Errorf("%w: %v", custom_error.ErrFailedToSave, err)
-		}
+        // Shuffle and pick 5 random challenges
+        shuffledChallenges := database.ShuffleChallenges(allChallenges)
+        dailyChallenges := shuffledChallenges[:5]
 
-		return dailyChallenges, nil
-	}
+        err = cm.db.AssignChallengesToUser(userID, dailyChallenges)
+        if err != nil {
+            return nil, fmt.Errorf("%w: %v", custom_error.ErrFailedToSave, err)
+        }
 
-	return dailies, nil
+        return dailyChallenges, nil
+    }
+
+    // Fetch daily challenges for the user
+    dailies, err := cm.db.GetUserDailyChallenges(userID)
+    if err != nil {
+        logger.Error("Failed to fetch user daily challenges", err)
+        return nil, fmt.Errorf("%w: %v", custom_error.ErrFailedToRetrieveData, err)
+    }
+
+    return dailies, nil
 }
 
 func (cm *ChallengeManager) ensureChallengesLoaded() error {

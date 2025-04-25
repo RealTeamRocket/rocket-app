@@ -6,16 +6,17 @@ import 'package:flutter_slidable/flutter_slidable.dart';
 
 import '../utils/backend_api/daily_challenges_api.dart';
 
-class LeaderboardsPage extends StatefulWidget {
-  const LeaderboardsPage({super.key, required this.title});
+class ChallengePage extends StatefulWidget {
+  const ChallengePage({super.key, required this.title});
 
   final String title;
 
   @override
-  State<LeaderboardsPage> createState() => _LeaderboardsPageState();
+  State<ChallengePage> createState() => _ChallengePageState();
 }
 
-class _LeaderboardsPageState extends State<LeaderboardsPage> with SingleTickerProviderStateMixin {
+class _ChallengePageState extends State<ChallengePage>
+    with SingleTickerProviderStateMixin {
   List<Challenge> _challenges = [];
 
   @override
@@ -32,6 +33,7 @@ class _LeaderboardsPageState extends State<LeaderboardsPage> with SingleTickerPr
       }
 
       final challenges = await ChallengesApi.fetchChallenges(jwt);
+      debugPrint(challenges.toString());
       setState(() {
         _challenges = challenges;
       });
@@ -43,9 +45,13 @@ class _LeaderboardsPageState extends State<LeaderboardsPage> with SingleTickerPr
   @override
   Widget build(BuildContext context) {
     const int totalChallenges = 5;
-    double progressValue = totalChallenges == 0
-        ? 0
-        : ((totalChallenges - _challenges.length) / totalChallenges).clamp(0.0, 1.0);
+    double progressValue =
+        totalChallenges == 0
+            ? 0
+            : ((totalChallenges - _challenges.length) / totalChallenges).clamp(
+              0.0,
+              1.0,
+            );
 
     return Container(
       color: ColorConstants.primaryColor,
@@ -133,7 +139,6 @@ class _LeaderboardsPageState extends State<LeaderboardsPage> with SingleTickerPr
     }
   }
 
-
   /// challenge Cards
   Widget _buildChallengeCard(Challenge challenge) {
     return Padding(
@@ -200,17 +205,16 @@ class _LeaderboardsPageState extends State<LeaderboardsPage> with SingleTickerPr
         Container(
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(20.0),
-            border: Border.all(
-              color: ColorConstants.white,
-              width: 2.0,
-            ),
+            border: Border.all(color: ColorConstants.white, width: 2.0),
           ),
           child: ClipRRect(
             borderRadius: BorderRadius.circular(20.0),
             child: LinearProgressIndicator(
               value: progressValue,
               minHeight: 12.0,
-              backgroundColor: ColorConstants.primaryColor.withValues(alpha: 0.3),
+              backgroundColor: ColorConstants.primaryColor.withValues(
+                alpha: 0.3,
+              ),
               valueColor: const AlwaysStoppedAnimation<Color>(
                 ColorConstants.greenColor,
               ),
@@ -230,13 +234,15 @@ class _LeaderboardsPageState extends State<LeaderboardsPage> with SingleTickerPr
       duration: const Duration(milliseconds: 800),
     );
 
-    final opacityAnimation = Tween<double>(begin: 1.0, end: 0.0).animate(
-      CurvedAnimation(parent: controller, curve: Curves.easeOut),
-    );
+    final opacityAnimation = Tween<double>(
+      begin: 1.0,
+      end: 0.0,
+    ).animate(CurvedAnimation(parent: controller, curve: Curves.easeOut));
 
-    final slideAnimation = Tween<Offset>(begin: Offset.zero, end: const Offset(0, -0.5)).animate(
-      CurvedAnimation(parent: controller, curve: Curves.easeOut),
-    );
+    final slideAnimation = Tween<Offset>(
+      begin: Offset.zero,
+      end: const Offset(0, -0.5),
+    ).animate(CurvedAnimation(parent: controller, curve: Curves.easeOut));
 
     overlayEntry = OverlayEntry(
       builder: (context) {
@@ -245,13 +251,15 @@ class _LeaderboardsPageState extends State<LeaderboardsPage> with SingleTickerPr
             child: Center(
               child: AnimatedBuilder(
                 animation: controller,
-                builder: (context, child) => Opacity(
-                  opacity: opacityAnimation.value,
-                  child: Transform.translate(
-                    offset: slideAnimation.value * 100, // Moves ~50px upward
-                    child: child,
-                  ),
-                ),
+                builder:
+                    (context, child) => Opacity(
+                      opacity: opacityAnimation.value,
+                      child: Transform.translate(
+                        offset:
+                            slideAnimation.value * 100, // Moves ~50px upward
+                        child: child,
+                      ),
+                    ),
                 child: Text(
                   '+$points RP',
                   style: const TextStyle(
