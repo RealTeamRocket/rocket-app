@@ -3,7 +3,7 @@ package server
 import (
 	"errors"
 	"net/http"
-	"rocket-backend/internal/auth"
+	"rocket-backend/pkg/auth"
 	"rocket-backend/internal/custom_error"
 	"rocket-backend/internal/types"
 	"rocket-backend/pkg/logger"

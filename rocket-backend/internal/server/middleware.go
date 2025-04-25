@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"strings"
 
-	"rocket-backend/internal/auth"
+	"rocket-backend/pkg/auth"
 
 	"github.com/gin-gonic/gin"
 )
