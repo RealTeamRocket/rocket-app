@@ -29,10 +29,10 @@ func (s *Server) AuthHelloHandler(c *gin.Context) {
 
 	cred, err := s.db.GetUserByID(userUUID)
 	if err != nil {
-		if errors.Is(err, custom_error.ErrFailedToRetrieveData) {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve user"})
-		} else {
+		if errors.Is(err, custom_error.ErrUserNotFound) {
 			c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
+		} else {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve user"})
 		}
 		return
 	}

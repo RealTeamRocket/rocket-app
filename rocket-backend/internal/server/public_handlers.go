@@ -73,7 +73,7 @@ func (s *Server) RegisterHandler(c *gin.Context) {
 		if errors.Is(err, custom_error.ErrEmailAlreadyExists) {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "Email already exists"})
 		} else {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal server error"})
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to check email"})
 		}
 		return
 	}

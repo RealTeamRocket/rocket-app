@@ -13,6 +13,7 @@ import (
 	"golang.org/x/crypto/bcrypt"
 
 	"rocket-backend/integration-tests/mocks"
+	"rocket-backend/internal/custom_error"
 	"rocket-backend/internal/server"
 	"rocket-backend/internal/types"
 )
@@ -144,16 +145,16 @@ var _ = Describe("PublicHandlers", func() {
 			})
 		})
 
-		Context("email already exists", func() {
+		Context("when email already exists", func() {
 			BeforeEach(func() {
 				mock.CheckEmailFunc = func(email string) error {
-					return errors.New("email already exists")
+					return custom_error.ErrEmailAlreadyExists
 				}
 			})
 
-			It("should return an error", func() {
-				body := `{"email": "test@example.com", "password": "password", "username": "testuser"}`
-				req, err := http.NewRequest("POST", "/register", strings.NewReader(body))
+			It("should return a bad request error", func() {
+				reqBody := `{"email": "existing@user.com", "password": "password123"}`
+				req, err := http.NewRequest("POST", "/register", strings.NewReader(reqBody))
 				Expect(err).To(BeNil())
 				req.Header.Set("Content-Type", "application/json")
 

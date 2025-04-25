@@ -46,16 +46,20 @@ func (s *service) AssignChallengesToUser(userID uuid.UUID, challenges []types.Ch
     `
 
 	for _, challenge := range challenges {
-		_, err := s.db.Exec(query, userID, challenge.ID)
+		result, err := s.db.Exec(query, userID, challenge.ID)
 		if err != nil {
 			logger.Error("Failed to assign challenge to user", err)
 			return fmt.Errorf("%w: %v", custom_error.ErrFailedToSave, err)
+		}
+
+		rowsAffected, _ := result.RowsAffected()
+		if rowsAffected == 0 {
+			logger.Warn(fmt.Sprintf("Challenge %s was not assigned to user %s (possible conflict)", challenge.ID, userID))
 		}
 	}
 
 	return nil
 }
-
 func (s *service) GetUserDailyChallenges(userID uuid.UUID) ([]types.Challenge, error) {
 	var challenges []types.Challenge
 	query := `
@@ -95,7 +99,6 @@ func (s *service) ResetDailyChallenges() error {
 		return fmt.Errorf("%w: %v", custom_error.ErrFailedToUpdate, err)
 	}
 
-	// Fetch all users
 	var userIDs []uuid.UUID
 	query := `SELECT id FROM users`
 	rows, err := s.db.Query(query)
@@ -119,13 +122,17 @@ func (s *service) ResetDailyChallenges() error {
 		return fmt.Errorf("%w: %v", custom_error.ErrDatabaseQuery, err)
 	}
 
-	// Assign new challenges to each user
 	allChallenges, err := s.GetAllChallenges()
 	if err != nil {
 		return err
 	}
 
 	for _, userID := range userIDs {
+		if len(allChallenges) < 5 {
+			logger.Error("Not enough challenges in the database to assign")
+			return fmt.Errorf("not enough challenges to assign")
+		}
+
 		shuffledChallenges := ShuffleChallenges(allChallenges)
 		dailyChallenges := shuffledChallenges[:5]
 
