@@ -75,12 +75,12 @@ var _ = Describe("Challenges Table", func() {
 		It("should assign challenges to a user successfully", func() {
 			userID := uuid.New()
 			challenge1 := types.Challenge{
-				ID:     uuid.New().String(),
+				ID:     "46849703-a389-4ecc-96cd-01d3a0c5ad15",
 				Text:   "Meditate for 10 minutes",
 				Points: 20,
 			}
 			challenge2 := types.Challenge{
-				ID:     uuid.New().String(),
+				ID:     "f6a0c411-d992-4f5c-bf2c-79e100fb04d4",
 				Text:   "Read 20 pages of a book",
 				Points: 40,
 			}
