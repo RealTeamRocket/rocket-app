@@ -30,3 +30,13 @@ func (s *service) GetUserByID(userID uuid.UUID) (types.User, error) {
 	}
 	return user, nil
 }
+
+func (s *service) GetUserIDByName(name string) (uuid.UUID, error) {
+ var userID uuid.UUID
+ query := `SELECT id FROM users WHERE username = $1`
+ err := s.db.QueryRow(query, name).Scan(&userID)
+ if err != nil {
+  return uuid.Nil, fmt.Errorf("failed to get user ID by name: %w", err)
+ }
+ return userID, nil
+}

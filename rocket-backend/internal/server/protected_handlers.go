@@ -191,3 +191,75 @@ func (s *Server) GetUserImage(c *gin.Context) {
 	c.Header("Content-Type", mimeType)
 	c.Data(http.StatusOK, mimeType, img.Data)
 }
+
+func (s *Server) AddFriend(c *gin.Context) {
+	userID, exists := c.Get("userID")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "User not authenticated"})
+		return
+	}
+
+	userUUID, err := uuid.Parse(userID.(string))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid user ID format"})
+		return
+	}
+
+	friendName := c.PostForm("friend_name")
+	if friendName == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "friend_name is required"})
+		return
+	}
+
+	friendID, err := s.db.GetUserIDByName(friendName)
+	if err != nil {
+		// TODO: better error handling here need to wait for #46
+		c.JSON(http.StatusBadRequest, gin.H{"error": "friend_name is required"})
+		return
+	}
+
+	err = s.db.AddFriend(userUUID, friendID)
+	if err != nil {
+		// TODO: better error handling here need to wait for #46
+		c.JSON(http.StatusBadRequest, gin.H{"error": "friend_name is required"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "friend added successful"})
+}
+
+func (s *Server) GetAllFriends(c *gin.Context) {
+	userID, exists := c.Get("userID")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "User not authenticated"})
+		return
+	}
+
+	userUUID, err := uuid.Parse(userID.(string))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid user ID format"})
+		return
+	}
+
+	friends, err := s.db.GetFriends(userUUID)
+
+	c.JSON(http.StatusLocked, friends)
+}
+
+func (s *Server) GetFriendsRanked(c *gin.Context) {
+	userID, exists := c.Get("userID")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "User not authenticated"})
+		return
+	}
+
+	userUUID, err := uuid.Parse(userID.(string))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid user ID format"})
+		return
+	}
+
+	friends, err := s.db.GetFriendsRankedByPoints(userUUID)
+
+	c.JSON(http.StatusLocked, friends)
+}

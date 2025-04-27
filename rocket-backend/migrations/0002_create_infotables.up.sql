@@ -31,6 +31,14 @@ CREATE TABLE settings (
     FOREIGN KEY (image_id) REFERENCES image_store(id) ON DELETE CASCADE
 );
 
+CREATE TABLE friends (
+    user_id UUID NOT NULL,
+    friend_id UUID NOT NULL,
+    PRIMARY KEY (user_id, friend_id),
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (friend_id) REFERENCES users(id) ON DELETE CASCADE,
+    CHECK (user_id <> friend_id)  -- Prevent a user from adding themselves as a friend
+);
 
 -- CREATE TABLE runs (
 -- username VARCHAR(255) NOT NULL REFERENCES users(username),

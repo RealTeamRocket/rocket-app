@@ -36,6 +36,7 @@ type Service interface {
 	// users
 	SaveUserProfile(user types.User) error
 	GetUserByID(userID uuid.UUID) (types.User, error)
+	GetUserIDByName(name string) (uuid.UUID, error)
 
 	// daily_steps
 	UpdateDailySteps(userID uuid.UUID, steps int) error
@@ -48,6 +49,11 @@ type Service interface {
 	// images
 	SaveImage(filename string, data []byte) (uuid.UUID, error)
 	GetUserImage(userID uuid.UUID) (*types.UserImage, error)
+
+	// friends
+	AddFriend(userID, friendID uuid.UUID) error
+	GetFriends(userID uuid.UUID) ([]types.User, error)
+	GetFriendsRankedByPoints(userID uuid.UUID) ([]types.User, error)
 }
 
 type service struct {
