@@ -9,7 +9,7 @@ class LeaderboardPage extends StatefulWidget {
   State<LeaderboardPage> createState() => _LeaderboardPageState();
 }
 
-class _LeaderboardPageState extends State<LeaderboardPage>{
+class _LeaderboardPageState extends State<LeaderboardPage> with SingleTickerProviderStateMixin{
 
   List<User> users = [
     User(name: 'John Doe', rocketpoints: 100, isFriend: true),
@@ -30,6 +30,11 @@ class _LeaderboardPageState extends State<LeaderboardPage>{
     User(name: 'Nina Dobrev', rocketpoints: 750, isFriend: false),
   ];
 
+
+
+  late AnimationController _controller;
+  late Animation<double> _animation;
+  int selectedToggle = 1;
   bool onlyFriends = false;
   List<User> sortedUsers = [];
   void getList() {
@@ -45,6 +50,8 @@ class _LeaderboardPageState extends State<LeaderboardPage>{
   }
   int _currentIndex = 0;
 
+
+  /// TODO: Needs to be implemented
   void _onItemTapped(int index) {
     setState(() {
       _currentIndex = index;
@@ -74,7 +81,15 @@ class _LeaderboardPageState extends State<LeaderboardPage>{
   @override
   void initState() {
     super.initState();
-    getList(); //
+    getList();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 300),
+    );
+    _animation = Tween<double>(begin: 0, end: 1).animate(_controller)
+      ..addListener(() {
+        setState(() {});
+      });
   }
 
   @override
@@ -87,123 +102,278 @@ class _LeaderboardPageState extends State<LeaderboardPage>{
       backgroundColor: Colors.blueGrey[100],
       body: Column(
         children: [
+
+          /**
+           * Here: Buttons to filter the leaderboard
+           */
+          const SizedBox(height: 7),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              OutlinedButton(
-                onPressed: () {
-                  setState(() {
-                    onlyFriends = false;
-                  });
-                  getList();
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: !onlyFriends ? Colors.blue : Colors.grey,
+              Container(
+                height: 44,
+                width: 200,
+                decoration: BoxDecoration(
+                  color: Colors.grey,
+                  borderRadius: BorderRadius.circular(100),
+                  border: Border.all(color: Colors.black, width: 2),
                 ),
-                child: const Text('All'),
-              ),
-              const SizedBox(width: 10),
-              OutlinedButton(
-                onPressed: () {
-                  setState(() {
-                    onlyFriends = true;
-                  });
-                  getList();
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: onlyFriends ? Colors.blue : Colors.grey,
+                child: Stack(
+                  alignment: Alignment.center,
+                  clipBehavior: Clip.none,
+                  children: [
+                    AnimatedAlign(
+                      alignment: onlyFriends ? Alignment.centerRight : Alignment.centerLeft,
+                      duration: const Duration(milliseconds: 300),
+                      child: Container(
+                        width: 100,
+                        height: 44,
+                        decoration: BoxDecoration(
+                          color: const Color(0xff9ba0fc),
+                          borderRadius: BorderRadius.circular(100),
+                        ),
+                      ),
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+                        InkWell(
+                          onTap: () {
+                            setState(() {
+                              onlyFriends = false;
+                            });
+                            getList();
+                          },
+                          child: Container(
+                            width: 98, // Breite anpassen
+                            alignment: Alignment.center,
+                            child: Text(
+                              "All",
+                              style: TextStyle(
+                                color: !onlyFriends ? Colors.white : Colors.black,
+                                fontSize: 15,
+                              ),
+                            ),
+                          ),
+                        ),
+                        InkWell(
+                          onTap: () {
+                            setState(() {
+                              onlyFriends = true;
+                            });
+                            getList();
+                          },
+                          child: Container(
+                            width: 98, // Breite anpassen
+                            alignment: Alignment.center,
+                            child: Text(
+                              "Friends",
+                              style: TextStyle(
+                                color: onlyFriends ? Colors.white : Colors.black,
+                                fontSize: 15,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
-                child: const Text('Friends'),
               ),
             ],
           ),
+          /**
+           * Here: Top part of the page (Podium)
+           */
+          /**
+           * TODO: Instead of a print Mehod with the podium open maybe a popup to add as a friend or see profile if is friend
+           *
+           * TODO: Max. Length of text inside the container/podium needs to be implemented
+           */
+
           if (sortedUsers.length >= 3) ...[
-            const SizedBox(height: 20),
+            const SizedBox(height: 30),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Expanded(
+                child: SizedBox(
+                  height: 200,
                   child: GridView.count(
-                    crossAxisCount: 3,
-                    mainAxisSpacing: 50,
-                    crossAxisSpacing: 50,
+                    crossAxisCount: 5,
+                    mainAxisSpacing: 1,
+                    crossAxisSpacing: 1,
                     shrinkWrap: true,
                     children: [
                       Container(),
-                      Container(
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Colors.black),
-                          color: Colors.blue,
-                        ),
-                        child: Center(
-                          child: Text(
-                            '${sortedUsers[0].name} - ${sortedUsers[0].rocketpoints}',
-                            style: const TextStyle(color: Colors.white),
+                      Container(),
+                      Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          GestureDetector(
+                            onTap: () {
+                              print('Erster Platz: ${sortedUsers[0].name}, Punkte: ${sortedUsers[0].rocketpoints}');
+                            },
+                            child: Container(
+                            width: 80, // Breite des Containers
+                            height: 80, // Höhe des Containers
+                            decoration: BoxDecoration(
+                              border: Border.all(color: Colors.black),
+                              color: Color(0xFFFFD700),
+                              shape: BoxShape.circle,
+                            ),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                const Icon(
+                                  Icons.emoji_events,
+                                  color: Colors.white,
+                                  size: 24,
+                                ),
+                                const SizedBox(height: 5), // Abstand zwischen Icon und Text
+                                Text(
+                                  '${sortedUsers[0].name}\n${sortedUsers[0].rocketpoints} RP',
+                                  style: const TextStyle(
+                                    color: Colors.black,
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                  textAlign: TextAlign.center,
+                                ),
+                              ],
+                            ),
                           ),
-                        ),
+                          ),
+                        ],
+                      ),
+                      Container(),
+                      Container(),
+                      Container(),
+                      Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          GestureDetector(
+                            onTap: () {
+                              print('Zweiter Platz: ${sortedUsers[1].name}, Punkte: ${sortedUsers[1].rocketpoints}');
+                            },
+                            child: Container(
+                            width: 80, // Breite des Containers
+                            height: 80, // Höhe des Containers
+                            decoration: BoxDecoration(
+                              border: Border.all(color: Colors.black),
+                              color: Color(0xFFC0C0C0),
+                              shape: BoxShape.circle,
+                            ),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                const Icon(
+                                  Icons.emoji_events,
+                                  color: Colors.white,
+                                  size: 24,
+                                ),
+                                const SizedBox(height: 5), // Abstand zwischen Icon und Text
+                                Text(
+                                  '${sortedUsers[1].name}\n${sortedUsers[1].rocketpoints} RP',
+                                  style: const TextStyle(
+                                    color: Colors.black,
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                  textAlign: TextAlign.center,
+                                ),
+                              ],
+                            ),
+                          ),
+                          ),
+                        ],
+                      ),
+                      Container(),
+                      Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          GestureDetector(
+                            onTap: () {
+                              print('Dritter Platz: ${sortedUsers[2].name}, Punkte: ${sortedUsers[2].rocketpoints}');
+                            },
+                            child: Container(
+                            width: 80, // Breite des Containers
+                            height: 80, // Höhe des Containers
+                            decoration: BoxDecoration(
+                              border: Border.all(color: Colors.black),
+                              color: Color(0xFFCD7F32),
+                              shape: BoxShape.circle,
+                            ),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                const Icon(
+                                  Icons.emoji_events,
+                                  color: Colors.white,
+                                  size: 24,
+                                ),
+                                const SizedBox(height: 5), // Abstand zwischen Icon und Text
+                                Text(
+                                  '${sortedUsers[2].name}\n${sortedUsers[2].rocketpoints} RP',
+                                  style: const TextStyle(
+                                    color: Colors.black,
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                  textAlign: TextAlign.center,
+                                ),
+                              ],
+                            ),
+                          ),
+                          ),
+                        ],
                       ),
                     ],
                   ),
                 ),
-              ],
-            ),
-            const SizedBox(height: 20),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Expanded(
-                  child: GridView.count(
-                    crossAxisCount: 4,
-                    mainAxisSpacing: 10,
-                    crossAxisSpacing: 10,
-                    shrinkWrap: true,
-                    children: [
-                      Container(),
-                      Container(
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Colors.black),
-                          color: Colors.blue,
-                        ),
-                        child: Center(
-                          child: Text(
-                            '${sortedUsers[1].name} - ${sortedUsers[1].rocketpoints}',
-                            style: const TextStyle(color: Colors.white),
-                          ),
-                        ),
-                      ),
-                      Container(
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Colors.black),
-                          color: Colors.blue,
-                        ),
-                        child: Center(
-                          child: Text(
-                            '${sortedUsers[2].name} - ${sortedUsers[2].rocketpoints}',
-                            style: const TextStyle(color: Colors.white),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
+                )
               ],
             ),
           ] else
             const Center(child: Text('Nicht genügend Benutzer für das Podium')),
-          const SizedBox(height: 20),
+
+          /**
+           * Here: Bottom part of the page
+           */
+
+          const SizedBox(height: 30),
           Expanded(
             child: ListView.builder(
-
-              itemCount: sortedUsers.length > 3 ? (sortedUsers.length - 3).clamp(0, 5) : 0,
+              /// With .clamp(0, 5) we can limit the number of items to 5 or to any number we want
+              /// Or leave it out to show all items
+              itemCount: sortedUsers.length > 3 ? (sortedUsers.length - 3) : 0,
               itemBuilder: (context, index) {
                 final user = sortedUsers[index + 3];
                 return ListTile(
-                  title: Text(user.name),
-                  subtitle: Text('Rocketpoints: ${user.rocketpoints}'),
-                  trailing: Icon(
-                    user.isFriend ? Icons.person : Icons.person_outline,
-                    color: user.isFriend ? Colors.green : Colors.grey,
+                  leading: Text(
+                    '${index + 4}.',
+                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.black), // Größere Schriftgröße
+                  ),
+                  title: Text(
+                    user.name,
+                    style: const TextStyle(fontSize: 14, color: Colors.black), // Größere Schriftgröße
+                  ),
+                  subtitle: Text(
+                    'Rocketpoints: ${user.rocketpoints}',
+                    style: const TextStyle(fontSize: 12), // Größere Schriftgröße
+                  ),
+                  trailing: ElevatedButton(
+                    onPressed: () {
+                      // TODO: Add friend functionality
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: user.isFriend ? Colors.green : Colors.grey,
+                    ),
+                    child: Icon(
+                      user.isFriend ? Icons.person : Icons.person_add_alt,
+                      color: Colors.white,
+                      size: 24, // Größeres Icon
+                    ),
                   ),
                 );
               },
