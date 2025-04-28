@@ -1,7 +1,5 @@
 import 'dart:convert';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
-
-import 'package:http/http.dart' as http;
+import 'base_api.dart';
 
 class HealthStats {
   final int idle;
@@ -39,12 +37,12 @@ class HealthStats {
       waitDuration: json['wait_duration'],
     );
   }
+}
 
+class HealthApi {
   static Future<HealthStats> fetchHealth() async {
-    final backendUrl = dotenv.get('BACKEND_URL', fallback: "http://10.0.2.2:8080");
-    final response = await http.get(
-      Uri.parse('$backendUrl/api/v1/health'),
-    );
+    final response = await BaseApi.get('/api/v1/health');
+
     if (response.statusCode == 200) {
       return HealthStats.fromJson(
         jsonDecode(response.body) as Map<String, dynamic>,
@@ -52,20 +50,5 @@ class HealthStats {
     } else {
       throw Exception('Failed to fetch stats');
     }
-  }
-
-  @override
-  String toString() {
-    return """
-      idle: $idle,
-      inUse: $inUse,
-      maxIdleClosed: $maxIdleClosed,
-      maxLifetimeClosed: $maxLifetimeClosed,
-      message: $message,
-      openConnections: $openConnections,
-      status: $status,
-      waitCount: $waitCount,
-      waitDuration: $waitDuration,
-    """;
   }
 }

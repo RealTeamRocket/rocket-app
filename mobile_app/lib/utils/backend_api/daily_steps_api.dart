@@ -1,6 +1,5 @@
 import 'dart:convert';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:http/http.dart' as http;
+import 'base_api.dart';
 
 class StepsResponse {
   final bool success;
@@ -19,19 +18,16 @@ class StepsResponse {
   String toString() => "success: $success";
 }
 
-
 class DailyStepsApi {
   static Future<StepsResponse> sendDailySteps(int steps, String jwt) async {
-    final backendUrl = dotenv.get('BACKEND_URL', fallback: "http://10.0.2.2:8080");
-
-    final response = await http.post(
-      Uri.parse('$backendUrl/api/v1/protected/updateSteps'),
+    final response = await BaseApi.post(
+      '/api/v1/protected/updateSteps',
       headers: {
         'Authorization': 'Bearer $jwt',
       },
-      body: jsonEncode({
+      body: {
         'steps': steps,
-      }),
+      },
     );
 
     if (response.statusCode == 200) {
