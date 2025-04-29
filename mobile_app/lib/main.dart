@@ -53,7 +53,7 @@ class _MyAppState extends State<MyApp> {
         return;
       }
 
-      final authStatus = await api.AuthStatus.fetchAuthStatus(jwt);
+      final authStatus = await api.AuthApi.fetchAuthStatus(jwt);
       setState(() {
         isAuthenticated = authStatus.authenticated;
       });
