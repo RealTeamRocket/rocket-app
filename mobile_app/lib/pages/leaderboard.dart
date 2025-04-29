@@ -74,6 +74,9 @@ class _LeaderboardPageState extends State<LeaderboardPage> with SingleTickerProv
 
   }
 
+  void addFriend(User user) {
+    print('Friend ${user.name} has been added!'); // TODO: Implement add friend functionality
+  }
 
 
 
@@ -222,6 +225,17 @@ class _LeaderboardPageState extends State<LeaderboardPage> with SingleTickerProv
                                       children: [
                                         Text('Rocketpoints: ${sortedUsers[0].rocketpoints}'),
                                         Text('Signed up: 01.01.2023'), // Beispiel-Datum
+                                        if(sortedUsers[0].isFriend)...[
+                                          Text('Status: Friend'),
+                                         ]else...[
+                                          Text('Status: Not a friend'),
+                                          IconButton(
+                                            icon: Icon(Icons.person_add_alt, color: Colors.black),
+                                            onPressed: () {
+                                              addFriend(sortedUsers[0]);
+                                            },
+                                          )
+                                        ]
                                       ],
                                     ),
                                     actions: [
@@ -250,7 +264,7 @@ class _LeaderboardPageState extends State<LeaderboardPage> with SingleTickerProv
                                   Icon(FontAwesomeIcons.award, color: Colors.white, size: 24),
                                 const SizedBox(height: 5), // Abstand zwischen Icon und Text
                                 Text(
-                                  '${sortedUsers[0].name}\n${sortedUsers[0].rocketpoints} RP',
+                                  '${sortedUsers[0].name.length > 12 ? sortedUsers[0].name.substring(0, 12): sortedUsers[0].name}\n${sortedUsers[0].rocketpoints} RP',
                                   style: const TextStyle(
                                     color: Colors.black,
                                     fontSize: 12,
@@ -282,6 +296,17 @@ class _LeaderboardPageState extends State<LeaderboardPage> with SingleTickerProv
                                       children: [
                                         Text('Rocketpoints: ${sortedUsers[1].rocketpoints}'),
                                         Text('Signed up: 01.01.2021'), // Beispiel-Datum
+                                        if(sortedUsers[1].isFriend)...[
+                                          Text('Status: Friend'),
+                                        ]else...[
+                                          Text('Status: Not a friend'),
+                                          IconButton(
+                                            icon: Icon(Icons.person_add_alt, color: Colors.black),
+                                            onPressed: () {
+                                              addFriend(sortedUsers[1]);
+                                            },
+                                          )
+                                        ]
                                       ],
                                     ),
                                     actions: [
@@ -310,7 +335,7 @@ class _LeaderboardPageState extends State<LeaderboardPage> with SingleTickerProv
                                 Icon(FontAwesomeIcons.medal, color: Colors.white, size: 24),
                                 const SizedBox(height: 5), // Abstand zwischen Icon und Text
                                 Text(
-                                  '${sortedUsers[1].name}\n${sortedUsers[1].rocketpoints} RP',
+                                  '${sortedUsers[1].name.length > 12 ? sortedUsers[1].name.substring(0, 12): sortedUsers[1].name}\n${sortedUsers[1].rocketpoints} RP',
                                   style: const TextStyle(
                                     color: Colors.black,
                                     fontSize: 12,
@@ -340,6 +365,17 @@ class _LeaderboardPageState extends State<LeaderboardPage> with SingleTickerProv
                                       children: [
                                         Text('Rocketpoints: ${sortedUsers[2].rocketpoints}'),
                                         Text('Signed up: 01.01.2022'), // Beispiel-Datum
+                                        if(sortedUsers[2].isFriend)...[
+                                          Text('Status: Friend'),
+                                        ]else...[
+                                          Text('Status: Not a friend'),
+                                          IconButton(
+                                            icon: Icon(Icons.person_add_alt, color: Colors.black),
+                                            onPressed: () {
+                                              addFriend(sortedUsers[2]);
+                                            },
+                                          )
+                                        ]
                                       ],
                                     ),
                                     actions: [
@@ -368,7 +404,7 @@ class _LeaderboardPageState extends State<LeaderboardPage> with SingleTickerProv
                                 Icon(FontAwesomeIcons.trophy, color: Colors.white, size: 24),
                                 const SizedBox(height: 5), // Abstand zwischen Icon und Text
                                 Text(
-                                  '${sortedUsers[2].name}\n${sortedUsers[2].rocketpoints} RP',
+                                  '${sortedUsers[2].name.length > 12 ? sortedUsers[2].name.substring(0, 12): sortedUsers[2].name}\n${sortedUsers[2].rocketpoints} RP',
                                   style: const TextStyle(
                                     color: Colors.black,
                                     fontSize: 12,
@@ -418,6 +454,7 @@ class _LeaderboardPageState extends State<LeaderboardPage> with SingleTickerProv
                   ),
                   trailing: ElevatedButton(
                     onPressed: () {
+                      addFriend(user);
                       // TODO: Add friend functionality
                     },
                     style: ElevatedButton.styleFrom(
@@ -440,7 +477,6 @@ class _LeaderboardPageState extends State<LeaderboardPage> with SingleTickerProv
       ),
     );
   }
-
 }
 
 void main() {
