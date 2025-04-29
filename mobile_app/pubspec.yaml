@@ -56,6 +56,8 @@ dependencies:
 
   location: ^8.0.0
 
+  font_awesome_flutter: ^10.8.0
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

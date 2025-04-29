@@ -1,4 +1,4 @@
-
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:mobile_app/widgets/menu_bar.dart';
 import 'package:flutter/material.dart';
 
@@ -212,7 +212,29 @@ class _LeaderboardPageState extends State<LeaderboardPage> with SingleTickerProv
                         children: [
                           GestureDetector(
                             onTap: () {
-                              print('Erster Platz: ${sortedUsers[0].name}, Punkte: ${sortedUsers[0].rocketpoints}');
+                              showDialog(
+                                context: context,
+                                builder: (BuildContext context) {
+                                  return AlertDialog(
+                                    title: Text(sortedUsers[0].name),
+                                    content: Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Text('Rocketpoints: ${sortedUsers[0].rocketpoints}'),
+                                        Text('Signed up: 01.01.2023'), // Beispiel-Datum
+                                      ],
+                                    ),
+                                    actions: [
+                                      TextButton(
+                                        onPressed: () {
+                                          Navigator.of(context).pop(); // Schließt das Pop-up
+                                        },
+                                        child: const Text('Okay'),
+                                      ),
+                                    ],
+                                  );
+                                },
+                              );
                             },
                             child: Container(
                             width: 80, // Breite des Containers
@@ -225,11 +247,7 @@ class _LeaderboardPageState extends State<LeaderboardPage> with SingleTickerProv
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                const Icon(
-                                  Icons.emoji_events,
-                                  color: Colors.white,
-                                  size: 24,
-                                ),
+                                  Icon(FontAwesomeIcons.award, color: Colors.white, size: 24),
                                 const SizedBox(height: 5), // Abstand zwischen Icon und Text
                                 Text(
                                   '${sortedUsers[0].name}\n${sortedUsers[0].rocketpoints} RP',
@@ -254,7 +272,29 @@ class _LeaderboardPageState extends State<LeaderboardPage> with SingleTickerProv
                         children: [
                           GestureDetector(
                             onTap: () {
-                              print('Zweiter Platz: ${sortedUsers[1].name}, Punkte: ${sortedUsers[1].rocketpoints}');
+                              showDialog(
+                                context: context,
+                                builder: (BuildContext context) {
+                                  return AlertDialog(
+                                    title: Text(sortedUsers[1].name),
+                                    content: Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Text('Rocketpoints: ${sortedUsers[1].rocketpoints}'),
+                                        Text('Signed up: 01.01.2021'), // Beispiel-Datum
+                                      ],
+                                    ),
+                                    actions: [
+                                      TextButton(
+                                        onPressed: () {
+                                          Navigator.of(context).pop(); // Schließt das Pop-up
+                                        },
+                                        child: const Text('Okay'),
+                                      ),
+                                    ],
+                                  );
+                                },
+                              );
                             },
                             child: Container(
                             width: 80, // Breite des Containers
@@ -267,11 +307,7 @@ class _LeaderboardPageState extends State<LeaderboardPage> with SingleTickerProv
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                const Icon(
-                                  Icons.emoji_events,
-                                  color: Colors.white,
-                                  size: 24,
-                                ),
+                                Icon(FontAwesomeIcons.medal, color: Colors.white, size: 24),
                                 const SizedBox(height: 5), // Abstand zwischen Icon und Text
                                 Text(
                                   '${sortedUsers[1].name}\n${sortedUsers[1].rocketpoints} RP',
@@ -294,7 +330,29 @@ class _LeaderboardPageState extends State<LeaderboardPage> with SingleTickerProv
                         children: [
                           GestureDetector(
                             onTap: () {
-                              print('Dritter Platz: ${sortedUsers[2].name}, Punkte: ${sortedUsers[2].rocketpoints}');
+                              showDialog(
+                                context: context,
+                                builder: (BuildContext context) {
+                                  return AlertDialog(
+                                    title: Text(sortedUsers[2].name),
+                                    content: Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Text('Rocketpoints: ${sortedUsers[2].rocketpoints}'),
+                                        Text('Signed up: 01.01.2022'), // Beispiel-Datum
+                                      ],
+                                    ),
+                                    actions: [
+                                      TextButton(
+                                        onPressed: () {
+                                          Navigator.of(context).pop(); // Schließt das Pop-up
+                                        },
+                                        child: const Text('Okay'),
+                                      ),
+                                    ],
+                                  );
+                                },
+                              );
                             },
                             child: Container(
                             width: 80, // Breite des Containers
@@ -307,11 +365,7 @@ class _LeaderboardPageState extends State<LeaderboardPage> with SingleTickerProv
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                const Icon(
-                                  Icons.emoji_events,
-                                  color: Colors.white,
-                                  size: 24,
-                                ),
+                                Icon(FontAwesomeIcons.trophy, color: Colors.white, size: 24),
                                 const SizedBox(height: 5), // Abstand zwischen Icon und Text
                                 Text(
                                   '${sortedUsers[2].name}\n${sortedUsers[2].rocketpoints} RP',
