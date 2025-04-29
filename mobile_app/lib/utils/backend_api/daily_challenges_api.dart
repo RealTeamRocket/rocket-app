@@ -1,6 +1,5 @@
 import 'dart:convert';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:http/http.dart' as http;
+import 'package:mobile_app/utils/backend_api/base_api.dart';
 
 /// Model for single challenge
 class Challenge {
@@ -24,10 +23,8 @@ class Challenge {
 /// API-Service: Returning list of challenges
 class ChallengesApi {
   static Future<List<Challenge>> fetchChallenges(String jwt) async {
-    final backendUrl = dotenv.get('BACKEND_URL', fallback: 'http://10.0.2.2:8080');
-    final uri = Uri.parse('$backendUrl/api/v1/protected/challenges/new');
-    final response = await http.get(
-      uri,
+    final response = await BaseApi.get(
+      '/api/v1/protected/challenges/new',
       headers: {'Authorization': 'Bearer $jwt'},
     );
 
@@ -44,10 +41,9 @@ class ChallengesApi {
   }
 
   static Future<void> markAsDone(String jwt, String challengeId, int rocketPoints) async {
-    final backendUrl = dotenv.get('BACKEND_URL', fallback: "http://10.0.2.2:8080");
 
-    final response = await http.post(
-      Uri.parse('$backendUrl/api/v1/protected/challenges/complete'),
+    final response = await BaseApi.post(
+      '/api/v1/protected/challenges/complete',
       headers: {
         'Authorization': 'Bearer $jwt',
         'Content-Type': 'application/json',
