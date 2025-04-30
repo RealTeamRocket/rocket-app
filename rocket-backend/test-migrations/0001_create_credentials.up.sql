@@ -36,3 +36,18 @@ CREATE TABLE settings (
     image_id UUID,
     step_goal INT DEFAULT 100000
 );
+
+CREATE TABLE challenges (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    description TEXT NOT NULL,
+    points_reward INT NOT NULL
+);
+
+CREATE TABLE user_challenges (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID NOT NULL,
+    challenge_id UUID NOT NULL,
+    date DATE NOT NULL,
+    is_completed BOOLEAN DEFAULT FALSE,
+    UNIQUE (user_id, challenge_id, date)
+);

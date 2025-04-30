@@ -5,8 +5,9 @@ import (
 	"strings"
 	"os"
 
+	"rocket-backend/pkg/auth"
+
 	_ "github.com/joho/godotenv/autoload"
-	"rocket-backend/internal/auth"
 	"github.com/gin-gonic/gin"
 )
 

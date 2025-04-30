@@ -1,7 +1,7 @@
 package auth
 
 import (
-	"rocket-backend/internal/auth"
+	"rocket-backend/pkg/auth"
 	"testing"
 	"time"
 
