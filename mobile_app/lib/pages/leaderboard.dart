@@ -472,17 +472,8 @@ class _LeaderboardPageState extends State<LeaderboardPage> with SingleTickerProv
           ),
         ],
       ),
-      bottomNavigationBar: CustomMenuBar(
-        onItemTapped: _onItemTapped,
-      ),
     );
   }
-}
-
-void main() {
-  runApp(MaterialApp(
-    home: LeaderboardPage(title: 'Leaderboard'),
-  ));
 }
 
 class User {
