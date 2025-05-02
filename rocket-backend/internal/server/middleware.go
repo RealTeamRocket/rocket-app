@@ -3,9 +3,11 @@ package server
 import (
 	"net/http"
 	"strings"
+	"os"
 
-	"rocket-backend/internal/auth"
+	"rocket-backend/pkg/auth"
 
+	_ "github.com/joho/godotenv/autoload"
 	"github.com/gin-gonic/gin"
 )
 
@@ -44,6 +46,30 @@ func (s *Server) AuthMiddleware() gin.HandlerFunc {
 		}
 
 		c.Set("userID", userUUID.String())
+		c.Next()
+	}
+}
+
+func (s *Server) APIKeyMiddleware() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		expectedAPIKey := os.Getenv("API_KEY")
+		sentApiKey := c.GetHeader("X-API-KEY")
+
+		// Debug-Logs
+		if expectedAPIKey == "" {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "API key not configured"})
+			c.Abort()
+			return
+		}
+
+		if sentApiKey != expectedAPIKey || sentApiKey == "" {
+			c.JSON(http.StatusForbidden, gin.H{
+				"error": "Invalid or missing API key",
+			})
+			c.Abort()
+			return
+		}
+
 		c.Next()
 	}
 }

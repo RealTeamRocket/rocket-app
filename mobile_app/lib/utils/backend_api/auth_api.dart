@@ -1,6 +1,5 @@
 import 'dart:convert';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:http/http.dart' as http;
+import 'base_api.dart';
 
 class AuthStatus {
   final bool authenticated;
@@ -14,15 +13,14 @@ class AuthStatus {
       authenticated: json['authenticated'] == 'true',
     );
   }
+}
 
+class AuthApi  {
   static Future<AuthStatus> fetchAuthStatus(String jwt) async {
-    final backendUrl = dotenv.get('BACKEND_URL', fallback: "http://10.0.2.2:8080");
-    final response = await http.get(
-      Uri.parse('$backendUrl/api/v1/protected/'),
-      headers: {
-        'Authorization': 'Bearer $jwt',
-      },
-    );
+    final response = await BaseApi.get('/api/v1/protected/', headers: {
+      'Authorization': 'Bearer $jwt',
+    });
+
     if (response.statusCode == 200) {
       return AuthStatus.fromJson(
         jsonDecode(response.body) as Map<String, dynamic>,
@@ -30,11 +28,5 @@ class AuthStatus {
     } else {
       throw Exception('Failed to fetch auth status');
     }
-  }
-  @override
-  String toString() {
-    return """
-      authenticated: $authenticated,
-    """;
   }
 }

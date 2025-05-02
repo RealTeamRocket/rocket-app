@@ -32,10 +32,10 @@ var _ = Describe("Settings table tests", func() {
 			imageId := uuid.Nil
 			stepGoal := 1
 
-			settings := types.Settings {
-				ID: id,
-				UserId: userID,
-				ImageId: imageId,
+			settings := types.Settings{
+				ID:       id,
+				UserId:   userID,
+				ImageId:  imageId,
 				StepGoal: stepGoal,
 			}
 
@@ -59,17 +59,17 @@ var _ = Describe("Settings table tests", func() {
 			imageId := uuid.Nil
 			stepGoal := 1
 
-			settings := types.Settings {
-				ID: id,
-				UserId: userID,
-				ImageId: imageId,
+			settings := types.Settings{
+				ID:       id,
+				UserId:   userID,
+				ImageId:  imageId,
 				StepGoal: stepGoal,
 			}
 
 			err := srv.CreateSettings(settings)
 			Expect(err).NotTo(HaveOccurred())
 
-			updatedSettings := types.SettingsDTO {
+			updatedSettings := types.SettingsDTO{
 				StepGoal: 100,
 			}
 			imageId = uuid.New()

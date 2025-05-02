@@ -19,7 +19,7 @@ class _HomePageState extends State<HomePage> {
   final List<Widget> _pages = <Widget>[
     const RunPage(title: 'Run'),
     const LeaderboardPage(title: 'Leaderboard'),
-    const LeaderboardsPage(title: 'Challenges'),
+    const ChallengePage(title: 'Challenges'),
     const ProfilePage(),
   ];
 

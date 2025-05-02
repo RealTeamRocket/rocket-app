@@ -23,8 +23,8 @@ func NewServer() *http.Server {
 	jwtSecret := os.Getenv("JWT_SECRET")
 
 	NewServer := &Server{
-		port: port,
-		db: database.New(),
+		port:      port,
+		db:        database.New(),
 		jwtSecret: jwtSecret,
 	}
 
@@ -41,9 +41,9 @@ func NewServer() *http.Server {
 }
 
 func NewServerWithDB(db database.Service, port int, jwtSecret string) *Server {
-    return &Server{
-        port:      port,
-        db:        db, // Inject the passed DB implementation.
-        jwtSecret: jwtSecret,
-    }
+	return &Server{
+		port:      port,
+		db:        db, // Inject the passed DB implementation.
+		jwtSecret: jwtSecret,
+	}
 }

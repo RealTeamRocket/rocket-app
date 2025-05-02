@@ -11,7 +11,7 @@ import (
 	. "github.com/onsi/gomega"
 
 	"rocket-backend/integration-tests/mocks"
-	"rocket-backend/internal/auth"
+	"rocket-backend/pkg/auth"
 	"rocket-backend/internal/server"
 	"rocket-backend/internal/types"
 )

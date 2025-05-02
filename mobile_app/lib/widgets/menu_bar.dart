@@ -24,13 +24,13 @@ class _CustomMenuBarState extends State<CustomMenuBar> {
           backgroundColor: ColorConstants.secoundaryColor,
         ),
         BottomNavigationBarItem(
-          icon: Icon(Icons.checklist),
-          label: 'Search',
+          icon: Icon(Icons.leaderboard),
+          label: 'Leaderboards',
           backgroundColor: ColorConstants.secoundaryColor,
         ),
         BottomNavigationBarItem(
-          icon: Icon(Icons.leaderboard),
-          label: 'Leaderboards',
+          icon: Icon(Icons.checklist),
+          label: 'Challenges',
           backgroundColor: ColorConstants.secoundaryColor,
         ),
         BottomNavigationBarItem(
