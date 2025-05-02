@@ -18,7 +18,7 @@ class BaseApi {
   static Future<http.Response> post(String endpoint, {Map<String, String>? headers, Object? body}) async {
     final uri = Uri.parse('$backendUrl$endpoint');
     final defaultHeaders = {
-      'x-api-key': apiKey,
+      'X-API-KEY': apiKey,
       'Content-Type': 'application/json',
       ...?headers,
     };
