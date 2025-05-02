@@ -17,9 +17,10 @@ USER appuser
 
 COPY --from=build /app/main /app/main
 
+COPY --from=build /app/internal/challenges/challenges.json /app/internal/challenges/challenges.json
+
 ARG PORT=8080
 ENV PORT=${PORT}
 EXPOSE ${PORT}
 
 ENTRYPOINT ["/app/main"]
-

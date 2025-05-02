@@ -1,9 +1,11 @@
 package server
 
 import (
+	"errors"
 	"fmt"
 	"net/http"
-	"rocket-backend/internal/auth"
+	"rocket-backend/pkg/auth"
+	"rocket-backend/internal/custom_error"
 	"rocket-backend/internal/types"
 	"rocket-backend/pkg/logger"
 	"time"
@@ -14,9 +16,7 @@ import (
 )
 
 func (s *Server) HelloWorldHandler(c *gin.Context) {
-	resp := make(map[string]string)
-	resp["message"] = "Hello World"
-
+	resp := map[string]string{"message": "Hello World"}
 	c.JSON(http.StatusOK, resp)
 }
 
@@ -33,9 +33,14 @@ func (s *Server) LoginHandler(c *gin.Context) {
 
 	storedCreds, err := s.db.GetUserByEmail(creds.Email)
 	if err != nil {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid username or password"})
+		if errors.Is(err, custom_error.ErrFailedToRetrieveData) {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal server error"})
+		} else {
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid username or password"})
+		}
 		return
 	}
+
 	if err := bcrypt.CompareHashAndPassword([]byte(storedCreds.Password), []byte(creds.Password)); err != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid username or password"})
 		return
@@ -48,16 +53,7 @@ func (s *Server) LoginHandler(c *gin.Context) {
 		return
 	}
 
-	c.SetCookie(
-		"jwt_token",
-		tokenString,
-		3600*72,
-		"/",
-		"",
-		true,
-		true,
-	)
-
+	c.SetCookie("jwt_token", tokenString, 3600*72, "/", "", true, true)
 	c.JSON(http.StatusOK, gin.H{"token": tokenString})
 }
 
@@ -75,7 +71,11 @@ func (s *Server) RegisterHandler(c *gin.Context) {
 	}
 
 	if err := s.db.CheckEmail(registerDto.Email); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Email already exists"})
+		if errors.Is(err, custom_error.ErrEmailAlreadyExists) {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Email already exists"})
+		} else {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to check email"})
+		}
 		return
 	}
 
@@ -87,7 +87,7 @@ func (s *Server) RegisterHandler(c *gin.Context) {
 	creds.LastLogin = creds.CreatedAt
 
 	if err := s.db.SaveCredentials(creds); err != nil {
-		logger.Error("Failed to save credential", err)
+		logger.Error("Failed to save credentials", err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to save credentials"})
 		return
 	}
@@ -99,19 +99,11 @@ func (s *Server) RegisterHandler(c *gin.Context) {
 	user.RocketPoints = 0
 
 	if err := s.db.SaveUserProfile(user); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to save user"})
-		return
-	}
-
-	var settings types.Settings
-	settings.ID = uuid.New()
-	settings.UserId = user.ID
-	settings.StepGoal = 10000
-
-	err = s.db.CreateSettings(settings)
-	if err != nil {
-		logger.Error("Failed to create settings for user", "user_id", user.ID, "error", err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create settings"})
+		if errors.Is(err, custom_error.ErrFailedToSave) {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to save user profile"})
+		} else {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal server error"})
+		}
 		return
 	}
 

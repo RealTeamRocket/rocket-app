@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../constants/color_constants.dart';
 import '/widgets/widgets.dart';
+import 'leaderboard.dart';
 import 'pages.dart';
 
 class HomePage extends StatefulWidget {
@@ -17,13 +18,8 @@ class _HomePageState extends State<HomePage> {
 
   final List<Widget> _pages = <Widget>[
     const RunPage(title: 'Run'),
-    Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: const [Text("Search"), Icon(Icons.checklist)],
-      ),
-    ),
-    const LeaderboardsPage(title: 'Challenges'),
+    const LeaderboardPage(title: 'Leaderboard'),
+    const ChallengePage(title: 'Challenges'),
     const ProfilePage(),
   ];
 

@@ -36,6 +36,7 @@ type Service interface {
 	// users
 	SaveUserProfile(user types.User) error
 	GetUserByID(userID uuid.UUID) (types.User, error)
+	UpdateRocketPoints(userID uuid.UUID, rocketPoints int) error
 	GetUserIDByName(name string) (uuid.UUID, error)
 
 	// daily_steps
@@ -49,6 +50,16 @@ type Service interface {
 	// images
 	SaveImage(filename string, data []byte) (uuid.UUID, error)
 	GetUserImage(userID uuid.UUID) (*types.UserImage, error)
+
+	// challenges
+	GetAllChallenges() ([]types.Challenge, error)
+	AssignChallengesToUser(userID uuid.UUID, challenges []types.Challenge) error
+	GetUserDailyChallenges(userID uuid.UUID) ([]types.Challenge, error)
+	ResetDailyChallenges() error
+	InsertChallenge(challenge types.Challenge) error
+	CompleteChallenge(UserID uuid.UUID, dto types.CompleteChallengesDTO) error
+	IsNewDayForUser(userID uuid.UUID) (bool, error)
+	CleanUpChallengesForUser(userID uuid.UUID) error
 
 	// friends
 	AddFriend(userID, friendID uuid.UUID) error
