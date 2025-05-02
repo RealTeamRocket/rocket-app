@@ -51,3 +51,10 @@ CREATE TABLE user_challenges (
     is_completed BOOLEAN DEFAULT FALSE,
     UNIQUE (user_id, challenge_id, date)
 );
+
+CREATE TABLE friends (
+    user_id UUID NOT NULL,
+    friend_id UUID NOT NULL,
+    PRIMARY KEY (user_id, friend_id),
+    CHECK (user_id <> friend_id)  -- Prevent a user from adding themselves as a friend
+);

@@ -47,6 +47,7 @@ CREATE TABLE user_challenges (
     FOREIGN KEY (challenge_id) REFERENCES challenges(id) ON DELETE CASCADE,
     UNIQUE (user_id, challenge_id, date)
 );
+
 CREATE TABLE friends (
     user_id UUID NOT NULL,
     friend_id UUID NOT NULL,
