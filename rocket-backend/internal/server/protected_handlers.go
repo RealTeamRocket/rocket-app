@@ -158,40 +158,6 @@ func (s *Server) GetSettings(c *gin.Context) {
 	c.JSON(http.StatusOK, settings)
 }
 
-func (s *Server) GetUserImage(c *gin.Context) {
-	var req types.GetImageDTO
-	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "user_id is required and must be a UUID"})
-		return
-	}
-
-	userUUID, err := uuid.Parse(req.UserID)
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid user_id format"})
-		return
-	}
-
-	img, err := s.db.GetUserImage(userUUID)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve image"})
-		return
-	}
-	if img == nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "No image found for user"})
-		return
-	}
-
-	mimeType := http.DetectContentType(img.Data)
-	if mimeType != "image/jpeg" && mimeType != "image/png" {
-		c.JSON(http.StatusUnsupportedMediaType, gin.H{"error": "Unsupported image type"})
-		return
-	}
-
-	c.Header("Content-Disposition", fmt.Sprintf("inline; filename=\"%s\"", img.Name))
-	c.Header("Content-Type", mimeType)
-	c.Data(http.StatusOK, mimeType, img.Data)
-}
-
 func (s *Server) AddFriend(c *gin.Context) {
 	userID, exists := c.Get("userID")
 	if !exists {
