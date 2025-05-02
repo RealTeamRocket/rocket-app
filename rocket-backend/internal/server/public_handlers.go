@@ -143,3 +143,17 @@ func (s *Server) GetUserImage(c *gin.Context) {
 	c.Header("Content-Type", mimeType)
 	c.Data(http.StatusOK, mimeType, img.Data)
 }
+
+func (s *Server) GetUserRanking(c *gin.Context) {
+	ranking, err := s.db.GetTopUsers(100)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error fetching ranking"})
+		return
+	}
+	if ranking == nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Ranking for user not found"})
+		return
+	}
+
+	c.JSON(http.StatusOK, ranking)
+}

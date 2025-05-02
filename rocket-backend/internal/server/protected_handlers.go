@@ -3,7 +3,6 @@ package server
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 	"io"
 	"net/http"
 	"rocket-backend/internal/challenges"
@@ -168,7 +167,7 @@ func (s *Server) GetSettings(c *gin.Context) {
 func (s *Server) AddFriend(c *gin.Context) {
 	userID, exists := c.Get("userID")
 	if !exists {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "User not authenticated"})
+		c.JSON(http.StatusUnauthorized, gin.H{"error": custom_error.ErrUserNotFound.Error()})
 		return
 	}
 
@@ -186,25 +185,23 @@ func (s *Server) AddFriend(c *gin.Context) {
 
 	friendID, err := s.db.GetUserIDByName(friendName)
 	if err != nil {
-		// TODO: better error handling here need to wait for #46
-		c.JSON(http.StatusBadRequest, gin.H{"error": "friend_name is required"})
+		c.JSON(http.StatusNotFound, gin.H{"error": custom_error.ErrUserNotFound.Error()})
 		return
 	}
 
 	err = s.db.AddFriend(userUUID, friendID)
 	if err != nil {
-		// TODO: better error handling here need to wait for #46
-		c.JSON(http.StatusBadRequest, gin.H{"error": "friend_name is required"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": custom_error.ErrFailedToSave.Error()})
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"message": "friend added successful"})
+	c.JSON(http.StatusOK, gin.H{"message": "Friend added successfully"})
 }
 
 func (s *Server) GetAllFriends(c *gin.Context) {
 	userID, exists := c.Get("userID")
 	if !exists {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "User not authenticated"})
+		c.JSON(http.StatusUnauthorized, gin.H{"error": custom_error.ErrUserNotFound.Error()})
 		return
 	}
 
@@ -215,14 +212,22 @@ func (s *Server) GetAllFriends(c *gin.Context) {
 	}
 
 	friends, err := s.db.GetFriends(userUUID)
+	if err != nil {
+		if errors.Is(err, custom_error.ErrUserNotFound) {
+			c.JSON(http.StatusNotFound, gin.H{"error": custom_error.ErrUserNotFound.Error()})
+		} else {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": custom_error.ErrFailedToRetrieveData.Error()})
+		}
+		return
+	}
 
-	c.JSON(http.StatusLocked, friends)
+	c.JSON(http.StatusOK, friends)
 }
 
 func (s *Server) GetFriendsRanked(c *gin.Context) {
 	userID, exists := c.Get("userID")
 	if !exists {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "User not authenticated"})
+		c.JSON(http.StatusUnauthorized, gin.H{"error": custom_error.ErrUserNotFound.Error()})
 		return
 	}
 
@@ -233,8 +238,16 @@ func (s *Server) GetFriendsRanked(c *gin.Context) {
 	}
 
 	friends, err := s.db.GetFriendsRankedByPoints(userUUID)
+	if err != nil {
+		if errors.Is(err, custom_error.ErrUserNotFound) {
+			c.JSON(http.StatusNotFound, gin.H{"error": custom_error.ErrUserNotFound.Error()})
+		} else {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": custom_error.ErrFailedToRetrieveData.Error()})
+		}
+		return
+	}
 
-	c.JSON(http.StatusLocked, friends)
+	c.JSON(http.StatusOK, friends)
 }
 
 func (s *Server) GetDailyChallenges(c *gin.Context) {

@@ -38,6 +38,7 @@ type Service interface {
 	GetUserByID(userID uuid.UUID) (types.User, error)
 	UpdateRocketPoints(userID uuid.UUID, rocketPoints int) error
 	GetUserIDByName(name string) (uuid.UUID, error)
+	GetTopUsers(limit int) ([]types.User, error)
 
 	// daily_steps
 	UpdateDailySteps(userID uuid.UUID, steps int) error

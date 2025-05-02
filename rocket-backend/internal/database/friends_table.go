@@ -2,6 +2,7 @@ package database
 
 import (
 	"fmt"
+	"rocket-backend/internal/custom_error"
 	"rocket-backend/internal/types"
 	"rocket-backend/pkg/logger"
 
@@ -11,7 +12,7 @@ import (
 
 func (s *service) AddFriend(userID, friendID uuid.UUID) error {
 	if userID == friendID {
-		return fmt.Errorf("user cannot add themselves as a friend")
+		return custom_error.ErrFailedToSave
 	}
 
 	_, err := s.db.Exec(`
@@ -22,7 +23,7 @@ func (s *service) AddFriend(userID, friendID uuid.UUID) error {
 
 	if err != nil {
 		logger.Error("Failed to add friend", err)
-		return fmt.Errorf("failed to add friend: %w", err)
+		return fmt.Errorf("%w: failed to add friend", custom_error.ErrFailedToSave)
 	}
 
 	return nil
@@ -39,7 +40,7 @@ func (s *service) GetFriends(userID uuid.UUID) ([]types.User, error) {
 	rows, err := s.db.Query(query, userID)
 	if err != nil {
 		logger.Error("Failed to get friends", err)
-		return nil, fmt.Errorf("failed to get friends: %w", err)
+		return nil, fmt.Errorf("%w: failed to retrieve friends", custom_error.ErrFailedToRetrieveData)
 	}
 	defer rows.Close()
 
@@ -48,7 +49,7 @@ func (s *service) GetFriends(userID uuid.UUID) ([]types.User, error) {
 		var friend types.User
 		if err := rows.Scan(&friend.ID, &friend.Username, &friend.Email, &friend.RocketPoints); err != nil {
 			logger.Error("Failed to scan friend row", err)
-			return nil, fmt.Errorf("failed to scan friend row: %w", err)
+			return nil, fmt.Errorf("%w: failed to scan friend row", custom_error.ErrFailedToRetrieveData)
 		}
 		friends = append(friends, friend)
 	}
@@ -57,6 +58,10 @@ func (s *service) GetFriends(userID uuid.UUID) ([]types.User, error) {
 	sort.Slice(friends, func(i, j int) bool {
 		return friends[i].Username < friends[j].Username
 	})
+
+	if len(friends) == 0 {
+		return nil, custom_error.ErrUserNotFound
+	}
 
 	return friends, nil
 }
@@ -73,7 +78,7 @@ func (s *service) GetFriendsRankedByPoints(userID uuid.UUID) ([]types.User, erro
 	rows, err := s.db.Query(query, userID)
 	if err != nil {
 		logger.Error("Failed to get friends ranked by points", err)
-		return nil, fmt.Errorf("failed to get friends ranked by points: %w", err)
+		return nil, fmt.Errorf("%w: failed to retrieve friends ranked by points", custom_error.ErrFailedToRetrieveData)
 	}
 	defer rows.Close()
 
@@ -82,9 +87,12 @@ func (s *service) GetFriendsRankedByPoints(userID uuid.UUID) ([]types.User, erro
 		var friend types.User
 		if err := rows.Scan(&friend.ID, &friend.Username, &friend.Email, &friend.RocketPoints); err != nil {
 			logger.Error("Failed to scan friend row", err)
-			return nil, fmt.Errorf("failed to scan friend row: %w", err)
+			return nil, fmt.Errorf("%w: failed to scan friend row", custom_error.ErrFailedToRetrieveData)
 		}
-		friends = append(friends, friend)
+	}
+
+	if len(friends) == 0 {
+		return nil, custom_error.ErrUserNotFound
 	}
 
 	return friends, nil

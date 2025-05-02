@@ -48,3 +48,27 @@ func (s *service) GetUserIDByName(name string) (uuid.UUID, error) {
  }
  return userID, nil
 }
+
+func (s *service) GetTopUsers(limit int) ([]types.User, error) {
+	var users []types.User
+	query := `SELECT id, username, email, rocketpoints FROM users ORDER BY rocketpoints DESC LIMIT $1`
+	rows, err := s.db.Query(query, limit)
+	if err != nil {
+		return nil, fmt.Errorf("%w: %v", custom_error.ErrFailedToRetrieveData, err)
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var user types.User
+		if err := rows.Scan(&user.ID, &user.Username, &user.Email, &user.RocketPoints); err != nil {
+			return nil, fmt.Errorf("failed to scan user: %w", err)
+		}
+		users = append(users, user)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("rows iteration error: %w", err)
+	}
+
+	return users, nil
+}
