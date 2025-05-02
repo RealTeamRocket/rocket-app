@@ -53,6 +53,7 @@ services:
       - ./migrations:/migrations
     entrypoint: ["/bin/sh", "-c"]
     command: ["migrate -path /migrations -database postgres://${BLUEPRINT_DB_USERNAME}:${BLUEPRINT_DB_PASSWORD}@postgres:5432/${BLUEPRINT_DB_DATABASE}?sslmode=disable up"]
+    restart: on-failure
     depends_on:
       postgres:
         condition: service_healthy
