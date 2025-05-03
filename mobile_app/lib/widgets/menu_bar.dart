@@ -11,7 +11,7 @@ class CustomMenuBar extends StatefulWidget {
 }
 
 class _CustomMenuBarState extends State<CustomMenuBar> {
-  int _currentIndex = 0;
+  int _currentIndex = 2; /// set position of starting page to hompage in the middle
 
   @override
   Widget build(BuildContext context) {
@@ -19,18 +19,23 @@ class _CustomMenuBarState extends State<CustomMenuBar> {
       type: BottomNavigationBarType.shifting,
       items: const <BottomNavigationBarItem>[
         BottomNavigationBarItem(
+          icon: Icon(Icons.checklist),
+          label: 'Challenges',
+          backgroundColor: ColorConstants.secoundaryColor,
+        ),
+        BottomNavigationBarItem(
+          icon: Icon(Icons.leaderboard),
+          label: 'Leaderboard',
+          backgroundColor: ColorConstants.secoundaryColor,
+        ),
+        BottomNavigationBarItem(
           icon: Icon(Icons.home),
           label: 'Home',
           backgroundColor: ColorConstants.secoundaryColor,
         ),
         BottomNavigationBarItem(
-          icon: Icon(Icons.leaderboard),
-          label: 'Leaderboards',
-          backgroundColor: ColorConstants.secoundaryColor,
-        ),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.checklist),
-          label: 'Challenges',
+          icon: Icon(Icons.group),
+          label: 'Friends',
           backgroundColor: ColorConstants.secoundaryColor,
         ),
         BottomNavigationBarItem(
