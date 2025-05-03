@@ -11,7 +11,7 @@ class CustomMenuBar extends StatefulWidget {
 }
 
 class _CustomMenuBarState extends State<CustomMenuBar> {
-  int _currentIndex = 2; /// set position of starting page to hompage in the middle
+  int _currentIndex = 2; /// set position of starting page to homepage in the middle
 
   @override
   Widget build(BuildContext context) {
