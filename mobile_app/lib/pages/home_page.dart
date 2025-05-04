@@ -14,12 +14,13 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  int _selectedIndex = 0;
+  int _selectedIndex = 2; /// set position of starting page to homepage in the middle
 
   final List<Widget> _pages = <Widget>[
-    const RunPage(title: 'Run'),
-    const LeaderboardPage(title: 'Leaderboard'),
     const ChallengePage(title: 'Challenges'),
+    const LeaderboardPage(title: 'Leaderboard'),
+    const RunPage(title: 'Run'),
+    const FriendlistPage(title: 'friends'),
     const ProfilePage(),
   ];
 
