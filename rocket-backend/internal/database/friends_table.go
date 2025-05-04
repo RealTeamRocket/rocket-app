@@ -115,9 +115,5 @@ func (s *service) GetFriendsRankedByPoints(userID uuid.UUID) ([]types.User, erro
 		}
 	}
 
-	if len(friends) == 0 {
-		return nil, custom_error.ErrUserNotFound
-	}
-
 	return friends, nil
 }

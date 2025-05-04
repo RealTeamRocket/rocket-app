@@ -289,6 +289,11 @@ func (s *Server) GetFriendsRanked(c *gin.Context) {
 		return
 	}
 
+	if len(friends) == 0 {
+		c.JSON(http.StatusOK, []interface{}{})
+		return
+	}
+
 	c.JSON(http.StatusOK, friends)
 }
 
