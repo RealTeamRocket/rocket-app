@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/material.dart';
 import 'package:mobile_app/utils/backend_api/base_api.dart';
 
 /// Model for single challenge
@@ -7,11 +8,7 @@ class Challenge {
   final String text;
   final int points;
 
-  const Challenge({
-    required this.id,
-    required this.text,
-    required this.points,
-  });
+  const Challenge({required this.id, required this.text, required this.points});
 
   factory Challenge.fromJson(Map<String, dynamic> json) => Challenge(
     id: json['id'] as String,
@@ -48,10 +45,10 @@ class ChallengesApi {
         'Authorization': 'Bearer $jwt',
         'Content-Type': 'application/json',
       },
-      body: jsonEncode({
+      body: {
         'challenge_id': challengeId,
         'rocket_points': rocketPoints,
-      }),
+      },
     );
 
     if (response.statusCode != 200) {
