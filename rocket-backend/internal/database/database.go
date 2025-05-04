@@ -66,6 +66,7 @@ type Service interface {
 	AddFriend(userID, friendID uuid.UUID) error
 	GetFriends(userID uuid.UUID) ([]types.User, error)
 	GetFriendsRankedByPoints(userID uuid.UUID) ([]types.User, error)
+	DeleteFriend(userID, friendID uuid.UUID) error
 }
 
 type service struct {

@@ -198,6 +198,48 @@ func (s *Server) AddFriend(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "Friend added successfully"})
 }
 
+func (s *Server) DeleteFriend(c *gin.Context) {
+	userID, exists := c.Get("userID")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "User not authenticated"})
+		return
+	}
+
+	userUUID, err := uuid.Parse(userID.(string))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid user ID format"})
+		return
+	}
+
+	friendName := c.PostForm("friend_name")
+	if friendName == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "friend_name is required"})
+		return
+	}
+
+	friendID, err := s.db.GetUserIDByName(friendName)
+	if err != nil {
+		if errors.Is(err, custom_error.ErrUserNotFound) {
+			c.JSON(http.StatusNotFound, gin.H{"error": "Friend not found"})
+		} else {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve friend information"})
+		}
+		return
+	}
+
+	err = s.db.DeleteFriend(userUUID, friendID)
+	if err != nil {
+		if errors.Is(err, custom_error.ErrFailedToDelete) {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete friend"})
+		} else {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal server error"})
+		}
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Friend deleted successfully"})
+}
+
 func (s *Server) GetAllFriends(c *gin.Context) {
 	userID, exists := c.Get("userID")
 	if !exists {

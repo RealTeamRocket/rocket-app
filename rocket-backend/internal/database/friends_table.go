@@ -29,6 +29,30 @@ func (s *service) AddFriend(userID, friendID uuid.UUID) error {
 	return nil
 }
 
+func (s *service) DeleteFriend(userID, friendID uuid.UUID) error {
+	result, err := s.db.Exec(`
+		DELETE FROM friends
+		WHERE user_id = $1 AND friend_id = $2
+	`, userID, friendID)
+
+	if err != nil {
+		logger.Error("Failed to delete friend", err)
+		return fmt.Errorf("%w: failed to delete friend", custom_error.ErrFailedToDelete)
+	}
+
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		logger.Error("Failed to get rows affected", err)
+		return fmt.Errorf("%w: failed to delete friend", custom_error.ErrFailedToDelete)
+	}
+
+	if rowsAffected == 0 {
+		return custom_error.ErrUserNotFound
+	}
+
+	return nil
+}
+
 func (s *service) GetFriends(userID uuid.UUID) ([]types.User, error) {
 	query := `
 		SELECT u.id, u.username, u.email, u.rocketpoints
