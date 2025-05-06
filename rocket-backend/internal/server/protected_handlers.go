@@ -9,6 +9,7 @@ import (
 	"rocket-backend/internal/challenges"
 	"rocket-backend/internal/custom_error"
 	"rocket-backend/internal/types"
+	"rocket-backend/pkg/logger"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
@@ -277,5 +278,26 @@ func (s *Server) GetAllUsers(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, users)
+	var usersWithImages []types.UserWithImageDTO
+
+	for _, user := range users {
+		var userWithImage types.UserWithImageDTO
+		userWithImage.ID = user.ID
+		userWithImage.Username = user.Username
+		userWithImage.Email = user.Email
+		userWithImage.RocketPoints = user.RocketPoints
+		userImage, err := s.db.GetUserImage(user.ID)
+
+		if err != nil {
+			logger.Warn("Failed to fetch image for user %s: %v\n", user.ID, err)
+			userWithImage.ImageName = ""
+			userWithImage.ImageData = nil
+		} else if userImage != nil {
+			userWithImage.ImageName = userImage.Name
+			userWithImage.ImageData = userImage.Data
+		}
+
+		usersWithImages = append(usersWithImages, userWithImage)
+	}
+	c.JSON(http.StatusOK, usersWithImages)
 }

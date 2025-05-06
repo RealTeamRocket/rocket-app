@@ -24,3 +24,12 @@ type CompleteChallengesDTO struct {
 	ChallengeID  uuid.UUID `json:"challenge_id" binding:"required"`
 	RocketPoints int       `json:"rocket_points" binding:"required"`
 }
+
+type UserWithImageDTO struct {
+	ID           uuid.UUID `json:"id"`
+	Username     string    `json:"username"`
+	Email        string    `json:"email"`
+	RocketPoints int       `json:"rocket_points"`
+	ImageName    string    `json:"image_name"`
+	ImageData    []byte    `json:"image_data"`
+}
