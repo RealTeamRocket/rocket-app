@@ -37,6 +37,8 @@ type Service interface {
 	SaveUserProfile(user types.User) error
 	GetUserByID(userID uuid.UUID) (types.User, error)
 	UpdateRocketPoints(userID uuid.UUID, rocketPoints int) error
+	GetUserIDByName(name string) (uuid.UUID, error)
+	GetTopUsers(limit int) ([]types.User, error)
 	GetAllUsers() ([]types.User, error)
 
 	// daily_steps
@@ -60,6 +62,12 @@ type Service interface {
 	CompleteChallenge(UserID uuid.UUID, dto types.CompleteChallengesDTO) error
 	IsNewDayForUser(userID uuid.UUID) (bool, error)
 	CleanUpChallengesForUser(userID uuid.UUID) error
+
+	// friends
+	AddFriend(userID, friendID uuid.UUID) error
+	GetFriends(userID uuid.UUID) ([]types.User, error)
+	GetFriendsRankedByPoints(userID uuid.UUID) ([]types.User, error)
+	DeleteFriend(userID, friendID uuid.UUID) error
 }
 
 type service struct {

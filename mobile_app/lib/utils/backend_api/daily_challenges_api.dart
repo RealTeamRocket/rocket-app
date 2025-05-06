@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'package:flutter/material.dart';
 import 'package:mobile_app/utils/backend_api/base_api.dart';
 
 /// Model for single challenge

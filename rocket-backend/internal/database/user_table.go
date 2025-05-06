@@ -39,6 +39,40 @@ func (s *service) UpdateRocketPoints(userID uuid.UUID, rocketPoints int) error {
 	return nil
 }
 
+func (s *service) GetUserIDByName(name string) (uuid.UUID, error) {
+ var userID uuid.UUID
+ query := `SELECT id FROM users WHERE username = $1`
+ err := s.db.QueryRow(query, name).Scan(&userID)
+ if err != nil {
+  return uuid.Nil, fmt.Errorf("failed to get user ID by name: %w", err)
+ }
+ return userID, nil
+}
+
+func (s *service) GetTopUsers(limit int) ([]types.User, error) {
+	var users []types.User
+	query := `SELECT id, username, email, rocketpoints FROM users ORDER BY rocketpoints DESC LIMIT $1`
+	rows, err := s.db.Query(query, limit)
+	if err != nil {
+		return nil, fmt.Errorf("%w: %v", custom_error.ErrFailedToRetrieveData, err)
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var user types.User
+		if err := rows.Scan(&user.ID, &user.Username, &user.Email, &user.RocketPoints); err != nil {
+			return nil, fmt.Errorf("failed to scan user: %w", err)
+		}
+		users = append(users, user)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("rows iteration error: %w", err)
+	}
+
+	return users, nil
+}
+
 func (s *service) GetAllUsers() ([]types.User, error) {
 	var users []types.User
 	query := `SELECT id, username, email, rocketpoints FROM users`

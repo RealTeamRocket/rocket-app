@@ -166,38 +166,145 @@ func (s *Server) GetSettings(c *gin.Context) {
 	c.JSON(http.StatusOK, settings)
 }
 
-func (s *Server) GetUserImage(c *gin.Context) {
-	var req types.GetImageDTO
-	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "user_id is required and must be a UUID"})
+func (s *Server) AddFriend(c *gin.Context) {
+	userID, exists := c.Get("userID")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": custom_error.ErrUserNotFound.Error()})
 		return
 	}
 
-	userUUID, err := uuid.Parse(req.UserID)
+	userUUID, err := uuid.Parse(userID.(string))
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid user_id format"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid user ID format"})
 		return
 	}
 
-	img, err := s.db.GetUserImage(userUUID)
+	friendName := struct {
+		FriendName string `json:"friend_name"`
+	}{}
+
+	if err := c.ShouldBindJSON(&friendName); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request body"})
+		return
+	}
+
+	if friendName.FriendName == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "friend_name is required"})
+		return
+	}
+
+	friendID, err := s.db.GetUserIDByName(friendName.FriendName)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve image"})
-		return
-	}
-	if img == nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "No image found for user"})
+		c.JSON(http.StatusNotFound, gin.H{"error": custom_error.ErrUserNotFound.Error()})
 		return
 	}
 
-	mimeType := http.DetectContentType(img.Data)
-	if mimeType != "image/jpeg" && mimeType != "image/png" {
-		c.JSON(http.StatusUnsupportedMediaType, gin.H{"error": "Unsupported image type"})
+	err = s.db.AddFriend(userUUID, friendID)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": custom_error.ErrFailedToSave.Error()})
 		return
 	}
 
-	c.Header("Content-Disposition", fmt.Sprintf("inline; filename=\"%s\"", img.Name))
-	c.Header("Content-Type", mimeType)
-	c.Data(http.StatusOK, mimeType, img.Data)
+	c.JSON(http.StatusOK, gin.H{"message": "Friend added successfully"})
+}
+
+func (s *Server) DeleteFriend(c *gin.Context) {
+	userID, exists := c.Get("userID")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "User not authenticated"})
+		return
+	}
+
+	userUUID, err := uuid.Parse(userID.(string))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid user ID format"})
+		return
+	}
+
+	friendName := c.PostForm("friend_name")
+	if friendName == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "friend_name is required"})
+		return
+	}
+
+	friendID, err := s.db.GetUserIDByName(friendName)
+	if err != nil {
+		if errors.Is(err, custom_error.ErrUserNotFound) {
+			c.JSON(http.StatusNotFound, gin.H{"error": "Friend not found"})
+		} else {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve friend information"})
+		}
+		return
+	}
+
+	err = s.db.DeleteFriend(userUUID, friendID)
+	if err != nil {
+		if errors.Is(err, custom_error.ErrFailedToDelete) {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete friend"})
+		} else {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal server error"})
+		}
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Friend deleted successfully"})
+}
+
+func (s *Server) GetAllFriends(c *gin.Context) {
+	userID, exists := c.Get("userID")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": custom_error.ErrUserNotFound.Error()})
+		return
+	}
+
+	userUUID, err := uuid.Parse(userID.(string))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid user ID format"})
+		return
+	}
+
+	friends, err := s.db.GetFriends(userUUID)
+	if err != nil {
+		if errors.Is(err, custom_error.ErrUserNotFound) {
+			c.JSON(http.StatusNotFound, gin.H{"error": custom_error.ErrUserNotFound.Error()})
+		} else {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": custom_error.ErrFailedToRetrieveData.Error()})
+		}
+		return
+	}
+
+	c.JSON(http.StatusOK, friends)
+}
+
+func (s *Server) GetFriendsRanked(c *gin.Context) {
+	userID, exists := c.Get("userID")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": custom_error.ErrUserNotFound.Error()})
+		return
+	}
+
+	userUUID, err := uuid.Parse(userID.(string))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid user ID format"})
+		return
+	}
+
+	friends, err := s.db.GetFriendsRankedByPoints(userUUID)
+	if err != nil {
+		if errors.Is(err, custom_error.ErrUserNotFound) {
+			c.JSON(http.StatusNotFound, gin.H{"error": custom_error.ErrUserNotFound.Error()})
+		} else {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": custom_error.ErrFailedToRetrieveData.Error()})
+		}
+		return
+	}
+
+	if len(friends) == 0 {
+		c.JSON(http.StatusOK, []interface{}{})
+		return
+	}
+
+	c.JSON(http.StatusOK, friends)
 }
 
 func (s *Server) GetDailyChallenges(c *gin.Context) {
@@ -300,4 +407,39 @@ func (s *Server) GetAllUsers(c *gin.Context) {
 		usersWithImages = append(usersWithImages, userWithImage)
 	}
 	c.JSON(http.StatusOK, usersWithImages)
+}
+
+func (s *Server) GetUserImage(c *gin.Context) {
+	var req types.GetImageDTO
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "user_id is required and must be a UUID"})
+		return
+	}
+
+	userUUID, err := uuid.Parse(req.UserID)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid user_id format"})
+		return
+	}
+
+	img, err := s.db.GetUserImage(userUUID)
+	if err != nil {
+		logger.Error("Failed to get image", err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve image"})
+		return
+	}
+	if img == nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "No image found for user"})
+		return
+	}
+
+	mimeType := http.DetectContentType(img.Data)
+	if mimeType != "image/jpeg" && mimeType != "image/png" {
+		c.JSON(http.StatusUnsupportedMediaType, gin.H{"error": "Unsupported image type"})
+		return
+	}
+
+	c.Header("Content-Disposition", fmt.Sprintf("inline; filename=\"%s\"", img.Name))
+	c.Header("Content-Type", mimeType)
+	c.Data(http.StatusOK, mimeType, img.Data)
 }

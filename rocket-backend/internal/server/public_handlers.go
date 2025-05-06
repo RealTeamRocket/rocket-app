@@ -106,5 +106,35 @@ func (s *Server) RegisterHandler(c *gin.Context) {
 		return
 	}
 
+	var settings types.Settings
+	settings.ID = uuid.New()
+	settings.UserId = user.ID
+	settings.ImageId = uuid.Nil
+	settings.StepGoal = 10000
+
+	if err := s.db.CreateSettings(settings); err != nil {
+		if errors.Is(err, custom_error.ErrFailedToSave) {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to save settings"})
+		} else {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal server error"})
+		}
+		return
+	}
+
+
 	c.JSON(http.StatusOK, gin.H{"message": "User registered successfully"})
+}
+
+func (s *Server) GetUserRanking(c *gin.Context) {
+	ranking, err := s.db.GetTopUsers(100)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error fetching ranking"})
+		return
+	}
+	if ranking == nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Ranking for user not found"})
+		return
+	}
+
+	c.JSON(http.StatusOK, ranking)
 }
