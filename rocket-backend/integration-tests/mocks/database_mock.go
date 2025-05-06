@@ -36,6 +36,7 @@ type MockDB struct {
 	AddFriendFunc                func(userID, friendID uuid.UUID) error
 	GetFriendsFunc               func(userID uuid.UUID) ([]types.User, error)
 	GetFriendsRankedByPointsFunc func(userID uuid.UUID) ([]types.User, error)
+	DeleteFriendFunc             func(userID, friendID uuid.UUID) error
 }
 
 func (m *MockDB) ExecuteRawSQL(query string) (sql.Result, error) {
@@ -230,4 +231,11 @@ func (m *MockDB) GetFriendsRankedByPoints(userID uuid.UUID) ([]types.User, error
 		return m.GetFriendsRankedByPointsFunc(userID)
 	}
 	return nil, nil
+}
+
+func (m *MockDB) DeleteFriend(userID, friendID uuid.UUID) error {
+	if m.DeleteFriendFunc != nil {
+		return m.DeleteFriendFunc(userID, friendID)
+	}
+	return nil
 }
