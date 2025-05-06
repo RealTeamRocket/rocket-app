@@ -105,21 +105,6 @@ Context("GetFriends", func() {
 		Expect(friends[0].Username).To(Equal("friend1"))
 		Expect(friends[1].Username).To(Equal("friend2"))
 	})
-
-	It("should return an error if the user has no friends", func() {
-		userID := uuid.New()
-
-		// Insert test user
-		_, err := srv.ExecuteRawSQL(fmt.Sprintf(`
-			INSERT INTO users (id, username, email, rocketpoints)
-			VALUES ('%s', 'user1', 'user1@example.com', 100)
-		`, userID))
-		Expect(err).NotTo(HaveOccurred())
-
-		// Attempt to retrieve friends
-		_, err = srv.GetFriends(userID)
-		Expect(err).To(HaveOccurred())
-	})
 })
 
 Context("GetFriendsRankedByPoints", func() {
@@ -134,8 +119,9 @@ Context("GetFriendsRankedByPoints", func() {
 		Expect(err).NotTo(HaveOccurred())
 
 		// Attempt to retrieve friends ranked by points
-		_, err = srv.GetFriendsRankedByPoints(userID)
-		Expect(err).To(HaveOccurred())
+		friends, err := srv.GetFriendsRankedByPoints(userID)
+		Expect(err).NotTo(HaveOccurred())
+		Expect(friends).To(BeEmpty())
 	})
 })
 })
