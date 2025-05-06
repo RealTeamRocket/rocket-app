@@ -60,7 +60,7 @@ class FriendsApi {
 
   /// Delete a friend by username
   static Future<void> deleteFriend(String jwt, String friendName) async {
-    final response = await BaseApi.post(
+    final response = await BaseApi.delete(
       '/api/v1/protected/friends/delete',
       headers: {
         'Authorization': 'Bearer $jwt',

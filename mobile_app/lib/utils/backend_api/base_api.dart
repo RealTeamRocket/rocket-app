@@ -24,4 +24,14 @@ class BaseApi {
     };
     return await http.post(uri, headers: defaultHeaders, body: jsonEncode(body));
   }
+
+  static Future<http.Response> delete(String endpoint, {Map<String, String>? headers, Object? body}) async {
+    final uri = Uri.parse('$backendUrl$endpoint');
+    final defaultHeaders = {
+      'X-API-KEY': apiKey,
+      'Content-Type': 'application/json',
+      ...?headers,
+    };
+    return await http.delete(uri, headers: defaultHeaders, body: jsonEncode(body));
+  }
 }
