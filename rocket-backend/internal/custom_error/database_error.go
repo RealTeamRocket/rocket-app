@@ -12,4 +12,5 @@ var (
 	ErrChallengeNotFound    = errors.New("challenge not found")
 	ErrImageNotFound        = errors.New("image not found")
 	ErrSettingsNotFound     = errors.New("settings not found")
+	ErrFailedToDelete = errors.New("failed to delete data")
 )
