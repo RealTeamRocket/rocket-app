@@ -269,3 +269,13 @@ func (s *Server) CompleteChallenge(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{"message": "Challenge completed successfully"})
 }
+
+func (s *Server) GetAllUsers(c *gin.Context) {
+	users, err := s.db.GetAllUsers()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve users"})
+		return
+	}
+
+	c.JSON(http.StatusOK, users)
+}

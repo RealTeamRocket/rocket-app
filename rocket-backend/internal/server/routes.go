@@ -34,6 +34,7 @@ func (s *Server) RegisterRoutes() http.Handler {
 			protected.POST("/image", s.GetUserImage)
 			protected.GET("/challenges/new", s.GetDailyChallenges)
 			protected.POST("/challenges/complete", s.CompleteChallenge)
+			protected.GET("/users", s.GetAllUsers)
 		}
 	}
 
