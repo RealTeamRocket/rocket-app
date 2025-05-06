@@ -177,13 +177,21 @@ func (s *Server) AddFriend(c *gin.Context) {
 		return
 	}
 
-	friendName := c.PostForm("friend_name")
-	if friendName == "" {
+	friendName := struct {
+		FriendName string `json:"friend_name"`
+	}{}
+
+	if err := c.ShouldBindJSON(&friendName); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request body"})
+		return
+	}
+
+	if friendName.FriendName == "" {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "friend_name is required"})
 		return
 	}
 
-	friendID, err := s.db.GetUserIDByName(friendName)
+	friendID, err := s.db.GetUserIDByName(friendName.FriendName)
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": custom_error.ErrUserNotFound.Error()})
 		return

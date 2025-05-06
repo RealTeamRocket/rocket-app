@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/material.dart';
 import 'package:mobile_app/utils/backend_api/base_api.dart';
 
 /// Model for a Friend
@@ -8,7 +9,12 @@ class Friend {
   final String email;
   final int rocketPoints;
 
-  const Friend({required this.id, required this.username, required this.email, required this.rocketPoints });
+  const Friend({
+    required this.id,
+    required this.username,
+    required this.email,
+    required this.rocketPoints,
+  });
 
   factory Friend.fromJson(Map<String, dynamic> json) {
     return Friend(
@@ -45,12 +51,13 @@ class FriendsApi {
 
   /// Add a friend by username
   static Future<void> addFriend(String jwt, String friendName) async {
+    debugPrint(friendName);
     final response = await BaseApi.post(
       '/api/v1/protected/friends/add',
-      headers: {
-        'Authorization': 'Bearer $jwt',
+      headers: {'Authorization': 'Bearer $jwt'},
+      body: {
+        'friend_name': friendName
       },
-      body: {'friend_name': friendName},
     );
 
     if (response.statusCode != 200) {
@@ -62,9 +69,7 @@ class FriendsApi {
   static Future<void> deleteFriend(String jwt, String friendName) async {
     final response = await BaseApi.delete(
       '/api/v1/protected/friends/delete',
-      headers: {
-        'Authorization': 'Bearer $jwt',
-      },
+      headers: {'Authorization': 'Bearer $jwt'},
       body: {'friend_name': friendName},
     );
 
