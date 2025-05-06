@@ -3,11 +3,13 @@ package server
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io"
 	"net/http"
 	"rocket-backend/internal/challenges"
 	"rocket-backend/internal/custom_error"
 	"rocket-backend/internal/types"
+	"rocket-backend/pkg/logger"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
@@ -374,4 +376,39 @@ func (s *Server) CompleteChallenge(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{"message": "Challenge completed successfully"})
+}
+
+func (s *Server) GetUserImage(c *gin.Context) {
+	var req types.GetImageDTO
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "user_id is required and must be a UUID"})
+		return
+	}
+
+	userUUID, err := uuid.Parse(req.UserID)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid user_id format"})
+		return
+	}
+
+	img, err := s.db.GetUserImage(userUUID)
+	if err != nil {
+		logger.Error("Failed to get image", err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve image"})
+		return
+	}
+	if img == nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "No image found for user"})
+		return
+	}
+
+	mimeType := http.DetectContentType(img.Data)
+	if mimeType != "image/jpeg" && mimeType != "image/png" {
+		c.JSON(http.StatusUnsupportedMediaType, gin.H{"error": "Unsupported image type"})
+		return
+	}
+
+	c.Header("Content-Disposition", fmt.Sprintf("inline; filename=\"%s\"", img.Name))
+	c.Header("Content-Type", mimeType)
+	c.Data(http.StatusOK, mimeType, img.Data)
 }

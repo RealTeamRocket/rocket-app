@@ -2,7 +2,6 @@ package server
 
 import (
 	"errors"
-	"fmt"
 	"net/http"
 	"rocket-backend/pkg/auth"
 	"rocket-backend/internal/custom_error"
@@ -107,41 +106,23 @@ func (s *Server) RegisterHandler(c *gin.Context) {
 		return
 	}
 
+	var settings types.Settings
+	settings.ID = uuid.New()
+	settings.UserId = user.ID
+	settings.ImageId = uuid.Nil
+	settings.StepGoal = 10000
+
+	if err := s.db.CreateSettings(settings); err != nil {
+		if errors.Is(err, custom_error.ErrFailedToSave) {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to save settings"})
+		} else {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal server error"})
+		}
+		return
+	}
+
+
 	c.JSON(http.StatusOK, gin.H{"message": "User registered successfully"})
-}
-
-func (s *Server) GetUserImage(c *gin.Context) {
-	var req types.GetImageDTO
-	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "user_id is required and must be a UUID"})
-		return
-	}
-
-	userUUID, err := uuid.Parse(req.UserID)
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid user_id format"})
-		return
-	}
-
-	img, err := s.db.GetUserImage(userUUID)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve image"})
-		return
-	}
-	if img == nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "No image found for user"})
-		return
-	}
-
-	mimeType := http.DetectContentType(img.Data)
-	if mimeType != "image/jpeg" && mimeType != "image/png" {
-		c.JSON(http.StatusUnsupportedMediaType, gin.H{"error": "Unsupported image type"})
-		return
-	}
-
-	c.Header("Content-Disposition", fmt.Sprintf("inline; filename=\"%s\"", img.Name))
-	c.Header("Content-Type", mimeType)
-	c.Data(http.StatusOK, mimeType, img.Data)
 }
 
 func (s *Server) GetUserRanking(c *gin.Context) {

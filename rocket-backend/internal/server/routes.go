@@ -30,7 +30,7 @@ func (s *Server) RegisterRoutes() http.Handler {
 			protected.POST("/updateSteps", s.UpdateSteps)
 
 			protected.POST("/settings/update", s.UpdateSettings)
-			protected.GET("/settings", s.GetSettings)
+			protected.POST("/settings", s.GetSettings)
 			protected.POST("/image", s.GetUserImage)
 
 			protected.GET("/challenges/new", s.GetDailyChallenges)
