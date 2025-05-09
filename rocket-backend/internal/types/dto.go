@@ -31,5 +31,5 @@ type UserWithImageDTO struct {
 	Email        string    `json:"email"`
 	RocketPoints int       `json:"rocket_points"`
 	ImageName    string    `json:"image_name"`
-	ImageData    []byte    `json:"image_data"`
+	ImageData    string    `json:"image_data"`
 }

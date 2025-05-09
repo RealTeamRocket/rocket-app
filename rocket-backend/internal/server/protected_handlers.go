@@ -1,6 +1,7 @@
 package server
 
 import (
+	"encoding/base64"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -398,10 +399,10 @@ func (s *Server) GetAllUsers(c *gin.Context) {
 		if err != nil {
 			logger.Warn("Failed to fetch image for user %s: %v\n", user.ID, err)
 			userWithImage.ImageName = ""
-			userWithImage.ImageData = nil
+			userWithImage.ImageData = ""
 		} else if userImage != nil {
 			userWithImage.ImageName = userImage.Name
-			userWithImage.ImageData = userImage.Data
+			userWithImage.ImageData = base64.StdEncoding.EncodeToString(userImage.Data)
 		}
 
 		usersWithImages = append(usersWithImages, userWithImage)
