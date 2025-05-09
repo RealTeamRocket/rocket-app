@@ -424,12 +424,17 @@ func (s *Server) getUserStatistics(c *gin.Context) {
 		ID string `json:"id"`
 	}{}
 
-	if err := c.ShouldBindJSON(&user); err != nil {
+	if err := c.ShouldBindJSON(&user); err != nil || user.ID == "" {
 		user.ID = userID.(string)
 	}
 
+	logger.Debug("userID.(string) = ", userID.(string))
+	logger.Debug(userID)
+	logger.Debug(user.ID)
+
 	userUUID, err := uuid.Parse(user.ID)
 	if err != nil {
+		logger.Debug("here is the upsi")
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid user ID format"})
 		return
 	}
