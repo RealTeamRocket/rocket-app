@@ -412,3 +412,37 @@ func (s *Server) GetUserImage(c *gin.Context) {
 	c.Header("Content-Type", mimeType)
 	c.Data(http.StatusOK, mimeType, img.Data)
 }
+
+func (s *Server) getUserStatistics(c *gin.Context) {
+	userID, exists := c.Get("userID")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "User not authenticated"})
+		return
+	}
+
+	user := struct {
+		ID string `json:"id"`
+	}{}
+
+	if err := c.ShouldBindJSON(&user); err != nil {
+		user.ID = userID.(string)
+	}
+
+	userUUID, err := uuid.Parse(user.ID)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid user ID format"})
+		return
+	}
+
+	stats, err := s.db.GetUserStatistics(userUUID)
+	if err != nil {
+		if errors.Is(err, custom_error.ErrUserNotFound) {
+			c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
+		} else {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve user statistics"})
+		}
+		return
+	}
+
+	c.JSON(http.StatusOK, stats)
+}
