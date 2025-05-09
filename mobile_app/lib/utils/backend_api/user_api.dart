@@ -21,7 +21,7 @@ class UserStatistics {
 class UserImage {
   final String name;
   final String mimeType;
-  final List<int> data;
+  final String data;
 
   const UserImage({
     required this.name,
@@ -33,7 +33,7 @@ class UserImage {
     return UserImage(
       name: json['name'] as String,
       mimeType: json['mime_type'] as String,
-      data: (json['data'] as List<dynamic>).cast<int>(),
+      data: json['data'] as String,
     );
   }
 }

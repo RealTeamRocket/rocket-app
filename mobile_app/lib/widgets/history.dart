@@ -12,25 +12,26 @@ class History extends StatefulWidget {
 }
 
 class _HistoryState extends State<History> {
-  late Future<List<UserStatistics>> _userStatisticsFuture;
+  late Future<List<UserStatistics>> _userStatisticsFuture = Future.value([]);
 
   @override
-    void initState() {
-      super.initState();
-      final storage = FlutterSecureStorage();
-      storage.read(key: 'jwt_token').then((jwt) {
-        if (jwt != null) {
-          setState(() {
-            _userStatisticsFuture = UserApi.fetchUserStatistics(jwt);
-          });
-        }
-      });
-    }
+  void initState() {
+    super.initState();
 
-    @override
-    Widget build(BuildContext context) {
-      return Padding(
-        padding: const EdgeInsets.all(16.0),
+    final storage = FlutterSecureStorage();
+    storage.read(key: 'jwt_token').then((jwt) {
+      if (jwt != null) {
+        setState(() {
+          _userStatisticsFuture = UserApi.fetchUserStatistics(jwt);
+        });
+      }
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -48,9 +49,7 @@ class _HistoryState extends State<History> {
               future: _userStatisticsFuture,
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(
-                    child: CircularProgressIndicator(),
-                  );
+                  return const Center(child: CircularProgressIndicator());
                 } else if (snapshot.hasError) {
                   return Center(
                     child: Text(
@@ -105,8 +104,7 @@ class _HistoryState extends State<History> {
                             LineChartBarData(
                               spots: List.generate(
                                 stepsData.length,
-                                (index) =>
-                                    FlSpot(index.toDouble(), stepsData[index]),
+                                (index) => FlSpot(index.toDouble(), stepsData[index]),
                               ),
                               isCurved: true,
                               color: ColorConstants.greenColor,
