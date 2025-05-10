@@ -1,4 +1,6 @@
+import 'package:background_fetch/background_fetch.dart';
 import 'package:flutter/material.dart';
+import 'package:mobile_app/utils/scheduler/step_scheduler.dart';
 import 'package:mobile_app/pages/settings_page.dart';
 import 'utils/backend_api/backend_api.dart' as api;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -13,6 +15,8 @@ void main() async {
     debugPrint("Error loading .env file using fallback: $e");
   }
   runApp(MyApp());
+  BackgroundFetch.registerHeadlessTask(backgroundFetchHeadlessTask);
+  StepScheduler.initialize();
 }
 
 class MyApp extends StatefulWidget {
@@ -50,7 +54,7 @@ class _MyAppState extends State<MyApp> {
         return;
       }
 
-      final authStatus = await api.AuthStatus.fetchAuthStatus(jwt);
+      final authStatus = await api.AuthApi.fetchAuthStatus(jwt);
       setState(() {
         isAuthenticated = authStatus.authenticated;
       });

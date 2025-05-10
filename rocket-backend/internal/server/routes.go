@@ -9,11 +9,11 @@ import (
 
 func (s *Server) RegisterRoutes() http.Handler {
 	r := gin.Default()
-
+	r.Use(s.APIKeyMiddleware())
 	r.Use(cors.New(cors.Config{
 		AllowOrigins:     []string{"*"},
 		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"},
-		AllowHeaders:     []string{"Accept", "Authorization", "Content-Type"},
+		AllowHeaders:     []string{"Accept", "Authorization", "Content-Type", "X-API-KEY"},
 		AllowCredentials: true, // Enable cookies/auth
 	}))
 
@@ -27,6 +27,21 @@ func (s *Server) RegisterRoutes() http.Handler {
 		protected.Use(s.AuthMiddleware())
 		{
 			protected.GET("/", s.Authenticated)
+			protected.POST("/updateSteps", s.UpdateSteps)
+
+			protected.POST("/settings/update", s.UpdateSettings)
+			protected.POST("/settings", s.GetSettings)
+			protected.POST("/image", s.GetUserImage)
+
+			protected.GET("/challenges/new", s.GetDailyChallenges)
+			protected.POST("/challenges/complete", s.CompleteChallenge)
+
+			protected.GET("/ranking/users", s.GetUserRanking)
+			protected.GET("/ranking/friends", s.GetFriendsRanked)
+
+			protected.GET("/friends", s.GetAllFriends)
+			protected.POST("/friends/add", s.AddFriend)
+			protected.DELETE("/friends/delete", s.DeleteFriend)
 		}
 	}
 

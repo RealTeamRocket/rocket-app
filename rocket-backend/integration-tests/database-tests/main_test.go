@@ -1,22 +1,34 @@
-package database
+package database_tests
 
 import (
 	"context"
 	"database/sql"
 	"errors"
 	"fmt"
-	"log"
+	"os"
 	"path/filepath"
+	"rocket-backend/pkg/logger"
 	"runtime"
+	"testing"
 	"time"
 
 	"github.com/golang-migrate/migrate/v4"
 	_ "github.com/golang-migrate/migrate/v4/database/postgres" // used by migrator
 	_ "github.com/golang-migrate/migrate/v4/source/file"       // used by migrator
 	_ "github.com/jackc/pgx/v5/stdlib"
+	. "github.com/onsi/ginkgo/v2"
+	. "github.com/onsi/gomega"
 	"github.com/testcontainers/testcontainers-go"
 	"github.com/testcontainers/testcontainers-go/wait"
 )
+
+var testDbInstance *sql.DB
+var connectionString string
+
+func TestMain(m *testing.M) {
+	code := m.Run()
+	os.Exit(code)
+}
 
 const (
 	DbName = "test_db"
@@ -30,21 +42,32 @@ type TestDatabase struct {
 	container  testcontainers.Container
 }
 
-func SetupTestDatabase() *TestDatabase {
+var testDB *TestDatabase
 
+var _ = BeforeSuite(func() {
+	testDB = SetupTestDatabase()
+	testDbInstance = testDB.DbInstance
+})
+
+var _ = AfterSuite(func() {
+	testDB.TearDown()
+})
+
+func SetupTestDatabase() *TestDatabase {
 	// setup db container
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*60)
+	defer cancel()
+
 	container, dbInstance, dbAddr, err := createContainer(ctx)
 	if err != nil {
-		log.Fatal("failed to setup test", err)
+		logger.Fatal("failed to setup test", err)
 	}
 
 	// migrate db schema
 	err = migrateDb(dbAddr)
 	if err != nil {
-		log.Fatal("failed to perform db migration", err)
+		logger.Fatal("failed to perform db migration", err)
 	}
-	cancel()
 
 	return &TestDatabase{
 		container:  container,
@@ -88,10 +111,10 @@ func createContainer(ctx context.Context) (testcontainers.Container, *sql.DB, st
 	}
 
 	dbAddr := fmt.Sprintf("localhost:%s", p.Port())
-	dsn := fmt.Sprintf("postgres://%s:%s@%s/%s?sslmode=disable", DbUser, DbPass, dbAddr, DbName)
+	connectionString = fmt.Sprintf("postgres://%s:%s@%s/%s?sslmode=disable", DbUser, DbPass, dbAddr, DbName)
 
 	// Attempt to open DB connection
-	db, err := sql.Open("pgx", dsn)
+	db, err := sql.Open("pgx", connectionString)
 	if err != nil {
 		return container, nil, dbAddr, fmt.Errorf("failed to open db connection: %w", err)
 	}
@@ -108,23 +131,22 @@ func createContainer(ctx context.Context) (testcontainers.Container, *sql.DB, st
 			break
 		}
 
-		log.Println("waiting for db to be ready...")
+		logger.Debug("waiting for db to be ready...")
 		time.Sleep(time.Second)
 	}
 
-	log.Println("postgres container ready and running at port:", p.Port())
+	logger.Info("postgres container ready and running at port:", p.Port())
 
 	return container, db, dbAddr, nil
 }
 
 func migrateDb(dbAddr string) error {
-
 	// get location of test
 	_, path, _, ok := runtime.Caller(0)
 	if !ok {
 		return fmt.Errorf("failed to get path")
 	}
-	pathToMigrationFiles := filepath.Join(filepath.Dir(path), "../../migrations")
+	pathToMigrationFiles := filepath.Join(filepath.Dir(path), "../../test-migrations")
 
 	databaseURL := fmt.Sprintf("postgres://%s:%s@%s/%s?sslmode=disable", DbUser, DbPass, dbAddr, DbName)
 	m, err := migrate.New(fmt.Sprintf("file:%s", pathToMigrationFiles), databaseURL)
@@ -138,7 +160,12 @@ func migrateDb(dbAddr string) error {
 		return err
 	}
 
-	log.Println("migration done")
+	logger.Debug("migration done")
 
 	return nil
+}
+
+func TestDatabaseIntegration(t *testing.T) {
+	RegisterFailHandler(Fail)
+	RunSpecs(t, "Database Integration Tests Suite")
 }

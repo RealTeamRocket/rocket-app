@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../constants/color_constants.dart';
 import '/widgets/widgets.dart';
+import 'leaderboard.dart';
 import 'pages.dart';
 
 class HomePage extends StatefulWidget {
@@ -13,22 +14,13 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  int _selectedIndex = 0;
+  int _selectedIndex = 2; /// set position of starting page to homepage in the middle
 
   final List<Widget> _pages = <Widget>[
+    const ChallengePage(title: 'Challenges'),
+    const LeaderboardPage(title: 'Leaderboard'),
     const RunPage(title: 'Run'),
-    Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: const [Text("Search"), Icon(Icons.checklist)],
-      ),
-    ),
-    Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: const [Text("Leaderboards"), Icon(Icons.leaderboard)],
-      ),
-    ),
+    const FriendlistPage(title: 'friends'),
     const ProfilePage(),
   ];
 

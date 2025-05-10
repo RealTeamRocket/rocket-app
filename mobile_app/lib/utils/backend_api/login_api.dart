@@ -1,6 +1,5 @@
 import 'dart:convert';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:http/http.dart' as http;
+import 'base_api.dart';
 
 class LoginResponse {
   final String token;
@@ -18,16 +17,12 @@ class LoginResponse {
 
 class LoginApi {
   static Future<LoginResponse> login(String email, String password) async {
-    final backendUrl = dotenv.get('BACKEND_URL', fallback: "http://10.0.2.2:8080");
-    final response = await http.post(
-      Uri.parse('$backendUrl/api/v1/login'),
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: jsonEncode({
+    final response = await BaseApi.post(
+      '/api/v1/login',
+      body: {
         'email': email,
         'password': password,
-      }),
+      },
     );
 
     if (response.statusCode == 200) {

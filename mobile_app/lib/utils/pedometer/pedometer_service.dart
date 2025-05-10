@@ -1,6 +1,9 @@
+import 'package:flutter/cupertino.dart';
 import 'package:pedometer/pedometer.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'dart:async';
+
 
 class PedometerService {
   int? _initialStepCount;
@@ -8,6 +11,7 @@ class PedometerService {
   Stream<StepCount>? _stepCountStream;
   Function(int)? onStepsUpdated;
   Function(String)? onError;
+
 
   Future<void> init() async {
     await _requestActivityRecognitionPermission();
@@ -83,6 +87,7 @@ class PedometerService {
     }
 
     final currentSteps = event.steps - _initialStepCount!;
+    await prefs.setInt('currentSteps', currentSteps);
 
     if (onStepsUpdated != null) {
       onStepsUpdated!(currentSteps);
@@ -91,7 +96,7 @@ class PedometerService {
 
   void _onStepCountError(error) {
     final errorMessage = "Step tracking failed: $error Please check permissions or restart the app.";
-    print(errorMessage);
+    debugPrint(errorMessage);
 
     if (onError != null) {
       onError!(errorMessage);
