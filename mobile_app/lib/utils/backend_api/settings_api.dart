@@ -1,8 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:flutter/rendering.dart';
-import 'package:http/http.dart' as http;
 
 import 'base_api.dart';
 
@@ -47,22 +45,29 @@ class SettingsApi {
     }
   }
 
-  static Future<void> updateSettings(String jwt, int stepGoal, {File? imageFile,}) async {
-    // Prepare the settings JSON as a form field
-    final settingsJson = jsonEncode({'stepGoal': stepGoal});
-
-    // Call the BaseApi's postMultipart method
-    final response = await BaseApi.postMultipart(
-      '/api/v1/protected/settings/update',
+  static Future<void> updateStepGoal(String jwt, int stepGoal) async {
+    // Ensure stepGoal is valid
+    final response = await BaseApi.post(
+      '/api/v1/protected/settings/step-goal',
       headers: {'Authorization': 'Bearer $jwt'},
-      fields: {'settings': settingsJson},
+      body: jsonEncode({'stepGoal': stepGoal}),
+    );
+
+    if (response.statusCode != 200) {
+      throw Exception('Failed to update step goal');
+    }
+  }
+
+  static Future<void> updateImage(String jwt, File imageFile) async {
+    final response = await BaseApi.postMultipart(
+      '/api/v1/protected/settings/image',
+      headers: {'Authorization': 'Bearer $jwt'},
       file: imageFile,
       fileFieldName: 'image',
     );
 
     if (response.statusCode != 200) {
-      final responseBody = await response.stream.bytesToString();
-      throw Exception('Failed to update settings: $responseBody');
+      throw Exception('Failed to update image');
     }
   }
 }

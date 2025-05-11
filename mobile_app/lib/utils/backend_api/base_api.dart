@@ -24,7 +24,8 @@ class BaseApi {
       'Content-Type': 'application/json',
       ...?headers,
     };
-    return await http.post(uri, headers: defaultHeaders, body: jsonEncode(body));
+    final requestBody = body is String ? body : jsonEncode(body);
+    return await http.post(uri, headers: defaultHeaders, body: requestBody);
   }
 
   static Future<http.Response> delete(String endpoint, {Map<String, String>? headers, Object? body}) async {

@@ -58,14 +58,29 @@ class _SettingsPageState extends State<SettingsPage> {
 
     try {
       final jwt = await _storage.read(key: 'jwt_token');
-      final stepGoal = int.tryParse(_stepGoalController.text) ?? 0;
+      final stepGoal = int.tryParse(_stepGoalController.text);
 
-      // Pass the selected image file to the API
-      await SettingsApi.updateSettings(jwt!, stepGoal, imageFile: _selectedImage);
+      if (stepGoal == null || stepGoal <= 0) {
+        setState(() {
+          _isLoading = false;
+          _errorMessage = 'Please enter a valid step goal greater than 0';
+        });
+        return;
+      }
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Settings updated successfully')),
-      );
+      if (stepGoal > 0) {
+        await SettingsApi.updateStepGoal(jwt!, stepGoal);
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Step goal updated successfully')),
+        );
+      }
+
+      if (_selectedImage != null) {
+        await SettingsApi.updateImage(jwt!, _selectedImage!);
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Image updated successfully')),
+        );
+      }
     } catch (e) {
       setState(() {
         _errorMessage = 'Failed to update settings: $e';
@@ -92,8 +107,12 @@ class _SettingsPageState extends State<SettingsPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Settings'),
+        title: const Text(
+          'Settings',
+          style: TextStyle(color: Colors.white),
+        ),
         backgroundColor: ColorConstants.secoundaryColor,
+        iconTheme: const IconThemeData(color: Colors.white),
       ),
       backgroundColor: ColorConstants.primaryColor,
       body: _isLoading
