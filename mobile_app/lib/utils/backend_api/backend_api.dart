@@ -5,3 +5,4 @@ export 'login_api.dart';
 export 'register_api.dart';
 export 'ranking_api.dart';
 export 'friends_api.dart';
+export 'settings_api.dart';

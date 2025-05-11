@@ -3,6 +3,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:mobile_app/constants/constants.dart';
 import 'package:mobile_app/pages/pages.dart';
 import 'package:mobile_app/utils/backend_api/login_api.dart';
+import 'package:mobile_app/utils/backend_api/settings_api.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -39,6 +40,17 @@ class _LoginPageState extends State<LoginPage> {
       );
 
       await _storage.write(key: 'jwt_token', value: loginResponse.token);
+      try {
+        final settings = await SettingsApi.getSettings(loginResponse.token);
+        print('Settings loaded: $settings');
+      } catch (e) {
+        if (e.toString().contains('500')) {
+          await SettingsApi.createSettings(loginResponse.token, 10000); // Default stepGoal
+          print('Default settings created');
+        } else {
+          throw Exception('Error while fetching or creating settings: $e');
+        }
+      }
 
       Navigator.pushReplacement(
         context,

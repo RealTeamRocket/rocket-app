@@ -4,7 +4,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:mobile_app/utils/backend_api/backend_api.dart';
 
 class LeaderboardPage extends StatefulWidget {
-  const LeaderboardPage({Key? key, required this.title}) : super(key: key);
+  const LeaderboardPage({super.key, required this.title});
   final String title;
 
   @override

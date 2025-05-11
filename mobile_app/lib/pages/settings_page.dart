@@ -1,72 +1,151 @@
+// filepath: /Users/ron/dev/rocket-app/mobile_app/lib/pages/settings_page.dart
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:mobile_app/constants/constants.dart';
+import 'package:mobile_app/utils/backend_api/settings_api.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class SettingsPage extends StatefulWidget {
+  const SettingsPage({super.key});
+
   @override
-  _SettingsPageState createState() => _SettingsPageState();
+  State<SettingsPage> createState() => _SettingsPageState();
 }
 
 class _SettingsPageState extends State<SettingsPage> {
-  final TextEditingController _usernameController = TextEditingController();
-  final TextEditingController _emailController = TextEditingController();
   final TextEditingController _stepGoalController = TextEditingController();
+  bool _isLoading = false;
+  String? _errorMessage;
+  final _storage = FlutterSecureStorage();
 
   @override
   void initState() {
     super.initState();
-    _loadSettings();
+    _fetchSettings();
   }
 
-  Future<void> _loadSettings() async {
-    final prefs = await SharedPreferences.getInstance();
+  Future<void> _fetchSettings() async {
     setState(() {
-      _usernameController.text = prefs.getString('username') ?? '';
-      _emailController.text = prefs.getString('email') ?? '';
-      _stepGoalController.text = prefs.getInt('stepGoal')?.toString() ?? '10000';
+      _isLoading = true;
+      _errorMessage = null;
     });
+
+    try {
+      final jwt = await _storage.read(key: 'jwt_token');
+      if (jwt == null) {
+        throw Exception('JWT token not found');
+      }
+      final settings = await SettingsApi.getSettings(jwt!);
+      _stepGoalController.text = settings.stepGoal.toString();
+    } catch (e) {
+      setState(() {
+        _errorMessage = 'Failed to load settings: $e';
+      });
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
   }
 
-  Future<void> _saveSettings() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString('username', _usernameController.text);
-    await prefs.setString('email', _emailController.text);
-    await prefs.setInt('stepGoal', int.parse(_stepGoalController.text));
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Einstellungen gespeichert!')),
-    );
+  Future<void> _updateSettings() async {
+    setState(() {
+      _isLoading = true;
+      _errorMessage = null;
+    });
+
+    try {
+      final jwt = await _storage.read(key: 'jwt_token');
+      final stepGoal = int.tryParse(_stepGoalController.text) ?? 0;
+      await SettingsApi.updateSettings(jwt!, stepGoal);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Settings updated successfully')),
+      );
+    } catch (e) {
+      setState(() {
+        _errorMessage = 'Failed to update settings: $e';
+      });
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Einstellungen'),
+        title: const Text('Settings'),
+        backgroundColor: ColorConstants.secoundaryColor,
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            TextField(
-              controller: _usernameController,
-              decoration: InputDecoration(labelText: 'Nutzername'),
+      backgroundColor: ColorConstants.primaryColor,
+      body: _isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  if (_errorMessage != null)
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 16.0),
+                      child: Text(
+                        _errorMessage!,
+                        style: const TextStyle(color: Colors.red),
+                      ),
+                    ),
+                  const Text(
+                    'Step Goal',
+                    style: TextStyle(
+                      fontSize: 18.0,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
+                  const SizedBox(height: 8.0),
+                  TextField(
+                    controller: _stepGoalController,
+                    keyboardType: TextInputType.number,
+                    style: const TextStyle(color: Colors.white),
+                    decoration: InputDecoration(
+                      filled: true,
+                      fillColor: ColorConstants.secoundaryColor,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide.none,
+                      ),
+                      hintText: 'Enter your step goal',
+                      hintStyle: const TextStyle(color: Colors.white54),
+                    ),
+                  ),
+                  const SizedBox(height: 16.0),
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: ColorConstants.greenColor,
+                      padding: const EdgeInsets.symmetric(vertical: 16.0),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12.0),
+                      ),
+                    ),
+                    onPressed: _updateSettings,
+                    child: const Text(
+                      'Save',
+                      style: TextStyle(
+                        fontSize: 18.0,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
-            TextField(
-              controller: _emailController,
-              decoration: InputDecoration(labelText: 'E-Mail'),
-            ),
-            TextField(
-              controller: _stepGoalController,
-              decoration: InputDecoration(labelText: 'Schrittziel'),
-              keyboardType: TextInputType.number,
-            ),
-            SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: _saveSettings,
-              child: Text('Speichern'),
-            ),
-          ],
-        ),
-      ),
     );
+  }
+
+  @override
+  void dispose() {
+    _stepGoalController.dispose();
+    super.dispose();
   }
 }
