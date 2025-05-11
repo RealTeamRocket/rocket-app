@@ -1,5 +1,7 @@
-// filepath: /Users/ron/dev/rocket-app/mobile_app/lib/pages/settings_page.dart
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:mobile_app/constants/constants.dart';
 import 'package:mobile_app/utils/backend_api/settings_api.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -16,6 +18,7 @@ class _SettingsPageState extends State<SettingsPage> {
   bool _isLoading = false;
   String? _errorMessage;
   final _storage = FlutterSecureStorage();
+  File? _selectedImage; // To store the selected image file
 
   @override
   void initState() {
@@ -34,7 +37,7 @@ class _SettingsPageState extends State<SettingsPage> {
       if (jwt == null) {
         throw Exception('JWT token not found');
       }
-      final settings = await SettingsApi.getSettings(jwt!);
+      final settings = await SettingsApi.getSettings(jwt);
       _stepGoalController.text = settings.stepGoal.toString();
     } catch (e) {
       setState(() {
@@ -56,7 +59,10 @@ class _SettingsPageState extends State<SettingsPage> {
     try {
       final jwt = await _storage.read(key: 'jwt_token');
       final stepGoal = int.tryParse(_stepGoalController.text) ?? 0;
-      await SettingsApi.updateSettings(jwt!, stepGoal);
+
+      // Pass the selected image file to the API
+      await SettingsApi.updateSettings(jwt!, stepGoal, imageFile: _selectedImage);
+
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Settings updated successfully')),
       );
@@ -67,6 +73,17 @@ class _SettingsPageState extends State<SettingsPage> {
     } finally {
       setState(() {
         _isLoading = false;
+      });
+    }
+  }
+
+  Future<void> _pickImage() async {
+    final picker = ImagePicker();
+    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+
+    if (pickedFile != null) {
+      setState(() {
+        _selectedImage = File(pickedFile.path);
       });
     }
   }
@@ -116,6 +133,42 @@ class _SettingsPageState extends State<SettingsPage> {
                       ),
                       hintText: 'Enter your step goal',
                       hintStyle: const TextStyle(color: Colors.white54),
+                    ),
+                  ),
+                  const SizedBox(height: 16.0),
+                  const Text(
+                    'Profile Image',
+                    style: TextStyle(
+                      fontSize: 18.0,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
+                  const SizedBox(height: 8.0),
+                  GestureDetector(
+                    onTap: _pickImage,
+                    child: Container(
+                      height: 150,
+                      width: double.infinity,
+                      decoration: BoxDecoration(
+                        color: ColorConstants.secoundaryColor,
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: Colors.white54),
+                      ),
+                      child: _selectedImage != null
+                          ? ClipRRect(
+                              borderRadius: BorderRadius.circular(12),
+                              child: Image.file(
+                                _selectedImage!,
+                                fit: BoxFit.cover,
+                              ),
+                            )
+                          : const Center(
+                              child: Text(
+                                'Tap to select an image',
+                                style: TextStyle(color: Colors.white54),
+                              ),
+                            ),
                     ),
                   ),
                   const SizedBox(height: 16.0),
