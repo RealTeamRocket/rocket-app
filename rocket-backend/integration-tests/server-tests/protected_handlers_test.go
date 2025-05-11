@@ -1,7 +1,9 @@
 package server_test
 
 import (
+	"bytes"
 	"errors"
+	"mime/multipart"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -127,10 +129,22 @@ var _ = Describe("ProtectedHandler", func() {
 				return nil
 			}
 
-			reqBody := `{"imageId": "` + uuid.New().String() + `"}`
-			req, err := http.NewRequest("POST", "/settings/image", strings.NewReader(reqBody))
+			// Create a multipart form request
+			var requestBody bytes.Buffer
+			writer := multipart.NewWriter(&requestBody)
+
+			// Add a mock image file to the request
+			fileWriter, err := writer.CreateFormFile("image", "test-image.png")
 			Expect(err).To(BeNil())
-			req.Header.Set("Content-Type", "application/json")
+			_, err = fileWriter.Write([]byte("mock image data"))
+			Expect(err).To(BeNil())
+
+			// Close the writer to finalize the form data
+			writer.Close()
+
+			req, err := http.NewRequest("POST", "/settings/image", &requestBody)
+			Expect(err).To(BeNil())
+			req.Header.Set("Content-Type", writer.FormDataContentType())
 
 			recorder := httptest.NewRecorder()
 			router.ServeHTTP(recorder, req)
