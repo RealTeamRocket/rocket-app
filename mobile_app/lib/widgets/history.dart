@@ -106,7 +106,7 @@ class _HistoryState extends State<History> {
                                 stepsData.length,
                                 (index) => FlSpot(index.toDouble(), stepsData[index]),
                               ),
-                              isCurved: true,
+                              isCurved: false,
                               color: ColorConstants.greenColor,
                               barWidth: 4,
                               isStrokeCapRound: true,
