@@ -363,6 +363,13 @@ func (s *Server) UpdateStepGoal(c *gin.Context) {
 		return
 	}
 
+	if stepGoalDTO.StepGoal <= 0 {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Step goal must be greater than 0"})
+		return
+	}
+
+	logger.Info("Updating step goal", "userID", userUUID, "stepGoal", stepGoalDTO.StepGoal)
+
 	err = s.db.UpdateStepGoal(userUUID, stepGoalDTO.StepGoal)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update step goal"})
@@ -397,6 +404,13 @@ func (s *Server) UpdateImage(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to read image data"})
 		return
 	}
+
+	if header == nil || len(imageData) == 0 {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "No image provided"})
+		return
+	}
+
+	logger.Info("Updating image", "userID", userUUID, "imageName", header.Filename)
 
 	imageID, err := s.db.SaveImage(header.Filename, imageData)
 	if err != nil {
