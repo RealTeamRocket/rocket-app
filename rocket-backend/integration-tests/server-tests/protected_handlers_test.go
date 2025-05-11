@@ -4,6 +4,7 @@ import (
 	"errors"
 	"net/http"
 	"net/http/httptest"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
@@ -96,6 +97,44 @@ var _ = Describe("ProtectedHandler", func() {
 				Expect(recorder.Code).To(Equal(http.StatusInternalServerError))
 				Expect(recorder.Body.String()).To(ContainSubstring("Failed to retrieve user"))
 			})
+		})
+	})
+
+	Describe("UpdateStepGoal", func() {
+		It("should update the step goal for the user", func() {
+			mock.UpdateSettingsStepGoalFunc = func(userID uuid.UUID, stepGoal int) error {
+				return nil
+			}
+
+			reqBody := `{"stepGoal": 10000}`
+			req, err := http.NewRequest("POST", "/settings/step-goal", strings.NewReader(reqBody))
+			Expect(err).To(BeNil())
+			req.Header.Set("Content-Type", "application/json")
+
+			recorder := httptest.NewRecorder()
+			router.ServeHTTP(recorder, req)
+
+			Expect(recorder.Code).To(Equal(http.StatusOK))
+			Expect(recorder.Body.String()).To(ContainSubstring("Step goal updated successfully"))
+		})
+	})
+
+	Describe("UpdateImage", func() {
+		It("should update the image for the user", func() {
+			mock.UpdateSettingsImageFunc = func(userID uuid.UUID, imageID uuid.UUID) error {
+				return nil
+			}
+
+			reqBody := `{"imageId": "` + uuid.New().String() + `"}`
+			req, err := http.NewRequest("POST", "/settings/image", strings.NewReader(reqBody))
+			Expect(err).To(BeNil())
+			req.Header.Set("Content-Type", "application/json")
+
+			recorder := httptest.NewRecorder()
+			router.ServeHTTP(recorder, req)
+
+			Expect(recorder.Code).To(Equal(http.StatusOK))
+			Expect(recorder.Body.String()).To(ContainSubstring("Image updated successfully"))
 		})
 	})
 })
