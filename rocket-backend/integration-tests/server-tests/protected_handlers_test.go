@@ -41,6 +41,8 @@ var _ = Describe("ProtectedHandler", func() {
 		router.GET("/auth-hello", srv.AuthHelloHandler)
 		router.GET("/authenticated", srv.Authenticated)
 		router.POST("/update-steps", srv.UpdateSteps)
+		router.POST("/settings/step-goal", srv.UpdateStepGoal)
+		router.POST("/settings/image", srv.UpdateImage)
 	})
 
 	Describe("AuthHelloHandler", func() {
