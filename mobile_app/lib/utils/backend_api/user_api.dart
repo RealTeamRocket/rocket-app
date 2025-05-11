@@ -1,14 +1,12 @@
 import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import 'package:mobile_app/utils/backend_api/base_api.dart';
 
 class UserStatistics {
   final int steps;
   final String day;
 
-  const UserStatistics({
-    required this.steps,
-    required this.day,
-  });
+  const UserStatistics({required this.steps, required this.day});
 
   factory UserStatistics.fromJson(Map<String, dynamic> json) {
     return UserStatistics(
@@ -19,11 +17,13 @@ class UserStatistics {
 }
 
 class UserImage {
+  final String username;
   final String name;
   final String mimeType;
   final String data;
 
   const UserImage({
+    required this.username,
     required this.name,
     required this.mimeType,
     required this.data,
@@ -31,6 +31,7 @@ class UserImage {
 
   factory UserImage.fromJson(Map<String, dynamic> json) {
     return UserImage(
+      username: json['username'] as String,
       name: json['name'] as String,
       mimeType: json['mime_type'] as String,
       data: json['data'] as String,
@@ -59,11 +60,14 @@ class UserApi {
   }
 
   /// Fetch user image
-  static Future<UserImage> fetchUserImage(String jwt, String userId) async {
+  static Future<UserImage> fetchUserImage(String jwt, {String? userId}) async {
+    // Prepare the request body
+    final body = userId != null ? {'user_id': userId} : null;
+
     final response = await BaseApi.post(
       '/api/v1/protected/user/image',
       headers: {'Authorization': 'Bearer $jwt'},
-      body: {'user_id': userId},
+      body: body,
     );
 
     if (response.statusCode != 200) {
