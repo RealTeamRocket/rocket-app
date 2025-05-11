@@ -1,25 +1,30 @@
-import 'base_api.dart';
 import 'dart:convert';
+import 'dart:io';
+
+import 'package:flutter/rendering.dart';
+import 'package:http/http.dart' as http;
+
+import 'base_api.dart';
 
 class SettingsResponse {
   final String id;
   final String userId;
-  final String? imageId;
+  final String imageId;
   final int stepGoal;
 
   const SettingsResponse({
     required this.id,
     required this.userId,
-    this.imageId,
+    required this.imageId,
     required this.stepGoal,
   });
 
   factory SettingsResponse.fromJson(Map<String, dynamic> json) {
     return SettingsResponse(
       id: json['id'],
-      userId: json['userId'],
-      imageId: json['imageId'],
-      stepGoal: json['stepGoal'],
+      userId: json['user_id'],
+      imageId: json['image_id'],
+      stepGoal: json['step_goal'],
     );
   }
 }
@@ -42,37 +47,22 @@ class SettingsApi {
     }
   }
 
-  static Future<void> updateSettings(String jwt, int stepGoal, {String? imageId}) async {
-    final body = {
-      'stepGoal': stepGoal,
-      if (imageId != null) 'imageId': imageId,
-    };
+  static Future<void> updateSettings(String jwt, int stepGoal, {File? imageFile,}) async {
+    // Prepare the settings JSON as a form field
+    final settingsJson = jsonEncode({'stepGoal': stepGoal});
 
-    final response = await BaseApi.post(
+    // Call the BaseApi's postMultipart method
+    final response = await BaseApi.postMultipart(
       '/api/v1/protected/settings/update',
       headers: {'Authorization': 'Bearer $jwt'},
-      body: body,
+      fields: {'settings': settingsJson},
+      file: imageFile,
+      fileFieldName: 'image',
     );
 
     if (response.statusCode != 200) {
-      throw Exception('Failed to update settings');
-    }
-  }
-
-  static Future<void> createSettings(String jwt, int stepGoal, {String? imageId}) async {
-    final body = {
-      'stepGoal': stepGoal,
-      if (imageId != null) 'imageId': imageId,
-    };
-
-    final response = await BaseApi.post(
-      '/api/v1/protected/settings/create',
-      headers: {'Authorization': 'Bearer $jwt'},
-      body: body,
-    );
-
-    if (response.statusCode != 200) {
-      throw Exception('Failed to create settings');
+      final responseBody = await response.stream.bytesToString();
+      throw Exception('Failed to update settings: $responseBody');
     }
   }
 }
