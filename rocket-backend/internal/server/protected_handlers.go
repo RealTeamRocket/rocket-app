@@ -363,6 +363,7 @@ func (s *Server) UpdateStepGoal(c *gin.Context) {
 		return
 	}
 
+	logger.Info("Received JSON body for step goal update", "body", stepGoalDTO)
 	logger.Info("Received step goal update request", "userID", userUUID, "stepGoal", stepGoalDTO.StepGoal)
 
 	if stepGoalDTO.StepGoal <= 0 {
