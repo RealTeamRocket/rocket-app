@@ -1,8 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:flutter/rendering.dart';
-import 'package:http/http.dart' as http;
 
 import 'base_api.dart';
 
@@ -65,4 +63,23 @@ class SettingsApi {
       throw Exception('Failed to update settings: $responseBody');
     }
   }
+
+static Future<File> getUserImage(String jwt) async {
+  final response = await BaseApi.get(
+    '/api/v1/protected/image',
+    headers: {'Authorization': 'Bearer $jwt'},
+  );
+
+  if (response.statusCode == 200) {
+    final bytes = response.bodyBytes;
+    final tempDir = Directory.systemTemp;
+    final file = File('${tempDir.path}/user_image.jpg');
+    await file.writeAsBytes(bytes);
+    return file;
+  } else if (response.statusCode == 404) {
+    throw Exception('User image not found');
+  } else {
+    throw Exception('Failed to fetch user image');
+  }
+}
 }
