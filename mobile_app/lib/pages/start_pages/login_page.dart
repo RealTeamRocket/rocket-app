@@ -3,6 +3,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:mobile_app/constants/constants.dart';
 import 'package:mobile_app/pages/pages.dart';
 import 'package:mobile_app/utils/backend_api/login_api.dart';
+import 'package:mobile_app/utils/backend_api/settings_api.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
