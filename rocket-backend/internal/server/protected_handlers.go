@@ -205,7 +205,27 @@ func (s *Server) GetAllFriends(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, friends)
+    var friendsWithImages []types.UserWithImageDTO
+        for _, fr := range friends {
+            var f types.FriendWithImageDTO
+            f.ID = fr.ID
+            f.Username = fr.Username
+            f.Email = fr.Email
+            f.RocketPoints = fr.RocketPoints
+
+            userImage, imgErr := s.db.GetUserImage(fr.ID)
+            if imgErr != nil {
+                logger.Warn("Failed to fetch image for friend %s: %v\n", fr.ID, imgErr)
+                f.ImageName = ""
+                f.ImageData = ""
+            } else if userImage != nil {
+                f.ImageName = userImage.Name
+                f.ImageData = base64.StdEncoding.EncodeToString(userImage.Data)
+            }
+            friendsWithImages = append(friendsWithImages, f)
+        }
+
+	c.JSON(http.StatusOK, friendsWithImages)
 }
 
 func (s *Server) GetFriendsRanked(c *gin.Context) {
