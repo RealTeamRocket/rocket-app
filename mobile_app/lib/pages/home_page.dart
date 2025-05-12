@@ -35,12 +35,31 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: ColorConstants.secoundaryColor,
-        title: Center(
-          child: Text(
-            widget.title,
-            style: TextStyle(color: ColorConstants.white),
+        title: SizedBox(
+          height: kToolbarHeight,
+          child: Stack(
+            children: [
+              Align(
+                alignment: Alignment.center,
+                child: Text(
+                  widget.title,
+                  style: TextStyle(color: ColorConstants.white),
+                ),
+              ),
+              if (_selectedIndex == 4)
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: IconButton(
+                    icon: Icon(Icons.settings, color: ColorConstants.white),
+                    onPressed: () {
+                      Navigator.pushNamed(context, '/settings');
+                    },
+                  ),
+                ),
+            ],
           ),
         ),
+        centerTitle: true,
       ),
       body: Center(child: _pages.elementAt(_selectedIndex)),
       bottomNavigationBar: CustomMenuBar(onItemTapped: _onItemTapped),

@@ -10,40 +10,54 @@ import (
 )
 
 type MockDB struct {
-	GetUserByIDFunc              func(userID uuid.UUID) (types.User, error)
-	UpdateDailyStepsFunc         func(userID uuid.UUID, steps int) error
-	UpdateRocketPointsFunc       func(userID uuid.UUID, rocketPoints int) error
-	HealthFunc                   func() map[string]string
-	GetUserByEmailFunc           func(email string) (types.Credentials, error)
-	CheckEmailFunc               func(email string) error
-	SaveCredentialsFunc          func(creds types.Credentials) error
-	SaveUserProfileFunc          func(user types.User) error
-	GetSettingsByUserIDFunc      func(userID uuid.UUID) (*types.Settings, error)
-	CreateSettingsFunc           func(settings types.Settings) error
-	UpdateSettingsFunc           func(userId uuid.UUID, settings types.SettingsDTO, imageID uuid.UUID) error
-	SaveImageFunc                func(filename string, data []byte) (uuid.UUID, error)
-	GetUserImageFunc             func(userID uuid.UUID) (*types.UserImage, error)
-	GetAllChallengesFunc         func() ([]types.Challenge, error)
-	AssignChallengesToUserFunc   func(userID uuid.UUID, challenges []types.Challenge) error
-	GetUserDailyChallengesFunc   func(userID uuid.UUID) ([]types.Challenge, error)
-	ResetDailyChallengesFunc     func() error
-	InsertChallengeFunc          func(challenge types.Challenge) error
-	CompleteChallengeFunc        func(userID uuid.UUID, dto types.CompleteChallengesDTO) error
-	IsNewDayForUserFunc          func(userID uuid.UUID) (bool, error)
+	ExecuteRawSQLFunc          func(query string) (sql.Result, error)
+	QueryRowFunc               func(query string, args ...interface{}) *sql.Row
+	HealthFunc                 func() map[string]string
+	CloseFunc                  func() error
+	SaveCredentialsFunc        func(creds types.Credentials) error
+	GetUserByEmailFunc         func(email string) (types.Credentials, error)
+	CheckEmailFunc             func(email string) error
+	SaveUserProfileFunc        func(user types.User) error
+	GetUserByIDFunc            func(userID uuid.UUID) (types.User, error)
+	UpdateRocketPointsFunc     func(userID uuid.UUID, rocketPoints int) error
+	GetUserIDByNameFunc        func(name string) (uuid.UUID, error)
+	GetTopUsersFunc            func(limit int) ([]types.User, error)
+	UpdateDailyStepsFunc       func(userID uuid.UUID, steps int) error
+	GetUserStatisticsFunc      func(userID uuid.UUID) ([]types.StepStatistic, error)
+	GetSettingsByUserIDFunc    func(userID uuid.UUID) (*types.Settings, error)
+	CreateSettingsFunc         func(settings types.Settings) error
+	UpdateSettingsFunc         func(userId uuid.UUID, settings types.SettingsDTO, imageID uuid.UUID) error
+	SaveImageFunc              func(filename string, data []byte) (uuid.UUID, error)
+	GetUserImageFunc           func(userID uuid.UUID) (*types.UserImage, error)
+	GetAllChallengesFunc       func() ([]types.Challenge, error)
+	AssignChallengesToUserFunc func(userID uuid.UUID, challenges []types.Challenge) error
+	GetUserDailyChallengesFunc func(userID uuid.UUID) ([]types.Challenge, error)
+	ResetDailyChallengesFunc   func() error
+	InsertChallengeFunc        func(challenge types.Challenge) error
+	CompleteChallengeFunc      func(userID uuid.UUID, dto types.CompleteChallengesDTO) error
+	IsNewDayForUserFunc        func(userID uuid.UUID) (bool, error)
 	CleanUpChallengesForUserFunc func(userID uuid.UUID) error
-	GetUserIDByNameFunc          func(name string) (uuid.UUID, error)
-	GetTopUsersFunc              func(limit int) ([]types.User, error)
-	AddFriendFunc                func(userID, friendID uuid.UUID) error
-	GetFriendsFunc               func(userID uuid.UUID) ([]types.User, error)
+	AddFriendFunc              func(userID, friendID uuid.UUID) error
+	GetFriendsFunc             func(userID uuid.UUID) ([]types.User, error)
 	GetFriendsRankedByPointsFunc func(userID uuid.UUID) ([]types.User, error)
 	DeleteFriendFunc             func(userID, friendID uuid.UUID) error
+	UpdateSettingsStepGoalFunc   func(userID uuid.UUID, stepGoal int) error
+	UpdateSettingsImageFunc      func(userID uuid.UUID, imageID uuid.UUID) error
+	UpdateImageFunc              func(userID uuid.UUID, imageID uuid.UUID) error
+	UpdateStepGoalFunc           func(userID uuid.UUID, stepGoal int) error
 }
 
 func (m *MockDB) ExecuteRawSQL(query string) (sql.Result, error) {
+	if m.ExecuteRawSQLFunc != nil {
+		return m.ExecuteRawSQLFunc(query)
+	}
 	return nil, errors.New("not implemented")
 }
 
 func (m *MockDB) QueryRow(query string, args ...interface{}) *sql.Row {
+	if m.QueryRowFunc != nil {
+		return m.QueryRowFunc(query, args...)
+	}
 	return nil
 }
 
@@ -55,6 +69,9 @@ func (m *MockDB) Health() map[string]string {
 }
 
 func (m *MockDB) Close() error {
+	if m.CloseFunc != nil {
+		return m.CloseFunc()
+	}
 	return nil
 }
 
@@ -93,6 +110,27 @@ func (m *MockDB) GetUserByID(userID uuid.UUID) (types.User, error) {
 	return types.User{}, nil
 }
 
+func (m *MockDB) UpdateRocketPoints(userID uuid.UUID, rocketPoints int) error {
+	if m.UpdateRocketPointsFunc != nil {
+		return m.UpdateRocketPointsFunc(userID, rocketPoints)
+	}
+	return nil
+}
+
+func (m *MockDB) GetUserIDByName(name string) (uuid.UUID, error) {
+	if m.GetUserIDByNameFunc != nil {
+		return m.GetUserIDByNameFunc(name)
+	}
+	return uuid.Nil, nil
+}
+
+func (m *MockDB) GetTopUsers(limit int) ([]types.User, error) {
+	if m.GetTopUsersFunc != nil {
+		return m.GetTopUsersFunc(limit)
+	}
+	return nil, nil
+}
+
 func (m *MockDB) UpdateDailySteps(userID uuid.UUID, steps int) error {
 	if m.UpdateDailyStepsFunc != nil {
 		return m.UpdateDailyStepsFunc(userID, steps)
@@ -100,11 +138,11 @@ func (m *MockDB) UpdateDailySteps(userID uuid.UUID, steps int) error {
 	return nil
 }
 
-func (m *MockDB) UpdateRocketPoints(userID uuid.UUID, rocketPoints int) error {
-	if m.UpdateRocketPointsFunc != nil {
-		return m.UpdateRocketPointsFunc(userID, rocketPoints)
+func (m *MockDB) GetUserStatistics(userID uuid.UUID) ([]types.StepStatistic, error) {
+	if m.GetUserStatisticsFunc != nil {
+		return m.GetUserStatisticsFunc(userID)
 	}
-	return nil
+	return nil, nil
 }
 
 func (m *MockDB) GetSettingsByUserID(userID uuid.UUID) (*types.Settings, error) {
@@ -198,20 +236,6 @@ func (m *MockDB) CleanUpChallengesForUser(userID uuid.UUID) error {
 	return nil
 }
 
-func (m *MockDB) GetUserIDByName(name string) (uuid.UUID, error) {
-	if m.GetUserIDByNameFunc != nil {
-		return m.GetUserIDByNameFunc(name)
-	}
-	return uuid.Nil, nil
-}
-
-func (m *MockDB) GetTopUsers(limit int) ([]types.User, error) {
-	if m.GetTopUsersFunc != nil {
-		return m.GetTopUsersFunc(limit)
-	}
-	return nil, nil
-}
-
 func (m *MockDB) AddFriend(userID, friendID uuid.UUID) error {
 	if m.AddFriendFunc != nil {
 		return m.AddFriendFunc(userID, friendID)
@@ -236,6 +260,34 @@ func (m *MockDB) GetFriendsRankedByPoints(userID uuid.UUID) ([]types.User, error
 func (m *MockDB) DeleteFriend(userID, friendID uuid.UUID) error {
 	if m.DeleteFriendFunc != nil {
 		return m.DeleteFriendFunc(userID, friendID)
+	}
+	return nil
+}
+
+func (m *MockDB) UpdateSettingsStepGoal(userID uuid.UUID, stepGoal int) error {
+	if m.UpdateSettingsStepGoalFunc != nil {
+		return m.UpdateSettingsStepGoalFunc(userID, stepGoal)
+	}
+	return nil
+}
+
+func (m *MockDB) UpdateSettingsImage(userID uuid.UUID, imageID uuid.UUID) error {
+	if m.UpdateSettingsImageFunc != nil {
+		return m.UpdateSettingsImageFunc(userID, imageID)
+	}
+	return nil
+}
+
+func (m *MockDB) UpdateImage(userID uuid.UUID, imageID uuid.UUID) error {
+	if m.UpdateImageFunc != nil {
+		return m.UpdateImageFunc(userID, imageID)
+	}
+	return nil
+}
+
+func (m *MockDB) UpdateStepGoal(userID uuid.UUID, stepGoal int) error {
+	if m.UpdateStepGoalFunc != nil {
+		return m.UpdateStepGoalFunc(userID, stepGoal)
 	}
 	return nil
 }
