@@ -8,6 +8,7 @@ import (
 	"strconv"
 	"time"
 
+	"rocket-backend/internal/custom_error"
 	"rocket-backend/internal/types"
 	"rocket-backend/pkg/logger"
 
@@ -47,7 +48,10 @@ type Service interface {
 	// settings
 	GetSettingsByUserID(userID uuid.UUID) (*types.Settings, error)
 	CreateSettings(settings types.Settings) error
-	UpdateSettings(userId uuid.UUID, settings types.SettingsDTO, imageID uuid.UUID) error
+	UpdateSettingsStepGoal(userId uuid.UUID, stepGoal int) error
+	UpdateSettingsImage(userId uuid.UUID, imageID uuid.UUID) error
+	UpdateStepGoal(userId uuid.UUID, stepGoal int) error
+	UpdateImage(userId uuid.UUID, imageID uuid.UUID) error
 
 	// images
 	SaveImage(filename string, data []byte) (uuid.UUID, error)
@@ -182,4 +186,52 @@ func (s *service) Health() map[string]string {
 func (s *service) Close() error {
 	logger.Debug("Disconnected from database: %s", database)
 	return s.db.Close()
+}
+
+func (s *service) UpdateStepGoal(userId uuid.UUID, stepGoal int) error {
+	query := `UPDATE settings
+			  SET step_goal = $1
+			  WHERE user_id = $2`
+	_, err := s.db.Exec(query, stepGoal, userId)
+	if err != nil {
+		logger.Error("Failed to update step goal in settings", err)
+		return fmt.Errorf("%w: %v", custom_error.ErrFailedToUpdate, err)
+	}
+	return nil
+}
+
+func (s *service) UpdateImage(userId uuid.UUID, imageID uuid.UUID) error {
+	query := `UPDATE settings
+			  SET image_id = $1
+			  WHERE user_id = $2`
+	_, err := s.db.Exec(query, imageID, userId)
+	if err != nil {
+		logger.Error("Failed to update image in settings", err)
+		return fmt.Errorf("%w: %v", custom_error.ErrFailedToUpdate, err)
+	}
+	return nil
+}
+
+func (s *service) UpdateSettingsImage(userId uuid.UUID, imageID uuid.UUID) error {
+	query := `UPDATE settings
+			  SET image_id = $1
+			  WHERE user_id = $2`
+	_, err := s.db.Exec(query, imageID, userId)
+	if err != nil {
+		logger.Error("Failed to update image in settings", err)
+		return fmt.Errorf("%w: %v", custom_error.ErrFailedToUpdate, err)
+	}
+	return nil
+}
+
+func (s *service) UpdateSettingsStepGoal(userId uuid.UUID, stepGoal int) error {
+	query := `UPDATE settings
+			  SET step_goal = $1
+			  WHERE user_id = $2`
+	_, err := s.db.Exec(query, stepGoal, userId)
+	if err != nil {
+		logger.Error("Failed to update step goal in settings", err)
+		return fmt.Errorf("%w: %v", custom_error.ErrFailedToUpdate, err)
+	}
+	return nil
 }

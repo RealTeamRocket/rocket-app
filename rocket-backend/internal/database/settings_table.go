@@ -10,18 +10,6 @@ import (
 	"github.com/google/uuid"
 )
 
-func (s *service) UpdateSettings(userId uuid.UUID, settings types.SettingsDTO, imageID uuid.UUID) error {
-	query := `UPDATE settings
-	          SET image_id = $1, step_goal = $2
-	          WHERE user_id = $3`
-	_, err := s.db.Exec(query, imageID, settings.StepGoal, userId)
-	if err != nil {
-		logger.Error("Failed to update settings", err)
-		return fmt.Errorf("%w: %v", custom_error.ErrFailedToUpdate, err)
-	}
-	return nil
-}
-
 func (s *service) CreateSettings(settings types.Settings) error {
 	query := `INSERT INTO settings (id, user_id, image_id, step_goal)
 	          VALUES ($1, $2, $3, $4)`

@@ -1,9 +1,12 @@
 package server_test
 
 import (
+	"bytes"
 	"errors"
+	"mime/multipart"
 	"net/http"
 	"net/http/httptest"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
@@ -40,6 +43,8 @@ var _ = Describe("ProtectedHandler", func() {
 		router.GET("/auth-hello", srv.AuthHelloHandler)
 		router.GET("/authenticated", srv.Authenticated)
 		router.POST("/update-steps", srv.UpdateSteps)
+		router.POST("/settings/step-goal", srv.UpdateStepGoal)
+		router.POST("/settings/image", srv.UpdateImage)
 	})
 
 	Describe("AuthHelloHandler", func() {
@@ -96,6 +101,56 @@ var _ = Describe("ProtectedHandler", func() {
 				Expect(recorder.Code).To(Equal(http.StatusInternalServerError))
 				Expect(recorder.Body.String()).To(ContainSubstring("Failed to retrieve user"))
 			})
+		})
+	})
+
+	Describe("UpdateStepGoal", func() {
+		It("should update the step goal for the user", func() {
+			mock.UpdateSettingsStepGoalFunc = func(userID uuid.UUID, stepGoal int) error {
+				return nil
+			}
+
+			reqBody := `{"stepGoal": 10000}`
+			req, err := http.NewRequest("POST", "/settings/step-goal", strings.NewReader(reqBody))
+			Expect(err).To(BeNil())
+			req.Header.Set("Content-Type", "application/json")
+
+			recorder := httptest.NewRecorder()
+			router.ServeHTTP(recorder, req)
+
+			Expect(recorder.Code).To(Equal(http.StatusOK))
+			Expect(recorder.Body.String()).To(ContainSubstring("Step goal updated successfully"))
+		})
+	})
+
+	Describe("UpdateImage", func() {
+		It("should update the image for the user", func() {
+			mock.UpdateSettingsImageFunc = func(userID uuid.UUID, imageID uuid.UUID) error {
+				return nil
+			}
+
+			// Create a multipart form request
+			var requestBody bytes.Buffer
+			writer := multipart.NewWriter(&requestBody)
+
+			// Add a mock image file to the request
+			fileWriter, err := writer.CreateFormFile("image", "test-image.png")
+			Expect(err).To(BeNil())
+			_, err = fileWriter.Write([]byte("mock image data"))
+			Expect(err).To(BeNil())
+
+			// Close the writer to finalize the form data
+			writer.Close()
+
+			req, err := http.NewRequest("POST", "/settings/image", &requestBody)
+			Expect(err).To(BeNil())
+			req.Header.Set("Content-Type", writer.FormDataContentType())
+
+			recorder := httptest.NewRecorder()
+			router.ServeHTTP(recorder, req)
+
+			Expect(recorder.Code).To(Equal(http.StatusOK))
+			Expect(recorder.Body.String()).To(ContainSubstring("Image updated successfully"))
 		})
 	})
 })
