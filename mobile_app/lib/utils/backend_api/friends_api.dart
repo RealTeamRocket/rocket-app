@@ -9,20 +9,29 @@ class Friend {
   final String username;
   final String email;
   final int rocketPoints;
+  final Uint8List? imageData;
 
   const Friend({
     required this.id,
     required this.username,
     required this.email,
     required this.rocketPoints,
+    this.imageData,
   });
 
   factory Friend.fromJson(Map<String, dynamic> json) {
+    Uint8List? data;
+    if (json['image_data'] != null) {
+      final base64Str = json['image_data'] as String;
+      data = base64Decode(base64Str);
+    }
+
     return Friend(
       id: json['id'] as String,
       username: json['username'] as String,
       email: json['email'] as String,
       rocketPoints: json['rocket_points'] as int,
+      imageData: data,
     );
   }
 }
