@@ -28,6 +28,12 @@ class _FriendlistPageState extends State<FriendlistPage> with TickerProviderStat
     loadData();
   }
 
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
   Future<void> loadData() async {
     final jwt = await const FlutterSecureStorage().read(key: 'jwt_token');
     if (jwt == null) return;
