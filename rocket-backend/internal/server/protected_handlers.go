@@ -1,8 +1,8 @@
 package server
 
 import (
+	"encoding/base64"
 	"errors"
-	"fmt"
 	"io"
 	"net/http"
 	"rocket-backend/internal/challenges"
@@ -312,8 +312,12 @@ func (s *Server) CompleteChallenge(c *gin.Context) {
 func (s *Server) GetUserImage(c *gin.Context) {
 	var req types.GetImageDTO
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "user_id is required and must be a UUID"})
-		return
+		userID, exists := c.Get("userID")
+		if !exists {
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "User not authenticated"})
+			return
+		}
+		req.UserID = userID.(string)
 	}
 
 	userUUID, err := uuid.Parse(req.UserID)
@@ -325,23 +329,67 @@ func (s *Server) GetUserImage(c *gin.Context) {
 	img, err := s.db.GetUserImage(userUUID)
 	if err != nil {
 		logger.Error("Failed to get image", err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve image"})
-		return
+		// Proceed without returning an error, as the image might not exist
+		img = nil
 	}
-	if img == nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "No image found for user"})
+
+	user, err := s.db.GetUserByID(userUUID)
+	if err != nil {
+		logger.Error("Failed to get user", err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve user"})
 		return
 	}
 
-	mimeType := http.DetectContentType(img.Data)
-	if mimeType != "image/jpeg" && mimeType != "image/png" {
-		c.JSON(http.StatusUnsupportedMediaType, gin.H{"error": "Unsupported image type"})
+	response := gin.H{
+		"username":  user.Username,
+		"name":      nil,
+		"mime_type": nil,
+		"data":      nil,
+	}
+
+	if img != nil {
+		encodedImage := base64.StdEncoding.EncodeToString(img.Data)
+		response["name"] = img.Name
+		response["mime_type"] = http.DetectContentType(img.Data)
+		response["data"] = encodedImage
+	}
+
+	c.JSON(http.StatusOK, response)
+}
+
+func (s *Server) getUserStatistics(c *gin.Context) {
+	userID, exists := c.Get("userID")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "User not authenticated"})
 		return
 	}
 
-	c.Header("Content-Disposition", fmt.Sprintf("inline; filename=\"%s\"", img.Name))
-	c.Header("Content-Type", mimeType)
-	c.Data(http.StatusOK, mimeType, img.Data)
+	user := struct {
+		ID string `json:"id"`
+	}{}
+
+	if err := c.ShouldBindJSON(&user); err != nil || user.ID == "" {
+		user.ID = userID.(string)
+	}
+
+	userUUID, err := uuid.Parse(user.ID)
+	if err != nil {
+		logger.Debug("here is the upsi")
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid user ID format"})
+		return
+	}
+
+	stats, err := s.db.GetUserStatistics(userUUID)
+	if err != nil {
+		if errors.Is(err, custom_error.ErrUserNotFound) {
+			c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
+		} else {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve user statistics"})
+		}
+		return
+	}
+
+	c.JSON(http.StatusOK, stats)
 }
 
 func (s *Server) UpdateStepGoal(c *gin.Context) {

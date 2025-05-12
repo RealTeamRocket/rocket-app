@@ -24,3 +24,8 @@ type CompleteChallengesDTO struct {
 	ChallengeID  uuid.UUID `json:"challenge_id" binding:"required"`
 	RocketPoints int       `json:"rocket_points" binding:"required"`
 }
+
+type StepStatistic struct {
+	Day   string `json:"day"`
+	Steps int    `json:"steps"`
+}
