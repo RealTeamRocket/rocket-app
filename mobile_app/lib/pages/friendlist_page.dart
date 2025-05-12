@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import '../constants/color_constants.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+
+import 'package:mobile_app/utils/backend_api/friends_api.dart';
+import 'package:mobile_app/utils/backend_api/user_api.dart';
 
 class FriendlistPage extends StatefulWidget {
   const FriendlistPage({super.key, required this.title});
@@ -11,64 +15,30 @@ class FriendlistPage extends StatefulWidget {
   State<FriendlistPage> createState() => _FriendlistPageState();
 }
 
-class _FriendlistPageState extends State<FriendlistPage>
-    with TickerProviderStateMixin {
+class _FriendlistPageState extends State<FriendlistPage> with TickerProviderStateMixin {
   final TextEditingController _searchController = TextEditingController();
   String _searchQuery = '';
   OverlayEntry? _overlayEntry;
 
-  List<Map<String, String>> friends = [
-    {
-      'name': 'Julianne Hough',
-      'data': 'Placeholder for something',
-      'image': 'https://i.pravatar.cc/150?img=1',
-    },
-    {
-      'name': 'Jessica Lowndes',
-      'data': 'Placeholder for something',
-      'image': 'https://i.pravatar.cc/150?img=2',
-    },
-    {
-      'name': 'Kristen Bell',
-      'data': 'Placeholder for something',
-      'image': 'https://i.pravatar.cc/150?img=3',
-    },
-    {
-      'name': 'Mila Kunis',
-      'data': 'Placeholder for something',
-      'image': 'https://i.pravatar.cc/150?img=4',
-    },
-    {
-      'name': 'Rosie Jones',
-      'data': 'Placeholder for something',
-      'image': 'https://i.pravatar.cc/150?img=5',
-    },
-    {
-      'name': 'Alexandra Pierce',
-      'data': 'Placeholder for something',
-      'image': 'https://i.pravatar.cc/150?img=6',
-    },
-    {
-      'name': 'Daniela Hartmann',
-      'data': 'Placeholder for something',
-      'image': 'https://i.pravatar.cc/150?img=7',
-    },
-    {
-      'name': 'Nina Lopez',
-      'data': 'Placeholder for something',
-      'image': 'https://i.pravatar.cc/150?img=8',
-    },
-    {
-      'name': 'Tessa Morgan',
-      'data': 'Placeholder for something',
-      'image': 'https://i.pravatar.cc/150?img=9',
-    },
-    {
-      'name': 'Carla Bergström',
-      'data': 'Placeholder for something',
-      'image': 'https://i.pravatar.cc/150?img=10',
-    },
-  ];
+  List<Friend> friends = [];
+  List<UserWithImage> allUsers = [];
+
+  @override
+  void initState() {
+    super.initState();
+    loadData();
+  }
+
+  Future<void> loadData() async {
+    final jwt = await const FlutterSecureStorage().read(key: 'jwt_token');
+    if (jwt == null) return;
+    var fetchedFriends = await FriendsApi.getAllFriends(jwt);
+    final users = await FriendsApi.getAllUsers(jwt);
+    setState(() {
+      friends = fetchedFriends;
+      allUsers = users;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
