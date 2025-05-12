@@ -4,7 +4,6 @@ import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 import 'package:mobile_app/utils/backend_api/friends_api.dart';
-import 'package:mobile_app/utils/backend_api/user_api.dart';
 
 class FriendlistPage extends StatefulWidget {
   const FriendlistPage({super.key, required this.title});
