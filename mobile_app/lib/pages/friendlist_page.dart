@@ -42,9 +42,16 @@ class _FriendlistPageState extends State<FriendlistPage> with TickerProviderStat
 
   @override
   Widget build(BuildContext context) {
+    // 1) Filter followed friends that match the text
     final filteredFriends = friends.where((f) {
-      return _searchQuery.isEmpty ||
-          f['name']!.toLowerCase().contains(_searchQuery.toLowerCase());
+      return _searchQuery.isEmpty || f.username.toLowerCase().contains(_searchQuery.toLowerCase());
+    }).toList();
+
+    // 2) Filter all Users, that are not friends and match the searched text
+    final searchResults = allUsers.where((u) {
+      final matchesQuery = _searchQuery.isNotEmpty && u.username.toLowerCase().contains(_searchQuery.toLowerCase());
+      final notFriendYet = !friends.any((f) => f.id == u.id);
+      return matchesQuery && notFriendYet;
     }).toList();
 
     return Container(
@@ -54,18 +61,27 @@ class _FriendlistPageState extends State<FriendlistPage> with TickerProviderStat
         children: [
           _buildSearchBar(),
           const SizedBox(height: 16),
-          if (_searchQuery.isNotEmpty &&
-              !friends.any((f) =>
-              f['name']!.toLowerCase() == _searchQuery.toLowerCase()))
-            _buildSearchResultCard(_searchQuery),
-          const SizedBox(height: 8),
+
+          // 3) show filtered list
+          if (searchResults.isNotEmpty) ...[
+            Text('Add new friends:', style: TextStyle(color: Colors.white70)),
+            const SizedBox(height: 8),
+            SizedBox(
+              height: searchResults.length * 72.0, // adjust itemHeight
+              child: ListView.builder(
+                physics: const NeverScrollableScrollPhysics(),
+                itemCount: searchResults.length,
+                itemBuilder: (ctx, i) => _buildSearchResultCard(searchResults[i]),
+              ),
+            ),
+            const SizedBox(height: 16),
+          ],
+
+          // 4) followed friends
           Expanded(
             child: ListView.builder(
               itemCount: filteredFriends.length,
-              itemBuilder: (context, index) {
-                final friend = filteredFriends[index];
-                return _buildFriendCard(friend);
-              },
+              itemBuilder: (ctx, i) => _buildFriendCard(filteredFriends[i]),
             ),
           ),
         ],
@@ -90,7 +106,7 @@ class _FriendlistPageState extends State<FriendlistPage> with TickerProviderStat
         contentPadding: const EdgeInsets.symmetric(vertical: 0, horizontal: 16),
       ),
       onChanged: (value) {
-        // TODO: sync with backend later/filtering for the right person => Call searchUsers API here to fetch real users
+        // filtered in build() afterwards
         setState(() {
           _searchQuery = value.trim();
         });
@@ -98,19 +114,33 @@ class _FriendlistPageState extends State<FriendlistPage> with TickerProviderStat
     );
   }
 
-  Widget _buildFriendCard(Map<String, String> friend) {
+  Widget _buildFriendCard(Friend friend) {
     return Slidable(
-      key: ValueKey(friend['name']),
+      key: ValueKey(friend.id),
       endActionPane: ActionPane(
         motion: const StretchMotion(),
         extentRatio: 0.25,
         children: [
           CustomSlidableAction(
-            onPressed: (_) {
-              // TODO: Unfollow logic with API
-              setState(() {
-                friends.remove(friend);
-              });
+            onPressed: (_) async {
+              final jwt = await const FlutterSecureStorage().read(key: 'jwt_token');
+              if (jwt == null) return;
+
+              try {
+                // 1) Unfollow
+                await FriendsApi.deleteFriend(jwt, friend.username);
+                // 2) refresh lists
+                final freshFriends = await FriendsApi.getAllFriends(jwt);
+                final freshUsers = await FriendsApi.getAllUsers(jwt);
+                setState(() {
+                  friends = freshFriends;
+                  allUsers = freshUsers;
+                });
+              } catch (e) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('Failed unfollowing: $e')),
+                );
+              }
             },
             backgroundColor: const Color(0xFFB5544D),
             borderRadius: BorderRadius.circular(16),
@@ -140,7 +170,9 @@ class _FriendlistPageState extends State<FriendlistPage> with TickerProviderStat
           children: [
             CircleAvatar(
               radius: 28,
-              backgroundImage: NetworkImage(friend['image']!),
+              backgroundImage: friend.imageData != null
+                  ? MemoryImage(friend.imageData!)
+                  : const AssetImage('assets/avatar_placeholder.png') as ImageProvider,
             ),
             const SizedBox(width: 16),
             Expanded(
@@ -148,7 +180,7 @@ class _FriendlistPageState extends State<FriendlistPage> with TickerProviderStat
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    friend['name']!,
+                    friend.username,
                     style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
@@ -157,7 +189,7 @@ class _FriendlistPageState extends State<FriendlistPage> with TickerProviderStat
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    friend['data']!,
+                    friend.email, // maybe some other stats/data?
                     style: const TextStyle(color: Colors.white70),
                   ),
                 ],
@@ -169,7 +201,7 @@ class _FriendlistPageState extends State<FriendlistPage> with TickerProviderStat
     );
   }
 
-  Widget _buildSearchResultCard(String name) {
+  Widget _buildSearchResultCard(UserWithImage user) {
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 8),
       padding: const EdgeInsets.all(12),
@@ -186,15 +218,16 @@ class _FriendlistPageState extends State<FriendlistPage> with TickerProviderStat
       ),
       child: Row(
         children: [
-          const CircleAvatar(
+          CircleAvatar(
             radius: 28,
-            backgroundImage:
-            NetworkImage('https://i.pravatar.cc/150?img=65'),
+            backgroundImage: user.imageData != null
+                ? MemoryImage(user.imageData!)
+                : const AssetImage('assets/avatar_placeholder.png') as ImageProvider,
           ),
           const SizedBox(width: 16),
           Expanded(
             child: Text(
-              name,
+              user.username,
               style: const TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
@@ -203,18 +236,29 @@ class _FriendlistPageState extends State<FriendlistPage> with TickerProviderStat
             ),
           ),
           ElevatedButton.icon(
-            onPressed: () {
-              // TODO: Send follow request to backend here (e.g. /api/follow)
-              setState(() {
-                friends.add({
-                  'name': name,
-                  'data': 'Newly followed',
-                  'image': 'https://i.pravatar.cc/150?img=65',
-                });
-                _searchController.clear();
-                _searchQuery = '';
-                _showFollowOverlay(name);
-              });
+            onPressed: () async {
+              final jwt = await const FlutterSecureStorage().read(key:'jwt_token');
+              if(jwt!=null){
+                try{
+                  // follow
+                  await FriendsApi.addFriend(jwt, user.username);
+                  // refresh lists
+                  final freshFriends = await FriendsApi.getAllFriends(jwt);
+                  final freshUsers   = await FriendsApi.getAllUsers(jwt);
+                  setState(() {
+                    friends  = freshFriends;
+                    allUsers = freshUsers;
+                    _searchQuery = '';
+                    _searchController.clear();
+                  });
+                  // visual feedback
+                  _showFollowOverlay(user.username);
+                } catch (e) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('Error: $e')),
+                  );
+                }
+              }
             },
             icon: const Icon(Icons.person_add, size: 18, color: Colors.white),
             label: const Text(
