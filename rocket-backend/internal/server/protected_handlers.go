@@ -1,7 +1,6 @@
 package server
 
 import (
-	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
@@ -70,74 +69,6 @@ func (s *Server) UpdateSteps(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{"message": "Daily Steps saved"})
-}
-
-func (s *Server) UpdateSettings(c *gin.Context) {
-	userID, exists := c.Get("userID")
-	if !exists {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "User not authenticated"})
-		return
-	}
-
-	userUUID, err := uuid.Parse(userID.(string))
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid user ID format"})
-		return
-	}
-
-	// maximus is 10mb
-	if err := c.Request.ParseMultipartForm(10 << 20); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Failed to parse form"})
-		return
-	}
-
-	settingsJSON := c.PostForm("settings")
-	var settingsDTO types.SettingsDTO
-	if err := json.Unmarshal([]byte(settingsJSON), &settingsDTO); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid settings format"})
-		return
-	}
-
-	file, header, err := c.Request.FormFile("image")
-	if err != nil && err != http.ErrMissingFile {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Failed to read image"})
-		return
-	}
-
-	var imageID uuid.UUID
-	if err == nil {
-		defer file.Close()
-
-		// Read image into bytes
-		imageData, err := io.ReadAll(file)
-		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to read image data"})
-			return
-		}
-
-		// Check the content type
-		mimeType := http.DetectContentType(imageData)
-		if mimeType != "image/jpeg" && mimeType != "image/png" {
-			c.JSON(http.StatusUnsupportedMediaType, gin.H{"error": "Only JPEG (.jpg, .jpeg) and PNG (.png) images are allowed"})
-			return
-		}
-
-		// Save image
-		imageID, err = s.db.SaveImage(header.Filename, imageData)
-		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to save image"})
-			return
-		}
-	}
-
-	// Save settings
-	err = s.db.UpdateSettings(userUUID, settingsDTO, imageID)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update settings"})
-		return
-	}
-
-	c.JSON(http.StatusOK, gin.H{"message": "Settings updated successfully"})
 }
 
 func (s *Server) GetSettings(c *gin.Context) {
@@ -411,4 +342,92 @@ func (s *Server) GetUserImage(c *gin.Context) {
 	c.Header("Content-Disposition", fmt.Sprintf("inline; filename=\"%s\"", img.Name))
 	c.Header("Content-Type", mimeType)
 	c.Data(http.StatusOK, mimeType, img.Data)
+}
+
+func (s *Server) UpdateStepGoal(c *gin.Context) {
+	userID, exists := c.Get("userID")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "User not authenticated"})
+		return
+	}
+
+	userUUID, err := uuid.Parse(userID.(string))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid user ID format"})
+		return
+	}
+
+	var stepGoalDTO types.SettingsDTO
+	if err := c.ShouldBindJSON(&stepGoalDTO); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request body"})
+		return
+	}
+
+	logger.Debug("Received JSON body for step goal update", "stepGoalDTO", stepGoalDTO)
+	logger.Debug("Received step goal update request", "userID", userUUID, "stepGoal", stepGoalDTO.StepGoal)
+
+	logger.Debug("UpdateStepGoal handler reached")
+
+	if stepGoalDTO.StepGoal <= 0 {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Step goal must be greater than 0"})
+		return
+	}
+
+	logger.Info("Updating step goal", "userID", userUUID, "stepGoal", stepGoalDTO.StepGoal)
+
+	err = s.db.UpdateStepGoal(userUUID, stepGoalDTO.StepGoal)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update step goal"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Step goal updated successfully"})
+}
+
+func (s *Server) UpdateImage(c *gin.Context) {
+	userID, exists := c.Get("userID")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "User not authenticated"})
+		return
+	}
+
+	userUUID, err := uuid.Parse(userID.(string))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid user ID format"})
+		return
+	}
+
+	file, header, err := c.Request.FormFile("image")
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Failed to read image"})
+		return
+	}
+	defer file.Close()
+
+	imageData, err := io.ReadAll(file)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to read image data"})
+		return
+	}
+
+	if header == nil || len(imageData) == 0 {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "No image provided"})
+		return
+	}
+
+	logger.Info("Updating image", "userID", userUUID, "imageName", header.Filename)
+
+	imageID, err := s.db.SaveImage(header.Filename, imageData)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to save image"})
+		return
+	}
+
+	err = s.db.UpdateImage(userUUID, imageID)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update image"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Image updated successfully"})
 }

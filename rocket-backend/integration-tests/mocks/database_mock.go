@@ -37,6 +37,10 @@ type MockDB struct {
 	GetFriendsFunc               func(userID uuid.UUID) ([]types.User, error)
 	GetFriendsRankedByPointsFunc func(userID uuid.UUID) ([]types.User, error)
 	DeleteFriendFunc             func(userID, friendID uuid.UUID) error
+	UpdateSettingsStepGoalFunc   func(userID uuid.UUID, stepGoal int) error
+	UpdateSettingsImageFunc      func(userID uuid.UUID, imageID uuid.UUID) error
+	UpdateImageFunc              func(userID uuid.UUID, imageID uuid.UUID) error
+	UpdateStepGoalFunc           func(userID uuid.UUID, stepGoal int) error
 }
 
 func (m *MockDB) ExecuteRawSQL(query string) (sql.Result, error) {
@@ -236,6 +240,34 @@ func (m *MockDB) GetFriendsRankedByPoints(userID uuid.UUID) ([]types.User, error
 func (m *MockDB) DeleteFriend(userID, friendID uuid.UUID) error {
 	if m.DeleteFriendFunc != nil {
 		return m.DeleteFriendFunc(userID, friendID)
+	}
+	return nil
+}
+
+func (m *MockDB) UpdateSettingsStepGoal(userID uuid.UUID, stepGoal int) error {
+	if m.UpdateSettingsStepGoalFunc != nil {
+		return m.UpdateSettingsStepGoalFunc(userID, stepGoal)
+	}
+	return nil
+}
+
+func (m *MockDB) UpdateSettingsImage(userID uuid.UUID, imageID uuid.UUID) error {
+	if m.UpdateSettingsImageFunc != nil {
+		return m.UpdateSettingsImageFunc(userID, imageID)
+	}
+	return nil
+}
+
+func (m *MockDB) UpdateImage(userID uuid.UUID, imageID uuid.UUID) error {
+	if m.UpdateImageFunc != nil {
+		return m.UpdateImageFunc(userID, imageID)
+	}
+	return nil
+}
+
+func (m *MockDB) UpdateStepGoal(userID uuid.UUID, stepGoal int) error {
+	if m.UpdateStepGoalFunc != nil {
+		return m.UpdateStepGoalFunc(userID, stepGoal)
 	}
 	return nil
 }
