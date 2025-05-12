@@ -2,7 +2,6 @@ package server
 
 import (
 	"encoding/base64"
-	"encoding/json"
 	"errors"
 	"io"
 	"net/http"
@@ -330,16 +329,9 @@ func (s *Server) GetUserImage(c *gin.Context) {
 	img, err := s.db.GetUserImage(userUUID)
 	if err != nil {
 		logger.Error("Failed to get image", err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve image"})
-		return
+		// Proceed without returning an error, as the image might not exist
+		img = nil
 	}
-	if img == nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "No image found for user"})
-		return
-	}
-
-	// Encode image data as Base64
-	encodedImage := base64.StdEncoding.EncodeToString(img.Data)
 
 	user, err := s.db.GetUserByID(userUUID)
 	if err != nil {
@@ -348,12 +340,21 @@ func (s *Server) GetUserImage(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{
+	response := gin.H{
 		"username":  user.Username,
-		"name":      img.Name,
-		"mime_type": http.DetectContentType(img.Data),
-		"data":      encodedImage,
-	})
+		"name":      nil,
+		"mime_type": nil,
+		"data":      nil,
+	}
+
+	if img != nil {
+		encodedImage := base64.StdEncoding.EncodeToString(img.Data)
+		response["name"] = img.Name
+		response["mime_type"] = http.DetectContentType(img.Data)
+		response["data"] = encodedImage
+	}
+
+	c.JSON(http.StatusOK, response)
 }
 
 func (s *Server) getUserStatistics(c *gin.Context) {

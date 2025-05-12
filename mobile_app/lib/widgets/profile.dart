@@ -57,15 +57,15 @@ class _ProfileState extends State<Profile> {
                   backgroundColor: Colors.grey,
                   child: CircularProgressIndicator(),
                 );
-              } else if (snapshot.hasError || snapshot.data == null) {
+              } else if (snapshot.hasError || snapshot.data == null || snapshot.data!.data == null) {
                 return const CircleAvatar(
                   radius: 50,
                   backgroundColor: Colors.grey,
                 );
               } else {
-                // If the image is successfully fetched, display it
+                // If the image is successfully fetched and not null, display it
                 final userImage = snapshot.data!;
-                final imageData = base64Decode(userImage.data);
+                final imageData = base64Decode(userImage.data!);
                 return CircleAvatar(
                   radius: 50,
                   backgroundImage: MemoryImage(Uint8List.fromList(imageData)),
@@ -96,7 +96,7 @@ class _ProfileState extends State<Profile> {
                   ),
                 );
               } else {
-                // If the username is successfully fetched, display it
+                // Display the username
                 final username = snapshot.data!.username;
                 return Text(
                   username,

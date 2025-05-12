@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'package:flutter/foundation.dart';
 import 'package:mobile_app/utils/backend_api/base_api.dart';
 
 class UserStatistics {
@@ -18,23 +17,23 @@ class UserStatistics {
 
 class UserImage {
   final String username;
-  final String name;
-  final String mimeType;
-  final String data;
+  final String? name;
+  final String? mimeType;
+  final String? data;
 
   const UserImage({
     required this.username,
-    required this.name,
-    required this.mimeType,
-    required this.data,
+    this.name,
+    this.mimeType,
+    this.data,
   });
 
   factory UserImage.fromJson(Map<String, dynamic> json) {
     return UserImage(
       username: json['username'] as String,
-      name: json['name'] as String,
-      mimeType: json['mime_type'] as String,
-      data: json['data'] as String,
+      name: json['name'] as String?,
+      mimeType: json['mime_type'] as String?,
+      data: json['data'] as String?,
     );
   }
 }

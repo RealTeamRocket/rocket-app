@@ -40,7 +40,6 @@ type MockDB struct {
 	AddFriendFunc              func(userID, friendID uuid.UUID) error
 	GetFriendsFunc             func(userID uuid.UUID) ([]types.User, error)
 	GetFriendsRankedByPointsFunc func(userID uuid.UUID) ([]types.User, error)
-	DeleteFriendFunc           func(userID, friendID uuid.UUID) error
 	DeleteFriendFunc             func(userID, friendID uuid.UUID) error
 	UpdateSettingsStepGoalFunc   func(userID uuid.UUID, stepGoal int) error
 	UpdateSettingsImageFunc      func(userID uuid.UUID, imageID uuid.UUID) error
