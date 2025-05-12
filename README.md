@@ -2,4 +2,4 @@
 App for competing with friends
 
 # Deadline
-3. + 5. Juni 2025
+- Präsentationen: 3. Juli und 5. Juli
