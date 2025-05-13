@@ -69,15 +69,13 @@ class _FriendlistPageState extends State<FriendlistPage>
 
           // 3) show filtered list
           if (searchResults.isNotEmpty) ...[
+            Text('Add new friends:', style: TextStyle(color: Colors.white70)),
             const SizedBox(height: 8),
-            SizedBox(
-              height: searchResults.length * 72.0, // adjust itemHeight
-              child: ListView.builder(
-                physics: const NeverScrollableScrollPhysics(),
-                itemCount: searchResults.length,
-                itemBuilder:
-                    (ctx, i) => _buildSearchResultCard(searchResults[i]),
-              ),
+            ListView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: searchResults.length,
+              itemBuilder: (ctx, i) => _buildSearchResultCard(searchResults[i]),
             ),
             const SizedBox(height: 16),
           ],
