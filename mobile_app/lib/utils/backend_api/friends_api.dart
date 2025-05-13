@@ -131,7 +131,6 @@ class FriendsApi {
       '/api/v1/protected/users',
       headers: {'Authorization': 'Bearer $jwt'},
     );
-    debugPrint(response.body);
 
     if (response.statusCode == 404) {
       return [];

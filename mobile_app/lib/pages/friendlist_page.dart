@@ -34,7 +34,6 @@ class _FriendlistPageState extends State<FriendlistPage>
     if (jwt == null) return;
     var fetchedFriends = await FriendsApi.getAllFriends(jwt);
     final users = await FriendsApi.getAllUsers(jwt);
-    debugPrint(users.toString());
     setState(() {
       friends = fetchedFriends;
       allUsers = users;
@@ -70,7 +69,6 @@ class _FriendlistPageState extends State<FriendlistPage>
 
           // 3) show filtered list
           if (searchResults.isNotEmpty) ...[
-            Text('Add new friends:', style: TextStyle(color: Colors.white70)),
             const SizedBox(height: 8),
             SizedBox(
               height: searchResults.length * 72.0, // adjust itemHeight
