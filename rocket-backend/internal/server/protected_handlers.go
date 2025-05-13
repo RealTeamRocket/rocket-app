@@ -152,13 +152,15 @@ func (s *Server) DeleteFriend(c *gin.Context) {
 		return
 	}
 
-	friendName := c.PostForm("friend_name")
-	if friendName == "" {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "friend_name is required"})
+	var friendName struct {
+		FriendName string `json:"friend_name"`
+	}
+	if err := c.ShouldBindJSON(&friendName); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request body"})
 		return
 	}
 
-	friendID, err := s.db.GetUserIDByName(friendName)
+	friendID, err := s.db.GetUserIDByName(friendName.FriendName)
 	if err != nil {
 		if errors.Is(err, custom_error.ErrUserNotFound) {
 			c.JSON(http.StatusNotFound, gin.H{"error": "Friend not found"})
@@ -204,7 +206,27 @@ func (s *Server) GetAllFriends(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, friends)
+    var friendsWithImages []types.UserWithImageDTO
+        for _, fr := range friends {
+            var f types.UserWithImageDTO
+            f.ID = fr.ID
+            f.Username = fr.Username
+            f.Email = fr.Email
+            f.RocketPoints = fr.RocketPoints
+
+            userImage, imgErr := s.db.GetUserImage(fr.ID)
+            if imgErr != nil {
+                logger.Warn("Failed to fetch image for friend %s: %v\n", fr.ID, imgErr)
+                f.ImageName = ""
+                f.ImageData = ""
+            } else if userImage != nil {
+                f.ImageName = userImage.Name
+                f.ImageData = base64.StdEncoding.EncodeToString(userImage.Data)
+            }
+            friendsWithImages = append(friendsWithImages, f)
+        }
+
+	c.JSON(http.StatusOK, friendsWithImages)
 }
 
 func (s *Server) GetFriendsRanked(c *gin.Context) {
@@ -307,6 +329,37 @@ func (s *Server) CompleteChallenge(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{"message": "Challenge completed successfully"})
+}
+
+func (s *Server) GetAllUsers(c *gin.Context) {
+	users, err := s.db.GetAllUsers()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve users"})
+		return
+	}
+
+	var usersWithImages []types.UserWithImageDTO
+
+	for _, user := range users {
+		var userWithImage types.UserWithImageDTO
+		userWithImage.ID = user.ID
+		userWithImage.Username = user.Username
+		userWithImage.Email = user.Email
+		userWithImage.RocketPoints = user.RocketPoints
+		userImage, err := s.db.GetUserImage(user.ID)
+
+		if err != nil {
+			logger.Warn("Failed to fetch image for user %s: %v\n", user.ID, err)
+			userWithImage.ImageName = ""
+			userWithImage.ImageData = ""
+		} else if userImage != nil {
+			userWithImage.ImageName = userImage.Name
+			userWithImage.ImageData = base64.StdEncoding.EncodeToString(userImage.Data)
+		}
+
+		usersWithImages = append(usersWithImages, userWithImage)
+	}
+	c.JSON(http.StatusOK, usersWithImages)
 }
 
 func (s *Server) GetUserImage(c *gin.Context) {

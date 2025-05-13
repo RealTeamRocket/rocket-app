@@ -72,3 +72,29 @@ func (s *service) GetTopUsers(limit int) ([]types.User, error) {
 
 	return users, nil
 }
+
+func (s *service) GetAllUsers() ([]types.User, error) {
+	var users []types.User
+	query := `SELECT id, username, email, rocketpoints FROM users`
+	rows, err := s.db.Query(query)
+
+	if err != nil {
+		return nil, fmt.Errorf("%w: %v", custom_error.ErrFailedToRetrieveData, err)
+	}
+
+	defer rows.Close()
+
+	for rows.Next() {
+		var user types.User
+		if err := rows.Scan(&user.ID, &user.Username, &user.Email, &user.RocketPoints); err != nil {
+			return nil, fmt.Errorf("%w: %v", custom_error.ErrFailedToRetrieveData, err)
+		}
+		users = append(users, user)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("%w: %v", custom_error.ErrFailedToRetrieveData, err)
+	}
+
+	return users, nil
+}

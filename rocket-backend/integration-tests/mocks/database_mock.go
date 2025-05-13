@@ -22,11 +22,15 @@ type MockDB struct {
 	UpdateRocketPointsFunc     func(userID uuid.UUID, rocketPoints int) error
 	GetUserIDByNameFunc        func(name string) (uuid.UUID, error)
 	GetTopUsersFunc            func(limit int) ([]types.User, error)
+	GetAllUsersFunc            func() ([]types.User, error) // Missing method
 	UpdateDailyStepsFunc       func(userID uuid.UUID, steps int) error
 	GetUserStatisticsFunc      func(userID uuid.UUID) ([]types.StepStatistic, error)
 	GetSettingsByUserIDFunc    func(userID uuid.UUID) (*types.Settings, error)
 	CreateSettingsFunc         func(settings types.Settings) error
-	UpdateSettingsFunc         func(userId uuid.UUID, settings types.SettingsDTO, imageID uuid.UUID) error
+	UpdateSettingsStepGoalFunc func(userID uuid.UUID, stepGoal int) error
+	UpdateSettingsImageFunc    func(userID uuid.UUID, imageID uuid.UUID) error
+	UpdateStepGoalFunc         func(userID uuid.UUID, stepGoal int) error
+	UpdateImageFunc            func(userID uuid.UUID, imageID uuid.UUID) error
 	SaveImageFunc              func(filename string, data []byte) (uuid.UUID, error)
 	GetUserImageFunc           func(userID uuid.UUID) (*types.UserImage, error)
 	GetAllChallengesFunc       func() ([]types.Challenge, error)
@@ -41,10 +45,6 @@ type MockDB struct {
 	GetFriendsFunc             func(userID uuid.UUID) ([]types.User, error)
 	GetFriendsRankedByPointsFunc func(userID uuid.UUID) ([]types.User, error)
 	DeleteFriendFunc             func(userID, friendID uuid.UUID) error
-	UpdateSettingsStepGoalFunc   func(userID uuid.UUID, stepGoal int) error
-	UpdateSettingsImageFunc      func(userID uuid.UUID, imageID uuid.UUID) error
-	UpdateImageFunc              func(userID uuid.UUID, imageID uuid.UUID) error
-	UpdateStepGoalFunc           func(userID uuid.UUID, stepGoal int) error
 }
 
 func (m *MockDB) ExecuteRawSQL(query string) (sql.Result, error) {
@@ -155,13 +155,6 @@ func (m *MockDB) GetSettingsByUserID(userID uuid.UUID) (*types.Settings, error) 
 func (m *MockDB) CreateSettings(settings types.Settings) error {
 	if m.CreateSettingsFunc != nil {
 		return m.CreateSettingsFunc(settings)
-	}
-	return nil
-}
-
-func (m *MockDB) UpdateSettings(userId uuid.UUID, settings types.SettingsDTO, imageID uuid.UUID) error {
-	if m.UpdateSettingsFunc != nil {
-		return m.UpdateSettingsFunc(userId, settings, imageID)
 	}
 	return nil
 }
@@ -290,4 +283,11 @@ func (m *MockDB) UpdateStepGoal(userID uuid.UUID, stepGoal int) error {
 		return m.UpdateStepGoalFunc(userID, stepGoal)
 	}
 	return nil
+}
+
+func (m *MockDB) GetAllUsers() ([]types.User, error) {
+	if m.GetAllUsersFunc != nil {
+		return m.GetAllUsersFunc()
+	}
+	return nil, nil
 }

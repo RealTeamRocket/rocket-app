@@ -29,3 +29,12 @@ type StepStatistic struct {
 	Day   string `json:"day"`
 	Steps int    `json:"steps"`
 }
+
+type UserWithImageDTO struct {
+	ID           uuid.UUID `json:"id"`
+	Username     string    `json:"username"`
+	Email        string    `json:"email"`
+	RocketPoints int       `json:"rocket_points"`
+	ImageName    string    `json:"image_name"`
+	ImageData    string    `json:"image_data"`
+}
