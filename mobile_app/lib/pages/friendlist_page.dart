@@ -14,7 +14,8 @@ class FriendlistPage extends StatefulWidget {
   State<FriendlistPage> createState() => _FriendlistPageState();
 }
 
-class _FriendlistPageState extends State<FriendlistPage> with TickerProviderStateMixin {
+class _FriendlistPageState extends State<FriendlistPage>
+    with TickerProviderStateMixin {
   final TextEditingController _searchController = TextEditingController();
   String _searchQuery = '';
   OverlayEntry? _overlayEntry;
@@ -39,6 +40,7 @@ class _FriendlistPageState extends State<FriendlistPage> with TickerProviderStat
     if (jwt == null) return;
     var fetchedFriends = await FriendsApi.getAllFriends(jwt);
     final users = await FriendsApi.getAllUsers(jwt);
+    debugPrint(users.toString());
     setState(() {
       friends = fetchedFriends;
       allUsers = users;
@@ -48,16 +50,21 @@ class _FriendlistPageState extends State<FriendlistPage> with TickerProviderStat
   @override
   Widget build(BuildContext context) {
     // 1) Filter followed friends that match the text
-    final filteredFriends = friends.where((f) {
-      return _searchQuery.isEmpty || f.username.toLowerCase().contains(_searchQuery.toLowerCase());
-    }).toList();
+    final filteredFriends =
+        friends.where((f) {
+          return _searchQuery.isEmpty ||
+              f.username.toLowerCase().contains(_searchQuery.toLowerCase());
+        }).toList();
 
     // 2) Filter all Users, that are not friends and match the searched text
-    final searchResults = allUsers.where((u) {
-      final matchesQuery = _searchQuery.isNotEmpty && u.username.toLowerCase().contains(_searchQuery.toLowerCase());
-      final notFriendYet = !friends.any((f) => f.id == u.id);
-      return matchesQuery && notFriendYet;
-    }).toList();
+    final searchResults =
+        allUsers.where((u) {
+          final matchesQuery =
+              _searchQuery.isNotEmpty &&
+              u.username.toLowerCase().contains(_searchQuery.toLowerCase());
+          final notFriendYet = !friends.any((f) => f.id == u.id);
+          return matchesQuery && notFriendYet;
+        }).toList();
 
     return Container(
       color: ColorConstants.primaryColor,
@@ -76,7 +83,8 @@ class _FriendlistPageState extends State<FriendlistPage> with TickerProviderStat
               child: ListView.builder(
                 physics: const NeverScrollableScrollPhysics(),
                 itemCount: searchResults.length,
-                itemBuilder: (ctx, i) => _buildSearchResultCard(searchResults[i]),
+                itemBuilder:
+                    (ctx, i) => _buildSearchResultCard(searchResults[i]),
               ),
             ),
             const SizedBox(height: 16),
@@ -128,7 +136,9 @@ class _FriendlistPageState extends State<FriendlistPage> with TickerProviderStat
         children: [
           CustomSlidableAction(
             onPressed: (_) async {
-              final jwt = await const FlutterSecureStorage().read(key: 'jwt_token');
+              final jwt = await const FlutterSecureStorage().read(
+                key: 'jwt_token',
+              );
               if (jwt == null) return;
 
               try {
@@ -168,16 +178,18 @@ class _FriendlistPageState extends State<FriendlistPage> with TickerProviderStat
               color: Colors.black.withValues(alpha: 0.05),
               blurRadius: 4,
               offset: const Offset(0, 2),
-            )
+            ),
           ],
         ),
         child: Row(
           children: [
             CircleAvatar(
               radius: 28,
-              backgroundImage: friend.imageData != null
-                  ? MemoryImage(friend.imageData!)
-                  : const AssetImage('assets/avatar_placeholder.png') as ImageProvider,
+              backgroundImage:
+                  friend.imageData != null
+                      ? MemoryImage(friend.imageData!)
+                      : const AssetImage('assets/avatar_placeholder.png')
+                          as ImageProvider,
             ),
             const SizedBox(width: 16),
             Expanded(
@@ -218,16 +230,18 @@ class _FriendlistPageState extends State<FriendlistPage> with TickerProviderStat
             color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 4,
             offset: const Offset(0, 2),
-          )
+          ),
         ],
       ),
       child: Row(
         children: [
           CircleAvatar(
             radius: 28,
-            backgroundImage: user.imageData != null
-                ? MemoryImage(user.imageData!)
-                : const AssetImage('assets/avatar_placeholder.png') as ImageProvider,
+            backgroundImage:
+                user.imageData != null
+                    ? MemoryImage(user.imageData!)
+                    : const AssetImage('assets/avatar_placeholder.png')
+                        as ImageProvider,
           ),
           const SizedBox(width: 16),
           Expanded(
@@ -242,16 +256,18 @@ class _FriendlistPageState extends State<FriendlistPage> with TickerProviderStat
           ),
           ElevatedButton.icon(
             onPressed: () async {
-              final jwt = await const FlutterSecureStorage().read(key:'jwt_token');
-              if(jwt!=null){
-                try{
+              final jwt = await const FlutterSecureStorage().read(
+                key: 'jwt_token',
+              );
+              if (jwt != null) {
+                try {
                   // follow
                   await FriendsApi.addFriend(jwt, user.username);
                   // refresh lists
                   final freshFriends = await FriendsApi.getAllFriends(jwt);
-                  final freshUsers   = await FriendsApi.getAllUsers(jwt);
+                  final freshUsers = await FriendsApi.getAllUsers(jwt);
                   setState(() {
-                    friends  = freshFriends;
+                    friends = freshFriends;
                     allUsers = freshUsers;
                     _searchQuery = '';
                     _searchController.clear();
@@ -259,21 +275,17 @@ class _FriendlistPageState extends State<FriendlistPage> with TickerProviderStat
                   // visual feedback
                   _showFollowOverlay(user.username);
                 } catch (e) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('Error: $e')),
-                  );
+                  ScaffoldMessenger.of(
+                    context,
+                  ).showSnackBar(SnackBar(content: Text('Error: $e')));
                 }
               }
             },
             icon: const Icon(Icons.person_add, size: 18, color: Colors.white),
-            label: const Text(
-              'Follow',
-              style: TextStyle(color: Colors.white),
-            ),
+            label: const Text('Follow', style: TextStyle(color: Colors.white)),
             style: ElevatedButton.styleFrom(
               backgroundColor: ColorConstants.greenColor,
-              padding:
-              const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(8),
               ),
@@ -288,24 +300,25 @@ class _FriendlistPageState extends State<FriendlistPage> with TickerProviderStat
     final overlay = Overlay.of(context);
 
     _overlayEntry = OverlayEntry(
-      builder: (context) => Center(
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-          decoration: BoxDecoration(
-            color: ColorConstants.greenColor.withValues(alpha: 0.8),
-            borderRadius: BorderRadius.circular(24),
-          ),
-          child: Text(
-            'Followed\n$name',
-            textAlign: TextAlign.center,
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 32,
-              fontWeight: FontWeight.bold,
+      builder:
+          (context) => Center(
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+              decoration: BoxDecoration(
+                color: ColorConstants.greenColor.withValues(alpha: 0.8),
+                borderRadius: BorderRadius.circular(24),
+              ),
+              child: Text(
+                'Followed\n$name',
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 32,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
             ),
           ),
-        ),
-      ),
     );
 
     overlay.insert(_overlayEntry!);

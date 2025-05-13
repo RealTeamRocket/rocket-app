@@ -2,7 +2,6 @@ package server
 
 import (
 	"encoding/base64"
-	"encoding/json"
 	"errors"
 	"io"
 	"net/http"
@@ -153,13 +152,15 @@ func (s *Server) DeleteFriend(c *gin.Context) {
 		return
 	}
 
-	friendName := c.PostForm("friend_name")
-	if friendName == "" {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "friend_name is required"})
+	var friendName struct {
+		FriendName string `json:"friend_name"`
+	}
+	if err := c.ShouldBindJSON(&friendName); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request body"})
 		return
 	}
 
-	friendID, err := s.db.GetUserIDByName(friendName)
+	friendID, err := s.db.GetUserIDByName(friendName.FriendName)
 	if err != nil {
 		if errors.Is(err, custom_error.ErrUserNotFound) {
 			c.JSON(http.StatusNotFound, gin.H{"error": "Friend not found"})
@@ -207,7 +208,7 @@ func (s *Server) GetAllFriends(c *gin.Context) {
 
     var friendsWithImages []types.UserWithImageDTO
         for _, fr := range friends {
-            var f types.FriendWithImageDTO
+            var f types.UserWithImageDTO
             f.ID = fr.ID
             f.Username = fr.Username
             f.Email = fr.Email

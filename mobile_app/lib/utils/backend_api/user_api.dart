@@ -68,7 +68,6 @@ class UserApi {
       headers: {'Authorization': 'Bearer $jwt'},
       body: body,
     );
-
     if (response.statusCode != 200) {
       throw Exception('Failed to fetch user image: ${response.statusCode}');
     }

@@ -79,6 +79,10 @@ class FriendsApi {
       headers: {'Authorization': 'Bearer $jwt'},
     );
 
+    if (response.statusCode == 404) {
+      return [];
+    }
+
     if (response.statusCode != 200) {
       throw Exception('Failed to fetch friends: ${response.statusCode}');
     }
@@ -100,9 +104,7 @@ class FriendsApi {
     final response = await BaseApi.post(
       '/api/v1/protected/friends/add',
       headers: {'Authorization': 'Bearer $jwt'},
-      body: {
-        'friend_name': friendName
-      },
+      body: {'friend_name': friendName},
     );
 
     if (response.statusCode != 200) {
@@ -129,6 +131,11 @@ class FriendsApi {
       '/api/v1/protected/users',
       headers: {'Authorization': 'Bearer $jwt'},
     );
+    debugPrint(response.body);
+
+    if (response.statusCode == 404) {
+      return [];
+    }
 
     if (response.statusCode != 200) {
       throw Exception('Failed to fetch users: \${response.statusCode}');
