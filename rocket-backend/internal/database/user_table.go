@@ -39,14 +39,24 @@ func (s *service) UpdateRocketPoints(userID uuid.UUID, rocketPoints int) error {
 	return nil
 }
 
+func (s *service) GetRocketPointsByUserID(userID uuid.UUID) (int, error) {
+	var rocketPoints int
+	query := `SELECT rocketpoints FROM users WHERE id = $1`
+	err := s.db.QueryRow(query, userID).Scan(&rocketPoints)
+	if err != nil {
+		return 0, fmt.Errorf("%w: %v", custom_error.ErrFailedToRetrieveData, err)
+	}
+	return rocketPoints, nil
+}
+
 func (s *service) GetUserIDByName(name string) (uuid.UUID, error) {
- var userID uuid.UUID
- query := `SELECT id FROM users WHERE username = $1`
- err := s.db.QueryRow(query, name).Scan(&userID)
- if err != nil {
-  return uuid.Nil, fmt.Errorf("failed to get user ID by name: %w", err)
- }
- return userID, nil
+	var userID uuid.UUID
+	query := `SELECT id FROM users WHERE username = $1`
+	err := s.db.QueryRow(query, name).Scan(&userID)
+	if err != nil {
+		return uuid.Nil, fmt.Errorf("failed to get user ID by name: %w", err)
+	}
+	return userID, nil
 }
 
 func (s *service) GetTopUsers(limit int) ([]types.User, error) {

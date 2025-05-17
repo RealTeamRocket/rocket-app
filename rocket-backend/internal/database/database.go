@@ -38,6 +38,7 @@ type Service interface {
 	SaveUserProfile(user types.User) error
 	GetUserByID(userID uuid.UUID) (types.User, error)
 	UpdateRocketPoints(userID uuid.UUID, rocketPoints int) error
+	GetRocketPointsByUserID(userID uuid.UUID) (int, error)
 	GetUserIDByName(name string) (uuid.UUID, error)
 	GetTopUsers(limit int) ([]types.User, error)
 	GetAllUsers() ([]types.User, error)
