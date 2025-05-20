@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-import '/utils/utils.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '/widgets/widgets.dart';
 import '/constants/constants.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:flutter_foreground_task/flutter_foreground_task.dart';
 
 import '../utils/backend_api/rocketpoints_api.dart';
 
@@ -14,40 +15,65 @@ class RunPage extends StatefulWidget {
   State<RunPage> createState() => _RunPageState();
 }
 
+Future<int> _loadSteps() async {
+  final prefs = await SharedPreferences.getInstance();
+  final savedSteps = prefs.getInt('steps') ?? 0;
+  return savedSteps;
+}
+
 class _RunPageState extends State<RunPage> {
+  // TODO use backend API to get daily goal
   final int dailyGoal = 10000;
   int currentSteps = 0;
   String selectedButton = 'Steps';
   int? rocketPoints;
 
-  late PedometerService _pedometerService;
+  final FlutterSecureStorage _secureStorage = const FlutterSecureStorage();
+
+  // Add this for the foreground task callback
+  late void Function(Object) _taskDataCallback;
 
   @override
   void initState() {
     super.initState();
-    _pedometerService = PedometerService();
-    _pedometerService.onStepsUpdated = (steps) {
-      setState(() {
-        currentSteps = steps;
-      });
-    };
-
-    _pedometerService.onError = (msg) {
-      if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text(msg)));
-      }
-    };
-
-    _pedometerService.init();
-
+    _initializeSteps();
     _loadRocketPoints();
+
+    // Define and register the callback for foreground task data
+    _taskDataCallback = (Object data) {
+      if (data is int) {
+        setState(() {
+          currentSteps = data;
+        });
+      }
+      // If you send a Map or JSON, handle accordingly
+      // if (data is Map<String, dynamic> && data.containsKey('steps')) {
+      //   setState(() {
+      //     currentSteps = data['steps'];
+      //   });
+      // }
+    };
+
+    FlutterForegroundTask.addTaskDataCallback(_taskDataCallback);
+  }
+
+  @override
+  void dispose() {
+    // Remove the callback to avoid memory leaks
+    FlutterForegroundTask.removeTaskDataCallback(_taskDataCallback);
+    super.dispose();
+  }
+
+  Future<void> _initializeSteps() async {
+    int steps = await _loadSteps();
+    setState(() {
+      currentSteps = steps;
+    });
   }
 
   Future<void> _loadRocketPoints() async {
     try {
-      final jwt = await FlutterSecureStorage().read(key: 'jwt_token');
+      final jwt = await _secureStorage.read(key: 'jwt_token');
       if (jwt == null) return;
       final response = await RocketPointsApi.fetchRocketPoints(jwt);
       setState(() {
@@ -90,15 +116,12 @@ class _RunPageState extends State<RunPage> {
                               color: ColorConstants.secoundaryColor,
                               borderRadius: BorderRadius.circular(16.0),
                               border: Border.all(
-                                color: ColorConstants.purpleColor.withValues(
-                                  alpha: 0.3,
-                                ),
+                                color: ColorConstants.purpleColor.withOpacity(0.3),
                                 width: 2.5,
                               ),
                               boxShadow: [
                                 BoxShadow(
-                                  color: ColorConstants.secoundaryColor
-                                      .withValues(alpha: 0.2),
+                                  color: ColorConstants.secoundaryColor.withOpacity(0.2),
                                   blurRadius: 6.0,
                                   offset: const Offset(0, 3),
                                 ),

@@ -106,22 +106,63 @@ void startCallback() {
 class MyTaskHandler extends TaskHandler {
   late StreamSubscription<StepCount> _sub;
   int _steps = 0;
+  late DateTime _lastResetDate;
 
   @override
   Future<void> onStart(DateTime timestamp, TaskStarter starter) async {
-    // Erlaubnis prüfen, SharedPreferences laden etc.
-    _sub = Pedometer.stepCountStream.listen((event) async {
-      _steps = event.steps;
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.setInt('currentSteps', _steps);
+    final prefs = await SharedPreferences.getInstance();
 
-      FlutterForegroundTask.updateService(
-        notificationTitle: 'Schritte',
-        notificationText: '$_steps',
+    // 1) Lade oder initialisiere das Datum des letzten Resets
+    final dateString = prefs.getString('lastResetDate');
+    if (dateString != null) {
+      _lastResetDate = DateTime.parse(dateString);
+    } else {
+      _lastResetDate = DateTime(timestamp.year, timestamp.month, timestamp.day);
+      await prefs.setString(
+        'lastResetDate',
+        _lastResetDate.toIso8601String(),
       );
-    }, onError: (e) {
-      debugPrint('Pedometer error in service: $e');
-    });
+    }
+
+    // 2) Starte den Pedometer-Stream
+    _sub = Pedometer.stepCountStream.listen(
+      _onStepCount,
+      onError: (e) => debugPrint('Pedometer error in service: $e'),
+    );
+  }
+
+  Future<void> _onStepCount(StepCount event) async {
+    final now = event.timeStamp;
+    final prefs = await SharedPreferences.getInstance();
+
+    // 3) Tageswechsel prüfen
+    if (!_isSameDay(now, _lastResetDate)) {
+      // Reset am Tagesanfang
+      _steps = 0;
+      _lastResetDate = DateTime(now.year, now.month, now.day);
+      await prefs.setString(
+        'lastResetDate',
+        _lastResetDate.toIso8601String(),
+      );
+    }
+
+    // 4) Schritte aktualisieren (bei absoluten Zählern ggf. delta subtract)
+    _steps = event.steps;
+
+    // 5) Persistenz und Notification-Update
+    await prefs.setInt('currentSteps', _steps);
+    FlutterForegroundTask.updateService(
+      notificationTitle: 'Schritte heute',
+      notificationText: '$_steps',
+    );
+
+    // 6) Optional: Daten ans Main-Isolat senden
+    FlutterForegroundTask.sendDataToMain(_steps);
+  }
+
+  @override
+  Future<void> onRepeatEvent(DateTime timestamp) async {
+    // Nicht benötigt, da der Stream alle Updates liefert
   }
 
   @override
@@ -129,38 +170,29 @@ class MyTaskHandler extends TaskHandler {
     await _sub.cancel();
   }
 
-  Future<void> _incrementCount() async {
-    // get pedometer data
-    final prefs = await SharedPreferences.getInstance();
-    _steps = prefs.getInt('currentSteps') ?? 0;
-    debugPrint("Steps: $_steps");
-
-    // Update notification content.
-    FlutterForegroundTask.updateService(
-      notificationTitle: 'Foreground Service Running',
-      notificationText: 'Steps: $_steps',
-    );
-
-    // Send data to main isolate.
-    FlutterForegroundTask.sendDataToMain(_steps);
+  @override
+  void onReceiveData(Object data) {
+    // Eingehende Daten vom UI-Isolat (falls benötigt)
   }
 
   @override
-  Future<void> onRepeatEvent(DateTime timestamp) async {
-    await _incrementCount();
+  void onNotificationButtonPressed(String id) {
+    // Falls du Notification-Buttons nutzen willst
   }
 
   @override
-  void onReceiveData(Object data) {}
+  void onNotificationPressed() {
+    // Wenn die Notification angetippt wird
+  }
 
   @override
-  void onNotificationButtonPressed(String id) {}
+  void onNotificationDismissed() {
+    // Wenn die Notification dismissed wird
+  }
 
-  @override
-  void onNotificationPressed() {}
-
-  @override
-  void onNotificationDismissed() {}
+  bool _isSameDay(DateTime a, DateTime b) {
+    return a.year == b.year && a.month == b.month && a.day == b.day;
+  }
 }
 
 // Permission and service helpers
