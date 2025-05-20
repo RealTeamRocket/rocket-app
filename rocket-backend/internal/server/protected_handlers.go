@@ -206,25 +206,25 @@ func (s *Server) GetAllFriends(c *gin.Context) {
 		return
 	}
 
-    var friendsWithImages []types.UserWithImageDTO
-        for _, fr := range friends {
-            var f types.UserWithImageDTO
-            f.ID = fr.ID
-            f.Username = fr.Username
-            f.Email = fr.Email
-            f.RocketPoints = fr.RocketPoints
+	var friendsWithImages []types.UserWithImageDTO
+	for _, fr := range friends {
+		var f types.UserWithImageDTO
+		f.ID = fr.ID
+		f.Username = fr.Username
+		f.Email = fr.Email
+		f.RocketPoints = fr.RocketPoints
 
-            userImage, imgErr := s.db.GetUserImage(fr.ID)
-            if imgErr != nil {
-                logger.Warn("Failed to fetch image for friend %s: %v\n", fr.ID, imgErr)
-                f.ImageName = ""
-                f.ImageData = ""
-            } else if userImage != nil {
-                f.ImageName = userImage.Name
-                f.ImageData = base64.StdEncoding.EncodeToString(userImage.Data)
-            }
-            friendsWithImages = append(friendsWithImages, f)
-        }
+		userImage, imgErr := s.db.GetUserImage(fr.ID)
+		if imgErr != nil {
+			logger.Warn("Failed to fetch image for friend %s: %v\n", fr.ID, imgErr)
+			f.ImageName = ""
+			f.ImageData = ""
+		} else if userImage != nil {
+			f.ImageName = userImage.Name
+			f.ImageData = base64.StdEncoding.EncodeToString(userImage.Data)
+		}
+		friendsWithImages = append(friendsWithImages, f)
+	}
 
 	c.JSON(http.StatusOK, friendsWithImages)
 }
@@ -531,4 +531,26 @@ func (s *Server) UpdateImage(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{"message": "Image updated successfully"})
+}
+
+func (s *Server) GetRocketPoints(c *gin.Context) {
+	userID, exists := c.Get("userID")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "User not authenticated"})
+		return
+	}
+
+	userUUID, err := uuid.Parse(userID.(string))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid user ID format"})
+		return
+	}
+
+	rocketPoints, err := s.db.GetRocketPointsByUserID(userUUID)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve rocket points"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"rocket_points": rocketPoints})
 }
