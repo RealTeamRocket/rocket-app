@@ -11,15 +11,15 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'pages/pages.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
   try {
     await dotenv.load(fileName: ".env");
   } catch (e) {
     debugPrint("Error loading .env file using fallback: $e");
   }
-  // BackgroundFetch.registerHeadlessTask(backgroundFetchHeadlessTask);
-  // StepScheduler.initialize();
   FlutterForegroundTask.initCommunicationPort();
   await _requestPermissions();
   _initService();
@@ -144,6 +144,7 @@ class MyTaskHandler extends TaskHandler {
   }
 
   Future<void> _onStepCount(StepCount event) async {
+    debugPrint('Step event received: ${event.steps} at ${event.timeStamp}');
     final now = event.timeStamp;
     final prefs = await SharedPreferences.getInstance();
 
@@ -216,7 +217,15 @@ Future<void> _requestPermissions() async {
     await FlutterForegroundTask.requestNotificationPermission();
   }
 
+  // Request ACTIVITY_RECOGNITION permission at runtime
   if (Platform.isAndroid) {
+    if (await Permission.activityRecognition.isDenied) {
+      await Permission.activityRecognition.request();
+    }
+    if (await Permission.activityRecognition.isPermanentlyDenied) {
+      // Optionally prompt user to open app settings
+      await openAppSettings();
+    }
     if (!await FlutterForegroundTask.isIgnoringBatteryOptimizations) {
       await FlutterForegroundTask.requestIgnoreBatteryOptimization();
     }
@@ -251,8 +260,10 @@ void _initService() {
 
 Future<void> _startService() async {
   if (await FlutterForegroundTask.isRunningService) {
+    debugPrint('Restarting foreground service');
     await FlutterForegroundTask.restartService();
   } else {
+    debugPrint('Starting foreground service');
     await FlutterForegroundTask.startService(
       serviceId: 256,
       notificationTitle: 'Foreground Service Running',
