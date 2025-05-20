@@ -20,6 +20,7 @@ void main() async {
   } catch (e) {
     debugPrint("Error loading .env file using fallback: $e");
   }
+
   FlutterForegroundTask.initCommunicationPort();
   await _requestPermissions();
   _initService();
@@ -111,9 +112,9 @@ class MyTaskHandler extends TaskHandler {
 
   @override
   Future<void> onStart(DateTime timestamp, TaskStarter starter) async {
+    await dotenv.load(fileName: ".env");
     final prefs = await SharedPreferences.getInstance();
 
-    // Load or initialize the date of the last reset
     final dateString = prefs.getString('lastResetDate');
     if (dateString != null) {
       _lastResetDate = DateTime.parse(dateString);
@@ -122,10 +123,8 @@ class MyTaskHandler extends TaskHandler {
       await prefs.setString('lastResetDate', _lastResetDate.toIso8601String());
     }
 
-    // Load or initialize the baseline steps
     _baselineSteps = prefs.getInt('baselineSteps');
 
-    // Try to get the latest pedometer value from prefs (if you save it)
     int? lastSteps = prefs.getInt('lastPedometerSteps');
     if (_baselineSteps != null && lastSteps != null) {
       _stepsToday = lastSteps - _baselineSteps!;
@@ -133,10 +132,8 @@ class MyTaskHandler extends TaskHandler {
       _stepsToday = 0;
     }
 
-    // Immediately send the current daily steps to the main isolate
     FlutterForegroundTask.sendDataToMain(_stepsToday);
 
-    // Start the pedometer stream
     _sub = Pedometer.stepCountStream.listen(
       _onStepCount,
       onError: (e) => debugPrint('Pedometer error in service: $e'),
@@ -148,12 +145,9 @@ class MyTaskHandler extends TaskHandler {
     final now = event.timeStamp;
     final prefs = await SharedPreferences.getInstance();
 
-    // Save the latest pedometer value
     await prefs.setInt('lastPedometerSteps', event.steps);
 
-    // Check for day change
     if (!_isSameDay(now, _lastResetDate)) {
-      // New day: set baseline to current steps
       _baselineSteps = event.steps;
       _stepsToday = 0;
       _lastResetDate = DateTime(now.year, now.month, now.day);
@@ -161,26 +155,38 @@ class MyTaskHandler extends TaskHandler {
       await prefs.setInt('baselineSteps', _baselineSteps!);
     }
 
-    // Calculate today's steps
     if (_baselineSteps == null) {
       _baselineSteps = event.steps;
       await prefs.setInt('baselineSteps', _baselineSteps!);
     }
     _stepsToday = event.steps - _baselineSteps!;
 
-    // Persist and update notification
     await prefs.setInt('currentSteps', _stepsToday);
     FlutterForegroundTask.updateService(
       notificationTitle: 'Schritte heute',
       notificationText: '$_stepsToday',
     );
 
-    // Send today's steps to main isolate
     FlutterForegroundTask.sendDataToMain(_stepsToday);
   }
 
   @override
-  Future<void> onRepeatEvent(DateTime timestamp) async {}
+  Future<void> onRepeatEvent(DateTime timestamp) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final steps = prefs.getInt('currentSteps') ?? 0;
+      final jwt = prefs.getString('jwt_token');
+      debugPrint("These values get send to backend: $jwt, $steps");
+      if (jwt != null && jwt.isNotEmpty) {
+        await api.DailyStepsApi.sendDailySteps(steps, jwt);
+        debugPrint('Sent steps to backend: $steps');
+      } else {
+        debugPrint('JWT not found in SharedPreferences, skipping step sync.');
+      }
+    } catch (e) {
+      debugPrint('Error sending steps to backend: $e');
+    }
+  }
 
   @override
   Future<void> onDestroy(DateTime timestamp, bool isTimeout) async {
@@ -190,8 +196,12 @@ class MyTaskHandler extends TaskHandler {
   @override
   void onReceiveData(Object data) async {
     if (data is String && data == 'getCurrentSteps') {
-      // Send the current daily steps to the main isolate
       FlutterForegroundTask.sendDataToMain(_stepsToday);
+    } else if (data is Map && data.containsKey('jwt_token')) {
+      debugPrint("this is the data from the task ${data['jwt_token']}");
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString('jwt_token', data['jwt_token']);
+      debugPrint('JWT saved to SharedPreferences in background isolate.');
     }
   }
 
@@ -209,7 +219,6 @@ class MyTaskHandler extends TaskHandler {
   }
 }
 
-// Permission and service helpers
 Future<void> _requestPermissions() async {
   final NotificationPermission notificationPermission =
       await FlutterForegroundTask.checkNotificationPermission();
@@ -217,13 +226,11 @@ Future<void> _requestPermissions() async {
     await FlutterForegroundTask.requestNotificationPermission();
   }
 
-  // Request ACTIVITY_RECOGNITION permission at runtime
   if (Platform.isAndroid) {
     if (await Permission.activityRecognition.isDenied) {
       await Permission.activityRecognition.request();
     }
     if (await Permission.activityRecognition.isPermanentlyDenied) {
-      // Optionally prompt user to open app settings
       await openAppSettings();
     }
     if (!await FlutterForegroundTask.isIgnoringBatteryOptimizations) {
@@ -249,7 +256,7 @@ void _initService() {
       playSound: false,
     ),
     foregroundTaskOptions: ForegroundTaskOptions(
-      eventAction: ForegroundTaskEventAction.repeat(1000), // 1 second
+      eventAction: ForegroundTaskEventAction.repeat(900000), // 15 minutes in ms
       autoRunOnBoot: true,
       autoRunOnMyPackageReplaced: true,
       allowWakeLock: true,
@@ -260,10 +267,8 @@ void _initService() {
 
 Future<void> _startService() async {
   if (await FlutterForegroundTask.isRunningService) {
-    debugPrint('Restarting foreground service');
     await FlutterForegroundTask.restartService();
   } else {
-    debugPrint('Starting foreground service');
     await FlutterForegroundTask.startService(
       serviceId: 256,
       notificationTitle: 'Foreground Service Running',
