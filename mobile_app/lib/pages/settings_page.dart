@@ -5,6 +5,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:mobile_app/constants/constants.dart';
 import 'package:mobile_app/utils/backend_api/settings_api.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:mobile_app/pages/start_pages/welcome_page.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});
@@ -101,6 +102,18 @@ class _SettingsPageState extends State<SettingsPage> {
         _selectedImage = File(pickedFile.path);
       });
     }
+  }
+
+  Future<void> _logout() async {
+    // Clear the JWT token from secure storage
+    await _storage.delete(key: 'jwt_token');
+
+    // Navigate to the WelcomePage
+    Navigator.pushAndRemoveUntil(
+      context,
+      MaterialPageRoute(builder: (context) => const WelcomePage()),
+      (route) => false, // Remove all previous routes
+    );
   }
 
   @override
@@ -206,6 +219,27 @@ class _SettingsPageState extends State<SettingsPage> {
                         fontSize: 18.0,
                         fontWeight: FontWeight.bold,
                         color: Colors.white,
+                      ),
+                    ),
+                  ),
+                  const Spacer(),
+                  Center(
+                    child: TextButton.icon(
+                      onPressed: _logout,
+                      icon: const Icon(Icons.logout, color: Colors.red),
+                      label: const Text(
+                        'Logout',
+                        style: TextStyle(
+                          fontSize: 16.0,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.red,
+                        ),
+                      ),
+                      style: TextButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(
+                          vertical: 12.0,
+                          horizontal: 16.0,
+                        ),
                       ),
                     ),
                   ),
