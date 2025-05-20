@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import '/widgets/widgets.dart';
 import '/constants/constants.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -15,14 +14,7 @@ class RunPage extends StatefulWidget {
   State<RunPage> createState() => _RunPageState();
 }
 
-Future<int> _loadSteps() async {
-  final prefs = await SharedPreferences.getInstance();
-  final savedSteps = prefs.getInt('steps') ?? 0;
-  return savedSteps;
-}
-
 class _RunPageState extends State<RunPage> {
-  // TODO use backend API to get daily goal
   final int dailyGoal = 10000;
   int currentSteps = 0;
   String selectedButton = 'Steps';
@@ -30,45 +22,31 @@ class _RunPageState extends State<RunPage> {
 
   final FlutterSecureStorage _secureStorage = const FlutterSecureStorage();
 
-  // Add this for the foreground task callback
   late void Function(Object) _taskDataCallback;
 
   @override
   void initState() {
     super.initState();
-    _initializeSteps();
     _loadRocketPoints();
 
-    // Define and register the callback for foreground task data
     _taskDataCallback = (Object data) {
       if (data is int) {
         setState(() {
           currentSteps = data;
         });
       }
-      // If you send a Map or JSON, handle accordingly
-      // if (data is Map<String, dynamic> && data.containsKey('steps')) {
-      //   setState(() {
-      //     currentSteps = data['steps'];
-      //   });
-      // }
     };
 
     FlutterForegroundTask.addTaskDataCallback(_taskDataCallback);
+
+    // Actively request the current steps from the foreground task
+    FlutterForegroundTask.sendDataToTask('getCurrentSteps');
   }
 
   @override
   void dispose() {
-    // Remove the callback to avoid memory leaks
     FlutterForegroundTask.removeTaskDataCallback(_taskDataCallback);
     super.dispose();
-  }
-
-  Future<void> _initializeSteps() async {
-    int steps = await _loadSteps();
-    setState(() {
-      currentSteps = steps;
-    });
   }
 
   Future<void> _loadRocketPoints() async {

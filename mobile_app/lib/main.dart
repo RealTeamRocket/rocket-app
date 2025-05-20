@@ -125,6 +125,17 @@ class MyTaskHandler extends TaskHandler {
     // Load or initialize the baseline steps
     _baselineSteps = prefs.getInt('baselineSteps');
 
+    // Try to get the latest pedometer value from prefs (if you save it)
+    int? lastSteps = prefs.getInt('lastPedometerSteps');
+    if (_baselineSteps != null && lastSteps != null) {
+      _stepsToday = lastSteps - _baselineSteps!;
+    } else {
+      _stepsToday = 0;
+    }
+
+    // Immediately send the current daily steps to the main isolate
+    FlutterForegroundTask.sendDataToMain(_stepsToday);
+
     // Start the pedometer stream
     _sub = Pedometer.stepCountStream.listen(
       _onStepCount,
@@ -135,6 +146,9 @@ class MyTaskHandler extends TaskHandler {
   Future<void> _onStepCount(StepCount event) async {
     final now = event.timeStamp;
     final prefs = await SharedPreferences.getInstance();
+
+    // Save the latest pedometer value
+    await prefs.setInt('lastPedometerSteps', event.steps);
 
     // Check for day change
     if (!_isSameDay(now, _lastResetDate)) {
@@ -173,7 +187,12 @@ class MyTaskHandler extends TaskHandler {
   }
 
   @override
-  void onReceiveData(Object data) {}
+  void onReceiveData(Object data) async {
+    if (data is String && data == 'getCurrentSteps') {
+      // Send the current daily steps to the main isolate
+      FlutterForegroundTask.sendDataToMain(_stepsToday);
+    }
+  }
 
   @override
   void onNotificationButtonPressed(String id) {}
