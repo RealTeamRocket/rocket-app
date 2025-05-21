@@ -17,7 +17,6 @@ export default defineConfig({
     },
   },
   build: {
-    outDir: fileURLToPath(new URL('./target/classes/static/admin', import.meta.url)),
     commonjsOptions: {
       include: [/node_modules/],
     }
