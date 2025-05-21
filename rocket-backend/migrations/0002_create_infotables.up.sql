@@ -57,13 +57,21 @@ CREATE TABLE friends (
     CHECK (user_id <> friend_id)  -- Prevent a user from adding themselves as a friend
 );
 
+
+CREATE TABLE runs (
+    id SERIAL PRIMARY KEY,
+    user_id UUID NOT NULL REFERENCES users(id),
+    route GEOMETRY(LINESTRING, 4326),
+    created_at TIMESTAMP DEFAULT now()
+);
+
 -- CREATE TABLE runs (
 -- username VARCHAR(255) NOT NULL REFERENCES users(username),
 -- duration TIME NOT NULL,
 -- distance real NOT NULL,
 -- avg_speed real NOT NULL,
 -- date DATE NOT NULL,
--- route GEOMETRY(LINESTRING, 4326) NOT NULL,
+-- route GEOMETRY(LINESTRING, 4326),
 -- --LINESTRING is a type of geometry that represents a sequence of points in 2D space
 -- --and 4326 is the SRID (Spatial Reference Identifier) for WGS 84, a standard for latitude and longitude coordinates
 -- PRIMARY KEY (username, date)

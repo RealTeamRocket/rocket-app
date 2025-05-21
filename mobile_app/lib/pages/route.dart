@@ -11,28 +11,6 @@ class RoutePage extends StatefulWidget {
   State<RoutePage> createState() => _RoutePageState();
 }
 
-Future<Position> _determinePosition() async {
-  bool serviceEnabled;
-  LocationPermission locationPermission;
-  serviceEnabled = await Geolocator.isLocationServiceEnabled();
-  if (!serviceEnabled) {
-    return Future.error('Location services are disabled.');
-  }
-  locationPermission = await Geolocator.checkPermission();
-  if (locationPermission == LocationPermission.denied) {
-    locationPermission = await Geolocator.requestPermission();
-    if (locationPermission == LocationPermission.denied) {
-      return Future.error('Location permissions are denied');
-    }
-  }
-  if (locationPermission == LocationPermission.deniedForever) {
-    return Future.error(
-      'Location permissions are permanently denied, we cannot request permissions.',
-    );
-  }
-  return await Geolocator.getCurrentPosition();
-}
-
 class _RoutePageState extends State<RoutePage> {
   GeoPoint? _initPosition;
   List<GeoPoint> _routePoints = [];
