@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import '/utils/utils.dart';
 import '/widgets/widgets.dart';
 import '/constants/constants.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:flutter_foreground_task/flutter_foreground_task.dart';
 
 import '../utils/backend_api/rocketpoints_api.dart';
 
@@ -20,34 +20,38 @@ class _RunPageState extends State<RunPage> {
   String selectedButton = 'Steps';
   int? rocketPoints;
 
-  late PedometerService _pedometerService;
+  final FlutterSecureStorage _secureStorage = const FlutterSecureStorage();
+
+  late void Function(Object) _taskDataCallback;
 
   @override
   void initState() {
     super.initState();
-    _pedometerService = PedometerService();
-    _pedometerService.onStepsUpdated = (steps) {
-      setState(() {
-        currentSteps = steps;
-      });
-    };
+    _loadRocketPoints();
 
-    _pedometerService.onError = (msg) {
-      if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text(msg)));
+    _taskDataCallback = (Object data) {
+      if (data is int) {
+        setState(() {
+          currentSteps = data;
+        });
       }
     };
 
-    _pedometerService.init();
+    FlutterForegroundTask.addTaskDataCallback(_taskDataCallback);
 
-    _loadRocketPoints();
+    // Actively request the current steps from the foreground task
+    FlutterForegroundTask.sendDataToTask('getCurrentSteps');
+  }
+
+  @override
+  void dispose() {
+    FlutterForegroundTask.removeTaskDataCallback(_taskDataCallback);
+    super.dispose();
   }
 
   Future<void> _loadRocketPoints() async {
     try {
-      final jwt = await FlutterSecureStorage().read(key: 'jwt_token');
+      final jwt = await _secureStorage.read(key: 'jwt_token');
       if (jwt == null) return;
       final response = await RocketPointsApi.fetchRocketPoints(jwt);
       setState(() {
@@ -90,15 +94,12 @@ class _RunPageState extends State<RunPage> {
                               color: ColorConstants.secoundaryColor,
                               borderRadius: BorderRadius.circular(16.0),
                               border: Border.all(
-                                color: ColorConstants.purpleColor.withValues(
-                                  alpha: 0.3,
-                                ),
+                                color: ColorConstants.purpleColor.withOpacity(0.3),
                                 width: 2.5,
                               ),
                               boxShadow: [
                                 BoxShadow(
-                                  color: ColorConstants.secoundaryColor
-                                      .withValues(alpha: 0.2),
+                                  color: ColorConstants.secoundaryColor.withOpacity(0.2),
                                   blurRadius: 6.0,
                                   offset: const Offset(0, 3),
                                 ),
