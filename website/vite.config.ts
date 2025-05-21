@@ -12,15 +12,22 @@ export default defineConfig({
   ],
   resolve: {
     alias: {
+      'vue': 'vue/dist/vue.esm-bundler.js',
       '@': fileURLToPath(new URL('./src', import.meta.url))
     },
   },
+  build: {
+    commonjsOptions: {
+      include: [/node_modules/],
+    }
+  },
+  base: './',
   server: {
     proxy: {
-      '/api': {
+      '/api/v1': {
         target: 'http://localhost:8080',
         changeOrigin: true,
-        rewrite: path => path,
+        rewrite: path => path.replace(/^\/api\/v1/, ''),
       }
     }
   }
