@@ -18,6 +18,7 @@ func (s *service) UpdateDailySteps(userID uuid.UUID, steps int) error {
 	err := s.db.QueryRow(queryCheck, userID, currentDate).Scan(&existingSteps)
 
 	if err != nil {
+		// No record for today, insert new record and award rocket points
 		id := uuid.New()
 		queryInsert := `INSERT INTO daily_steps (id, user_id, steps_taken, date) VALUES ($1, $2, $3, $4)`
 		_, err := s.db.Exec(queryInsert, id, userID, steps, currentDate)
@@ -26,15 +27,34 @@ func (s *service) UpdateDailySteps(userID uuid.UUID, steps int) error {
 			logger.Error("Error inserting daily steps: %v\n", err)
 			return fmt.Errorf("failed to insert daily steps: %w", err)
 		}
+		// Award rocket points for all steps (steps/10)
+		rocketPoints := steps / 10
+		if rocketPoints > 0 {
+			if err := s.UpdateRocketPoints(userID, rocketPoints); err != nil {
+				logger.Error("Error updating rocket points: %v\n", err)
+				return fmt.Errorf("failed to update rocket points: %w", err)
+			}
+		}
 	} else {
-		// If an entry exists, update the steps only if the new steps are greater than the existing steps
+		// If an entry exists, update the steps and rocket points only if the new steps are greater than the existing steps
 		if steps > existingSteps {
-			queryUpdate := `UPDATE daily_steps SET steps_taken = $1 WHERE user_id = $2 AND date = $3`
-			_, err := s.db.Exec(queryUpdate, steps, userID, currentDate)
-			if err != nil {
-				// Log and return error if the update fails
-				logger.Error("Error updating daily steps: %v\n", err)
-				return fmt.Errorf("failed to update daily steps: %w", err)
+			stepDiff := steps - existingSteps
+			if stepDiff > 0 {
+				queryUpdate := `UPDATE daily_steps SET steps_taken = $1 WHERE user_id = $2 AND date = $3`
+				_, err := s.db.Exec(queryUpdate, steps, userID, currentDate)
+				if err != nil {
+					// Log and return error if the update fails
+					logger.Error("Error updating daily steps: %v\n", err)
+					return fmt.Errorf("failed to update daily steps: %w", err)
+				}
+				// Award rocket points for the difference in steps (stepDiff/10)
+				rocketPoints := stepDiff / 10
+				if rocketPoints > 0 {
+					if err := s.UpdateRocketPoints(userID, rocketPoints); err != nil {
+						logger.Error("Error updating rocket points: %v\n", err)
+						return fmt.Errorf("failed to update rocket points: %w", err)
+					}
+				}
 			}
 		}
 	}
