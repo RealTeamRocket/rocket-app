@@ -3,15 +3,16 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:mobile_app/constants/constants.dart';
 import 'package:mobile_app/pages/pages.dart';
 import 'package:mobile_app/utils/backend_api/login_api.dart';
+import 'package:flutter_foreground_task/flutter_foreground_task.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
 
   @override
-  _LoginPageState createState() => _LoginPageState();
+  LoginPageState createState() => LoginPageState();
 }
 
-class _LoginPageState extends State<LoginPage> {
+class LoginPageState extends State<LoginPage> {
   final _formKey = GlobalKey<FormState>();
   final _usernameController = TextEditingController();
   final _passwordController = TextEditingController();
@@ -39,6 +40,9 @@ class _LoginPageState extends State<LoginPage> {
       );
 
       await _storage.write(key: 'jwt_token', value: loginResponse.token);
+
+      // Send JWT to background task for SharedPreferences storage in background isolate
+      FlutterForegroundTask.sendDataToTask({'jwt_token': loginResponse.token});
 
       Navigator.pushReplacement(
         context,
@@ -150,15 +154,15 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                     ),
                     if (_errorMessage != null)
-                    Padding(
-                      padding: const EdgeInsets.only(top: 20),
-                      child: Center(
-                        child: Text(
-                          _errorMessage!,
-                          style: TextStyle(color: Colors.red),
+                      Padding(
+                        padding: const EdgeInsets.only(top: 20),
+                        child: Center(
+                          child: Text(
+                            _errorMessage!,
+                            style: TextStyle(color: Colors.red),
+                          ),
                         ),
                       ),
-                    ),
                   ],
                 ),
               ),
