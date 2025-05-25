@@ -128,14 +128,14 @@ class _RoutePageState extends State<RoutePage> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      "Distanz: ${distance.toStringAsFixed(2)} km",
+                      "Distance: ${distance.toStringAsFixed(2)} km",
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
                     Text(
-                      "Dauer: ${widget.elapsedTime}",
+                      "Time: ${widget.elapsedTime}",
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,

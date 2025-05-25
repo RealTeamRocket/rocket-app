@@ -296,7 +296,7 @@ class _TrackingPageState extends State<TrackingPage> {
             SizedBox(height: 30),
             Divider(),
             Text(
-              "Vergangene Läufe",
+              "Past Runs",
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
             SizedBox(height: 10),
@@ -349,7 +349,7 @@ class _TrackingPageState extends State<TrackingPage> {
                                       context,
                                       MaterialPageRoute(
                                         builder: (context) => RoutePage(
-                                          title: "Vergangener Lauf",
+                                          title: _formatDate(run.createdAt),
                                           routePoints: geoPoints,
                                           elapsedTime: run.duration,
                                         ),
