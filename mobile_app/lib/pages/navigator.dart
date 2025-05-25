@@ -4,17 +4,22 @@ import '/widgets/widgets.dart';
 import 'leaderboard.dart';
 import 'pages.dart';
 
-class HomePage extends StatefulWidget {
-  const HomePage({super.key, required this.title});
+class AppNavigator extends StatefulWidget {
+  const AppNavigator({
+    super.key,
+    required this.title,
+    this.initialIndex = 2, // Default to "Run" tab in the middle
+  });
 
   final String title;
+  final int initialIndex;
 
   @override
-  State<HomePage> createState() => _HomePageState();
+  State<AppNavigator> createState() => _AppNavigatorState();
 }
 
-class _HomePageState extends State<HomePage> {
-  int _selectedIndex = 2; /// set position of starting page to homepage in the middle
+class _AppNavigatorState extends State<AppNavigator> {
+  late int _selectedIndex;
 
   final List<Widget> _pages = <Widget>[
     const ChallengePage(title: 'Challenges'),
@@ -23,6 +28,12 @@ class _HomePageState extends State<HomePage> {
     const FriendlistPage(title: 'friends'),
     const ProfilePage(),
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    _selectedIndex = widget.initialIndex;
+  }
 
   void _onItemTapped(int index) {
     setState(() {

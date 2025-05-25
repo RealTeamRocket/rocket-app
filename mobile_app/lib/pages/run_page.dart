@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:mobile_app/utils/backend_api/backend_api.dart' as api;
 import '/widgets/widgets.dart';
 import '/constants/constants.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_foreground_task/flutter_foreground_task.dart';
 
-import '../utils/backend_api/rocketpoints_api.dart';
+import 'tracking.dart';
 
 class RunPage extends StatefulWidget {
   const RunPage({super.key, required this.title});
@@ -15,7 +16,7 @@ class RunPage extends StatefulWidget {
 }
 
 class _RunPageState extends State<RunPage> {
-  final int dailyGoal = 10000;
+  int? dailyGoal;
   int currentSteps = 0;
   String selectedButton = 'Steps';
   int? rocketPoints;
@@ -28,6 +29,7 @@ class _RunPageState extends State<RunPage> {
   void initState() {
     super.initState();
     _loadRocketPoints();
+    _loadStepGoal();
 
     _taskDataCallback = (Object data) {
       if (data is int) {
@@ -53,7 +55,7 @@ class _RunPageState extends State<RunPage> {
     try {
       final jwt = await _secureStorage.read(key: 'jwt_token');
       if (jwt == null) return;
-      final response = await RocketPointsApi.fetchRocketPoints(jwt);
+      final response = await api.RocketPointsApi.fetchRocketPoints(jwt);
       setState(() {
         rocketPoints = response.rocketPoints;
       });
@@ -64,10 +66,32 @@ class _RunPageState extends State<RunPage> {
     }
   }
 
+  Future<void> _loadStepGoal() async {
+    try {
+      final jwt = await _secureStorage.read(key: 'jwt_token');
+      if (jwt == null) return;
+      final settings = await api.SettingsApi.getSettings(jwt);
+      setState(() {
+        dailyGoal = settings.stepGoal;
+      });
+    } catch (e) {
+      setState(() {
+        dailyGoal = null;
+      });
+    }
+  }
+
   void _onButtonPressed(String button) {
-    setState(() {
-      selectedButton = button;
-    });
+    if (button == 'Race') {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => TrackingPage(title: 'Tracking')),
+      );
+    } else {
+      setState(() {
+        selectedButton = button;
+      });
+    }
   }
 
   @override
@@ -132,17 +156,9 @@ class _RunPageState extends State<RunPage> {
             ),
 
             /// Progressbar
-            StepCounterWidget(currentSteps: currentSteps, dailyGoal: dailyGoal),
-            const SizedBox(height: 20.0),
-          ] else if (selectedButton == 'Race') ...[
-            Text(
-              'To be implemented',
-              style: TextStyle(
-                fontSize: 30.0,
-                fontWeight: FontWeight.bold,
-                color: ColorConstants.blackColor,
-              ),
-            ),
+            dailyGoal != null
+                ? StepCounterWidget(currentSteps: currentSteps, dailyGoal: dailyGoal!)
+                : const CircularProgressIndicator(),
             const SizedBox(height: 20.0),
           ],
 

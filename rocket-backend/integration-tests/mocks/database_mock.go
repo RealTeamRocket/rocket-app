@@ -23,7 +23,7 @@ type MockDB struct {
 	GetRocketPointsByUserIDFunc  func(userID uuid.UUID) (int, error)
 	GetUserIDByNameFunc          func(name string) (uuid.UUID, error)
 	GetTopUsersFunc              func(limit int) ([]types.User, error)
-	GetAllUsersFunc              func() ([]types.User, error) // Missing method
+	GetAllUsersFunc              func() ([]types.User, error)
 	UpdateDailyStepsFunc         func(userID uuid.UUID, steps int) error
 	GetUserStatisticsFunc        func(userID uuid.UUID) ([]types.StepStatistic, error)
 	GetSettingsByUserIDFunc      func(userID uuid.UUID) (*types.Settings, error)
@@ -46,6 +46,8 @@ type MockDB struct {
 	GetFriendsFunc               func(userID uuid.UUID) ([]types.User, error)
 	GetFriendsRankedByPointsFunc func(userID uuid.UUID) ([]types.User, error)
 	DeleteFriendFunc             func(userID, friendID uuid.UUID) error
+	SaveRunFunc                      func(userID uuid.UUID, route string, duration string, distance float64) error
+	GetAllRunsByUserFunc             func(userID uuid.UUID) ([]types.RunDTO, error)
 }
 
 func (m *MockDB) ExecuteRawSQL(query string) (sql.Result, error) {
@@ -296,6 +298,20 @@ func (m *MockDB) UpdateStepGoal(userID uuid.UUID, stepGoal int) error {
 func (m *MockDB) GetAllUsers() ([]types.User, error) {
 	if m.GetAllUsersFunc != nil {
 		return m.GetAllUsersFunc()
+	}
+	return nil, nil
+}
+
+func (m *MockDB) SaveRun(userID uuid.UUID, route string, duration string, distance float64) error {
+	if m.SaveRunFunc != nil {
+		return m.SaveRun(userID, route, duration, distance)
+	}
+	return nil
+}
+
+func (m *MockDB) GetAllRunsByUser(userID uuid.UUID) ([]types.RunDTO, error) {
+	if m.GetAllRunsByUserFunc != nil {
+		return m.GetAllRunsByUser(userID)
 	}
 	return nil, nil
 }

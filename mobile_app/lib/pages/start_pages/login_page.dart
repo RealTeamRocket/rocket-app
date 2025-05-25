@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:mobile_app/constants/constants.dart';
-import 'package:mobile_app/pages/pages.dart';
+import 'package:mobile_app/pages/navigator.dart';
 import 'package:mobile_app/utils/backend_api/login_api.dart';
 import 'package:flutter_foreground_task/flutter_foreground_task.dart';
 
@@ -46,7 +46,7 @@ class LoginPageState extends State<LoginPage> {
 
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => HomePage(title: 'Rocket App')),
+        MaterialPageRoute(builder: (context) => AppNavigator(title: 'Rocket App')),
       );
     } catch (e) {
       setState(() {

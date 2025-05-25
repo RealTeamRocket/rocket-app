@@ -11,8 +11,7 @@ class LeaderboardPage extends StatefulWidget {
   State<LeaderboardPage> createState() => _LeaderboardPageState();
 }
 
-class _LeaderboardPageState extends State<LeaderboardPage>
-    with SingleTickerProviderStateMixin {
+class _LeaderboardPageState extends State<LeaderboardPage> {
   List<RankedUser> allUsers = [];
   List<RankedUser> friends = [];
   List<RankedUser> displayedUsers = [];
@@ -62,6 +61,7 @@ class _LeaderboardPageState extends State<LeaderboardPage>
       displayedUsers = tabIndex == 0 ? allUsers : friends;
     });
   }
+
   void addFriend(RankedUser user) async {
     final storage = FlutterSecureStorage();
     final jwt = await storage.read(key: 'jwt_token');
@@ -86,143 +86,157 @@ class _LeaderboardPageState extends State<LeaderboardPage>
         backgroundColor: Colors.blueGrey[100],
       ),
       backgroundColor: Colors.blueGrey[100],
-      body:
-          isLoading
-              ? const Center(child: CircularProgressIndicator())
-              : Column(
-                children: [
-                  // Toggle Buttons for "All" and "Friends"
-                  const SizedBox(height: 7),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Container(
-                        height: 44,
-                        width: 200,
-                        decoration: BoxDecoration(
-                          color: Colors.grey,
-                          borderRadius: BorderRadius.circular(100),
-                          border: Border.all(color: Colors.black, width: 2),
-                        ),
-                        child: Stack(
-                          alignment: Alignment.center,
-                          clipBehavior: Clip.none,
-                          children: [
-                            AnimatedAlign(
-                              alignment:
-                                  selectedTab == 1
-                                      ? Alignment.centerRight
-                                      : Alignment.centerLeft,
-                              duration: const Duration(milliseconds: 300),
-                              child: Container(
-                                width: 100,
-                                height: 44,
-                                decoration: BoxDecoration(
-                                  color: const Color(0xff9ba0fc),
-                                  borderRadius: BorderRadius.circular(100),
-                                ),
-                              ),
-                            ),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceAround,
-                              children: [
-                                InkWell(
-                                  onTap: () => switchTab(0),
-                                  child: Container(
-                                    width: 98,
-                                    alignment: Alignment.center,
-                                    child: Text(
-                                      "All",
-                                      style: TextStyle(
-                                        color:
-                                            selectedTab == 0
-                                                ? Colors.white
-                                                : Colors.black,
-                                        fontSize: 15,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                                InkWell(
-                                  onTap: () => switchTab(1),
-                                  child: Container(
-                                    width: 98,
-                                    alignment: Alignment.center,
-                                    child: Text(
-                                      "Friends",
-                                      style: TextStyle(
-                                        color:
-                                            selectedTab == 1
-                                                ? Colors.white
-                                                : Colors.black,
-                                        fontSize: 15,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-
-                  // Podium for Top 3 Users
-                  if (displayedUsers.length >= 3) ...[
-                    const SizedBox(height: 30),
+      body: isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : SafeArea(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    // Toggle Buttons for "All" and "Friends"
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Expanded(
-                          child: SizedBox(
-                            height: 200,
-                            child: GridView.count(
-                              crossAxisCount: 5,
-                              mainAxisSpacing: 1,
-                              crossAxisSpacing: 1,
-                              shrinkWrap: true,
-                              children: [
-                                Container(),
-                                Container(),
-                                buildPodiumUser(
-                                  displayedUsers[0],
-                                  Colors.yellow,
-                                  FontAwesomeIcons.award,
+                        Container(
+                          height: 44,
+                          width: 200,
+                          decoration: BoxDecoration(
+                            color: Colors.grey,
+                            borderRadius: BorderRadius.circular(100),
+                            border: Border.all(color: Colors.black, width: 2),
+                          ),
+                          child: Stack(
+                            alignment: Alignment.center,
+                            clipBehavior: Clip.none,
+                            children: [
+                              AnimatedAlign(
+                                alignment: selectedTab == 1
+                                    ? Alignment.centerRight
+                                    : Alignment.centerLeft,
+                                duration: const Duration(milliseconds: 300),
+                                child: Container(
+                                  width: 100,
+                                  height: 44,
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xff9ba0fc),
+                                    borderRadius: BorderRadius.circular(100),
+                                  ),
                                 ),
-                                Container(),
-                                Container(),
-                                Container(),
-                                buildPodiumUser(
-                                  displayedUsers[1],
-                                  Colors.grey,
-                                  FontAwesomeIcons.medal,
-                                ),
-                                Container(),
-                                buildPodiumUser(
-                                  displayedUsers[2],
-                                  Colors.brown,
-                                  FontAwesomeIcons.trophy,
-                                ),
-                              ],
-                            ),
+                              ),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                children: [
+                                  InkWell(
+                                    onTap: () => switchTab(0),
+                                    child: Container(
+                                      width: 98,
+                                      alignment: Alignment.center,
+                                      child: Text(
+                                        "All",
+                                        style: TextStyle(
+                                          color: selectedTab == 0
+                                              ? Colors.white
+                                              : Colors.black,
+                                          fontSize: 15,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  InkWell(
+                                    onTap: () => switchTab(1),
+                                    child: Container(
+                                      width: 98,
+                                      alignment: Alignment.center,
+                                      child: Text(
+                                        "Friends",
+                                        style: TextStyle(
+                                          color: selectedTab == 1
+                                              ? Colors.white
+                                              : Colors.black,
+                                          fontSize: 15,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
                           ),
                         ),
                       ],
                     ),
-                  ] else ...[
-                    const Center(
-                      child: Text('Not enough users for the podium'),
-                    ),
-                    const SizedBox(height: 10),
-                    Expanded(
-                      child: ListView.builder(
-                        itemCount: displayedUsers.length,
+                    const SizedBox(height: 24),
+
+                    // Podium for Top 3 Users
+                    if (displayedUsers.length >= 3) ...[
+                      Center(
+                        child: SizedBox(
+                          width: 320,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            children: [
+                              // 2nd Place
+                              _PodiumSpot(
+                                child: buildPodiumUserCircle(
+                                  displayedUsers[1],
+                                  Colors.grey,
+                                  FontAwesomeIcons.medal,
+                                  size: 65,
+                                ),
+                                place: "2nd",
+                                points: displayedUsers[1].rocketPoints,
+                                height: 110,
+                              ),
+                              // 1st Place (center, bigger)
+                              _PodiumSpot(
+                                child: buildPodiumUserCircle(
+                                  displayedUsers[0],
+                                  Colors.yellow[700]!,
+                                  FontAwesomeIcons.award,
+                                  size: 85,
+                                ),
+                                place: "1st",
+                                points: displayedUsers[0].rocketPoints,
+                                height: 140,
+                              ),
+                              // 3rd Place
+                              _PodiumSpot(
+                                child: buildPodiumUserCircle(
+                                  displayedUsers[2],
+                                  Colors.brown,
+                                  FontAwesomeIcons.trophy,
+                                  size: 55,
+                                ),
+                                place: "3rd",
+                                points: displayedUsers[2].rocketPoints,
+                                height: 90,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 32),
+                    ] else ...[
+                      const Center(
+                        child: Text('Not enough users for the podium'),
+                      ),
+                      const SizedBox(height: 10),
+                    ],
+
+                    // List of Remaining Users
+                    if (displayedUsers.length > 3)
+                      ListView.separated(
+                        physics: const NeverScrollableScrollPhysics(),
+                        shrinkWrap: true,
+                        itemCount: displayedUsers.length - 3,
+                        separatorBuilder: (_, __) => const Divider(height: 1),
                         itemBuilder: (context, index) {
-                          final user = displayedUsers[index];
+                          final user = displayedUsers[index + 3];
                           return ListTile(
                             leading: Text(
-                              '${index + 1}.',
+                              '${index + 4}.',
                               style: const TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
@@ -240,65 +254,33 @@ class _LeaderboardPageState extends State<LeaderboardPage>
                               'Rocketpoints: ${user.rocketPoints}',
                               style: const TextStyle(fontSize: 12),
                             ),
+                            trailing: ElevatedButton(
+                              onPressed: () {
+                                addFriend(user);
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.grey,
+                                shape: const CircleBorder(),
+                                padding: const EdgeInsets.all(8),
+                              ),
+                              child: const Icon(
+                                Icons.person_add_alt,
+                                color: Colors.white,
+                                size: 22,
+                              ),
+                            ),
                           );
                         },
                       ),
-                    ),
                   ],
-
-                  // List of Remaining Users
-                  const SizedBox(height: 30),
-                  Expanded(
-                    child: ListView.builder(
-                      itemCount:
-                          displayedUsers.length > 3
-                              ? (displayedUsers.length - 3)
-                              : 0,
-                      itemBuilder: (context, index) {
-                        final user = displayedUsers[index + 3];
-                        return ListTile(
-                          leading: Text(
-                            '${index + 4}.',
-                            style: const TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black,
-                            ),
-                          ),
-                          title: Text(
-                            user.username,
-                            style: const TextStyle(
-                              fontSize: 14,
-                              color: Colors.black,
-                            ),
-                          ),
-                          subtitle: Text(
-                            'Rocketpoints: ${user.rocketPoints}',
-                            style: const TextStyle(fontSize: 12),
-                          ),
-                          trailing: ElevatedButton(
-                            onPressed: () {
-                              addFriend(user);
-                            },
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.grey,
-                            ),
-                            child: const Icon(
-                              Icons.person_add_alt,
-                              color: Colors.white,
-                              size: 24,
-                            ),
-                          ),
-                        );
-                      },
-                    ),
-                  ),
-                ],
+                ),
               ),
+            ),
     );
   }
 
-  Widget buildPodiumUser(RankedUser user, Color color, IconData icon) {
+  // Only icon and username in the circle
+  Widget buildPodiumUserCircle(RankedUser user, Color color, IconData icon, {double size = 80}) {
     return GestureDetector(
       onTap: () {
         showDialog(
@@ -333,30 +315,77 @@ class _LeaderboardPageState extends State<LeaderboardPage>
         );
       },
       child: Container(
-        width: 80,
-        height: 80,
+        width: size,
+        height: size,
         decoration: BoxDecoration(
           border: Border.all(color: Colors.black),
           color: color,
           shape: BoxShape.circle,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.08),
+              blurRadius: 6,
+              offset: const Offset(0, 3),
+            ),
+          ],
         ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(icon, color: Colors.white, size: 24),
-            const SizedBox(height: 5),
+            Icon(icon, color: Colors.white, size: size * 0.4),
+            const SizedBox(height: 4),
             Text(
-              '${user.username.length > 12 ? user.username.substring(0, 12) : user.username}\n${user.rocketPoints} RP',
+              user.username.length > 10
+                  ? user.username.substring(0, 10)
+                  : user.username,
               style: const TextStyle(
                 color: Colors.black,
                 fontSize: 12,
                 fontWeight: FontWeight.bold,
               ),
               textAlign: TextAlign.center,
+              overflow: TextOverflow.ellipsis,
             ),
           ],
         ),
       ),
+    );
+  }
+}
+
+class _PodiumSpot extends StatelessWidget {
+  final Widget child;
+  final String place;
+  final int points;
+  final double height;
+
+  const _PodiumSpot({
+    required this.child,
+    required this.place,
+    required this.points,
+    required this.height,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.end,
+      children: [
+        SizedBox(height: height, child: child),
+        const SizedBox(height: 8),
+        Text(
+          place,
+          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+        ),
+        Text(
+          '$points RP',
+          style: const TextStyle(
+            color: Colors.black87,
+            fontSize: 13,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+      ],
     );
   }
 }
