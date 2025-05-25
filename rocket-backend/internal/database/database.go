@@ -74,6 +74,9 @@ type Service interface {
 	GetFriends(userID uuid.UUID) ([]types.User, error)
 	GetFriendsRankedByPoints(userID uuid.UUID) ([]types.User, error)
 	DeleteFriend(userID, friendID uuid.UUID) error
+
+	// runs
+	SaveRun(userID uuid.UUID, route string, duration string, distance float64) error
 }
 
 type service struct {

@@ -38,3 +38,9 @@ type UserWithImageDTO struct {
 	ImageName    string    `json:"image_name"`
 	ImageData    string    `json:"image_data"`
 }
+
+type RunDataDTO struct {
+    Route    string  `json:"route" binding:"required"`    // WKT LineString
+    Duration string  `json:"duration" binding:"required"`
+    Distance float64 `json:"distance"`
+}

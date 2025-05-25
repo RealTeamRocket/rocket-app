@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:flutter_osm_plugin/flutter_osm_plugin.dart';
@@ -86,36 +87,24 @@ class _TrackingPageState extends State<TrackingPage> {
     _positionStream?.cancel();
     _stopwatch.stop();
     _timer.cancel();
-    String? userId;
 
     setState(() {
       _isTracking = false;
-      _lastRoutePoints = List<GeoPoint>.from(_geoPoints); // Save the last route
+      _lastRoutePoints = List<GeoPoint>.from(_geoPoints);
     });
 
-    try {
-      final storage = FlutterSecureStorage();
-      userId = await storage.read(key: 'userId');
-      if (userId == null) {
-        debugPrint("Benutzer-ID ist null");
-        return;
-      }
-
-      debugPrint("Benutzer-ID erfolgreich abgerufen: $userId");
-    } catch (e) {
-      debugPrint("Fehler beim Abrufen der Benutzer-ID: $e");
-    }
-
-    if (userId == null) {
+    final storage = FlutterSecureStorage();
+    final jwt = await storage.read(key: 'jwt_token');
+    if (jwt == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text("Benutzer-ID nicht gefunden. Anmeldung erforderlich."),
-        ),
+        SnackBar(content: Text("JWT nicht gefunden. Anmeldung erforderlich.")),
       );
       return;
     }
 
     final lineString = geoPointsToLineString(_geoPoints);
+    final duration = _formattedTime;
+    final distance = _calculateTotalDistance(_geoPoints);
 
     if (lineString.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -125,7 +114,7 @@ class _TrackingPageState extends State<TrackingPage> {
     }
 
     try {
-      await TrackingApi.addRun(userId, lineString);
+      await TrackingApi.addRun(jwt, lineString, duration, distance);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("Tracking-Daten erfolgreich gespeichert.")),
       );
@@ -144,6 +133,31 @@ class _TrackingPageState extends State<TrackingPage> {
     return "LINESTRING($coordinates)";
   }
 
+  double _calculateTotalDistance(List<GeoPoint> points) {
+    if (points.length < 2) return 0.0;
+    double total = 0.0;
+    for (int i = 0; i < points.length - 1; i++) {
+      total += _calculateDistanceBetween(points[i], points[i + 1]);
+    }
+    return total;
+  }
+
+  double _calculateDistanceBetween(GeoPoint a, GeoPoint b) {
+    const double R = 6371; // Earth's radius in km
+    double dLat = _deg2rad(b.latitude - a.latitude);
+    double dLon = _deg2rad(b.longitude - a.longitude);
+    double lat1 = _deg2rad(a.latitude);
+    double lat2 = _deg2rad(b.latitude);
+
+    double hav =
+        (sin(dLat / 2) * sin(dLat / 2)) +
+        (sin(dLon / 2) * sin(dLon / 2) * cos(lat1) * cos(lat2));
+    double c = 2 * atan2(sqrt(hav), sqrt(1 - hav));
+    return R * c;
+  }
+
+  double _deg2rad(double deg) => deg * (pi / 180);
+
   @override
   Widget build(BuildContext context) {
     Widget content;
@@ -156,7 +170,6 @@ class _TrackingPageState extends State<TrackingPage> {
         children: [
           ElevatedButton(
             onPressed: () {
-              // Go to main navigation, select "Run" tab (index 2)
               Navigator.pushAndRemoveUntil(
                 context,
                 MaterialPageRoute(
@@ -170,7 +183,6 @@ class _TrackingPageState extends State<TrackingPage> {
           SizedBox(width: 20),
           ElevatedButton(
             onPressed: () {
-              // Show the route, and on back go to main navigation
               Navigator.pushAndRemoveUntil(
                 context,
                 MaterialPageRoute(
