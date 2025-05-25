@@ -1,21 +1,12 @@
 import 'dart:async';
-import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:http/http.dart' as http;
 import 'package:flutter_osm_plugin/flutter_osm_plugin.dart';
-import 'package:http/http.dart' as dotenv;
-import 'package:http/http.dart' as storage;
-import 'package:mobile_app/utils/backend_api/backend_api.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'dart:convert';
-import 'dart:io';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:http/http.dart' as http;
-import 'package:path/path.dart';
+import 'package:mobile_app/pages/pages.dart';
 
 import '../utils/backend_api/tracking_api.dart';
+import 'route.dart';
 
 class TrackingPage extends StatefulWidget {
   const TrackingPage({super.key, required this.title});
@@ -30,6 +21,7 @@ class _TrackingPageState extends State<TrackingPage> {
   bool _isTracking = false;
   bool _wasStarted = false;
   List<GeoPoint> _geoPoints = [];
+  List<GeoPoint> _lastRoutePoints = [];
   Stopwatch _stopwatch = Stopwatch();
   late Timer _timer;
   String _formattedTime = "00:00:00";
@@ -43,7 +35,7 @@ class _TrackingPageState extends State<TrackingPage> {
       permission = await Geolocator.requestPermission();
       if (permission == LocationPermission.denied ||
           permission == LocationPermission.deniedForever) {
-        ScaffoldMessenger.of(context as BuildContext).showSnackBar(
+        ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text("Standortberechtigung benötigt.")),
         );
         return;
@@ -98,6 +90,7 @@ class _TrackingPageState extends State<TrackingPage> {
 
     setState(() {
       _isTracking = false;
+      _lastRoutePoints = List<GeoPoint>.from(_geoPoints); // Save the last route
     });
 
     try {
@@ -109,14 +102,12 @@ class _TrackingPageState extends State<TrackingPage> {
       }
 
       debugPrint("Benutzer-ID erfolgreich abgerufen: $userId");
-
-      // Hier kannst du die userId weiterverwenden, z. B. für API-Aufrufe
     } catch (e) {
       debugPrint("Fehler beim Abrufen der Benutzer-ID: $e");
     }
 
     if (userId == null) {
-      ScaffoldMessenger.of(context as BuildContext).showSnackBar(
+      ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text("Benutzer-ID nicht gefunden. Anmeldung erforderlich."),
         ),
@@ -127,7 +118,7 @@ class _TrackingPageState extends State<TrackingPage> {
     final lineString = geoPointsToLineString(_geoPoints);
 
     if (lineString.isEmpty) {
-      ScaffoldMessenger.of(context as BuildContext).showSnackBar(
+      ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("Keine Tracking-Daten vorhanden.")),
       );
       return;
@@ -135,11 +126,11 @@ class _TrackingPageState extends State<TrackingPage> {
 
     try {
       await TrackingApi.addRun(userId, lineString);
-      ScaffoldMessenger.of(context as BuildContext).showSnackBar(
+      ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("Tracking-Daten erfolgreich gespeichert.")),
       );
     } catch (e) {
-      ScaffoldMessenger.of(context as BuildContext).showSnackBar(
+      ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("Fehler beim Speichern der Tracking-Daten: $e")),
       );
     }
@@ -163,9 +154,37 @@ class _TrackingPageState extends State<TrackingPage> {
       content = Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          ElevatedButton(onPressed: () {}, child: Text("Home")),
+          ElevatedButton(
+            onPressed: () {
+              // Go to main navigation, select "Run" tab (index 2)
+              Navigator.pushAndRemoveUntil(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => AppNavigator(title: 'Rocket App', initialIndex: 2),
+                ),
+                (route) => false,
+              );
+            },
+            child: Text("Home"),
+          ),
           SizedBox(width: 20),
-          ElevatedButton(onPressed: () {}, child: Text("Run anzeigen")),
+          ElevatedButton(
+            onPressed: () {
+              // Show the route, and on back go to main navigation
+              Navigator.pushAndRemoveUntil(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => RoutePage(
+                    title: "Completed Run",
+                    routePoints: _lastRoutePoints,
+                    elapsedTime: _formattedTime,
+                  ),
+                ),
+                (route) => false,
+              );
+            },
+            child: Text("Run anzeigen"),
+          ),
         ],
       );
     } else {
@@ -184,11 +203,7 @@ class _TrackingPageState extends State<TrackingPage> {
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            /**
-             * TODO
-             */
-            ///Hier noch Icons verändern oder nach 20 min 2 Stars und 30 3 stars.
-            if (_stopwatch.elapsed.inMinutes >= 10) // Icon anzeigen, wenn länger als 10 Minuten
+            if (_stopwatch.elapsed.inMinutes >= 10)
               Icon(
                 Icons.star,
                 color: Colors.yellow,
@@ -206,8 +221,4 @@ class _TrackingPageState extends State<TrackingPage> {
       ),
     );
   }
-}
-
-void main() {
-  runApp(MaterialApp(home: TrackingPage(title: 'Tracking App')));
 }

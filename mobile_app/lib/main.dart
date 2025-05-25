@@ -10,7 +10,7 @@ import 'utils/backend_api/backend_api.dart' as api;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'pages/pages.dart';
+import 'pages/pages.dart' as pages;
 import 'package:permission_handler/permission_handler.dart';
 
 void main() async {
@@ -92,8 +92,8 @@ class MyAppState extends State<MyApp> {
       ),
       home:
           isAuthenticated!
-              ? const HomePage(title: 'Rocket App')
-              : const WelcomePage(),
+              ? const pages.AppNavigator(title: 'Rocket App')
+              : const pages.WelcomePage(),
       routes: {'/settings': (context) => SettingsPage()},
     );
   }
