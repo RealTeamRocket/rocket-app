@@ -28,6 +28,38 @@ class _TrackingPageState extends State<TrackingPage> {
   String _formattedTime = "00:00:00";
   StreamSubscription<Position>? _positionStream;
 
+  // For displaying runs
+  List<RunModel> _runs = [];
+  bool _isLoadingRuns = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchRuns();
+  }
+
+  Future<void> _fetchRuns() async {
+    setState(() {
+      _isLoadingRuns = true;
+    });
+    try {
+      final storage = FlutterSecureStorage();
+      final jwt = await storage.read(key: 'jwt_token');
+      if (jwt != null) {
+        final runs = await TrackingApi.getAllRuns(jwt);
+        setState(() {
+          _runs = runs;
+        });
+      }
+    } catch (e) {
+      // Optionally show error
+    } finally {
+      setState(() {
+        _isLoadingRuns = false;
+      });
+    }
+  }
+
   Future<void> _startTracking() async {
     bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
     LocationPermission permission = await Geolocator.checkPermission();
@@ -118,6 +150,7 @@ class _TrackingPageState extends State<TrackingPage> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("Tracking-Daten erfolgreich gespeichert.")),
       );
+      await _fetchRuns(); // Refresh runs after saving
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("Fehler beim Speichern der Tracking-Daten: $e")),
@@ -157,6 +190,38 @@ class _TrackingPageState extends State<TrackingPage> {
   }
 
   double _deg2rad(double deg) => deg * (pi / 180);
+
+  // Helper to parse WKT LineString to List<GeoPoint>
+  List<GeoPoint> parseLineString(String lineString) {
+    final regex = RegExp(r'LINESTRING\((.*)\)');
+    final match = regex.firstMatch(lineString);
+    if (match == null) return [];
+    final coords = match.group(1)!.split(',');
+    List<GeoPoint> points = [];
+    for (var c in coords) {
+      var parts = c.trim().split(RegExp(r'\s+'));
+      if (parts.length != 2) continue;
+      try {
+        double lon = double.parse(parts[0]);
+        double lat = double.parse(parts[1]);
+        points.add(GeoPoint(latitude: lat, longitude: lon));
+      } catch (e) {
+        // Skip invalid points
+        continue;
+      }
+    }
+    return points;
+  }
+
+  String _formatDate(String isoString) {
+    try {
+      final date = DateTime.parse(isoString);
+      return "${date.day.toString().padLeft(2, '0')}.${date.month.toString().padLeft(2, '0')}.${date.year}, "
+             "${date.hour.toString().padLeft(2, '0')}:${date.minute.toString().padLeft(2, '0')}";
+    } catch (_) {
+      return isoString;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -228,6 +293,74 @@ class _TrackingPageState extends State<TrackingPage> {
             ),
             SizedBox(height: 30),
             Center(child: content),
+            SizedBox(height: 30),
+            Divider(),
+            Text(
+              "Vergangene Läufe",
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
+            SizedBox(height: 10),
+            _isLoadingRuns
+                ? CircularProgressIndicator()
+                : Expanded(
+                    child: _runs.isEmpty
+                        ? Text("Keine Läufe vorhanden.")
+                        : ListView.builder(
+                            itemCount: _runs.length,
+                            itemBuilder: (context, index) {
+                              final run = _runs[index];
+                              return Card(
+                                margin: const EdgeInsets.symmetric(vertical: 6, horizontal: 2),
+                                elevation: 2,
+                                child: ListTile(
+                                  contentPadding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                                  leading: Icon(Icons.directions_run, color: Colors.blueAccent, size: 32),
+                                  title: Row(
+                                    children: [
+                                      Icon(Icons.route, size: 18, color: Colors.grey[700]),
+                                      SizedBox(width: 6),
+                                      Text("${run.distance.toStringAsFixed(2)} km"),
+                                    ],
+                                  ),
+                                  subtitle: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Row(
+                                        children: [
+                                          Icon(Icons.calendar_today, size: 16, color: Colors.grey[600]),
+                                          SizedBox(width: 4),
+                                          Text(_formatDate(run.createdAt)),
+                                        ],
+                                      ),
+                                      SizedBox(height: 2),
+                                      Row(
+                                        children: [
+                                          Icon(Icons.timer, size: 18, color: Colors.grey[700]),
+                                          SizedBox(width: 6),
+                                          Text(run.duration),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                  trailing: Icon(Icons.chevron_right, color: Colors.grey[600]),
+                                  onTap: () {
+                                    final geoPoints = parseLineString(run.route);
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => RoutePage(
+                                          title: "Vergangener Lauf",
+                                          routePoints: geoPoints,
+                                          elapsedTime: run.duration,
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                ),
+                              );
+                            },
+                          ),
+                  ),
           ],
         ),
       ),

@@ -82,14 +82,15 @@ class _RunPageState extends State<RunPage> {
   }
 
   void _onButtonPressed(String button) {
-    setState(() {
-      selectedButton = button;
-    });
     if (button == 'Race') {
       Navigator.push(
         context,
         MaterialPageRoute(builder: (context) => TrackingPage(title: 'Tracking')),
       );
+    } else {
+      setState(() {
+        selectedButton = button;
+      });
     }
   }
 
@@ -158,16 +159,6 @@ class _RunPageState extends State<RunPage> {
             dailyGoal != null
                 ? StepCounterWidget(currentSteps: currentSteps, dailyGoal: dailyGoal!)
                 : const CircularProgressIndicator(),
-            const SizedBox(height: 20.0),
-          ] else if (selectedButton == 'Race') ...[
-            Text(
-              'To be implemented',
-              style: TextStyle(
-                fontSize: 30.0,
-                fontWeight: FontWeight.bold,
-                color: ColorConstants.blackColor,
-              ),
-            ),
             const SizedBox(height: 20.0),
           ],
 

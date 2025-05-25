@@ -44,3 +44,11 @@ type RunDataDTO struct {
     Duration string  `json:"duration" binding:"required"`
     Distance float64 `json:"distance"`
 }
+
+type RunDTO struct {
+    ID       string  `json:"id"`
+    Route    string  `json:"route"`
+    Duration string  `json:"duration"`
+    Distance float64 `json:"distance"`
+    CreatedAt string `json:"created_at"`
+}

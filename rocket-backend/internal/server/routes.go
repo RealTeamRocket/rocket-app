@@ -51,6 +51,7 @@ func (s *Server) RegisterRoutes() http.Handler {
 			protected.DELETE("/friends/delete", s.DeleteFriend)
 
 			protected.POST("/runs", s.UploadRun)
+			protected.GET("/runs", s.GetAllRuns)
 		}
 	}
 

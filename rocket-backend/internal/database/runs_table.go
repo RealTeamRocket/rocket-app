@@ -1,7 +1,9 @@
 package database
 
 import (
-    "github.com/google/uuid"
+	"rocket-backend/internal/types"
+
+	"github.com/google/uuid"
 )
 
 func (s *service) SaveRun(userID uuid.UUID, route string, duration string, distance float64) error {
@@ -14,4 +16,28 @@ func (s *service) SaveRun(userID uuid.UUID, route string, duration string, dista
         return err
     }
     return nil
+}
+
+func (s *service) GetAllRunsByUser(userID uuid.UUID) ([]types.RunDTO, error) {
+    query := `
+        SELECT id, ST_AsText(route), duration, distance, created_at
+        FROM runs
+        WHERE user_id = $1
+        ORDER BY created_at DESC
+    `
+    rows, err := s.db.Query(query, userID)
+    if err != nil {
+        return nil, err
+    }
+    defer rows.Close()
+
+    var runs []types.RunDTO
+    for rows.Next() {
+        var run types.RunDTO
+        if err := rows.Scan(&run.ID, &run.Route, &run.Duration, &run.Distance, &run.CreatedAt); err != nil {
+            return nil, err
+        }
+        runs = append(runs, run)
+    }
+    return runs, nil
 }
