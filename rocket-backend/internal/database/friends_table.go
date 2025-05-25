@@ -101,8 +101,8 @@ func (s *service) GetFriendsRankedByPoints(userID uuid.UUID) ([]types.User, erro
 
 	rows, err := s.db.Query(query, userID)
 	if err != nil {
-		logger.Error("Failed to get friends ranked by points", err)
-		return nil, fmt.Errorf("%w: failed to retrieve friends ranked by points", custom_error.ErrFailedToRetrieveData)
+		logger.Error("Failed to get friends", err)
+		return nil, fmt.Errorf("%w: failed to retrieve friends", custom_error.ErrFailedToRetrieveData)
 	}
 	defer rows.Close()
 
@@ -113,6 +113,7 @@ func (s *service) GetFriendsRankedByPoints(userID uuid.UUID) ([]types.User, erro
 			logger.Error("Failed to scan friend row", err)
 			return nil, fmt.Errorf("%w: failed to scan friend row", custom_error.ErrFailedToRetrieveData)
 		}
+		friends = append(friends, friend)
 	}
 
 	return friends, nil
