@@ -73,9 +73,19 @@ class _LeaderboardPageState extends State<LeaderboardPage> {
       debugPrint("Adding friend: ${user.username}");
       await FriendsApi.addFriend(jwt, user.username);
       debugPrint("Friend added successfully");
+      setState(() {
+        // Add to friends list if not already present
+        if (!friends.any((f) => f.username == user.username)) {
+          friends.add(user);
+        }
+      });
     } catch (e) {
       debugPrint("Error adding friend: $e");
     }
+  }
+
+  bool isFriend(RankedUser user) {
+    return friends.any((f) => f.username == user.username);
   }
 
   @override
@@ -168,7 +178,7 @@ class _LeaderboardPageState extends State<LeaderboardPage> {
                     ),
                     const SizedBox(height: 24),
 
-                    // Podium for Top 3 Users
+                    // Podium for Top 3 Users (only if 3 or more)
                     if (displayedUsers.length >= 3) ...[
                       Center(
                         child: SizedBox(
@@ -218,25 +228,24 @@ class _LeaderboardPageState extends State<LeaderboardPage> {
                         ),
                       ),
                       const SizedBox(height: 32),
-                    ] else ...[
-                      const Center(
-                        child: Text('Not enough users for the podium'),
-                      ),
-                      const SizedBox(height: 10),
                     ],
 
-                    // List of Remaining Users
-                    if (displayedUsers.length > 3)
+                    // List of Users
+                    if (displayedUsers.isNotEmpty)
                       ListView.separated(
                         physics: const NeverScrollableScrollPhysics(),
                         shrinkWrap: true,
-                        itemCount: displayedUsers.length - 3,
+                        itemCount: displayedUsers.length < 3
+                            ? displayedUsers.length
+                            : displayedUsers.length - 3,
                         separatorBuilder: (_, __) => const Divider(height: 1),
                         itemBuilder: (context, index) {
-                          final user = displayedUsers[index + 3];
+                          final user = displayedUsers.length < 3
+                              ? displayedUsers[index]
+                              : displayedUsers[index + 3];
                           return ListTile(
                             leading: Text(
-                              '${index + 4}.',
+                              '${displayedUsers.length < 3 ? index + 1 : index + 4}.',
                               style: const TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
@@ -254,21 +263,29 @@ class _LeaderboardPageState extends State<LeaderboardPage> {
                               'Rocketpoints: ${user.rocketPoints}',
                               style: const TextStyle(fontSize: 12),
                             ),
-                            trailing: ElevatedButton(
-                              onPressed: () {
-                                addFriend(user);
-                              },
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.grey,
-                                shape: const CircleBorder(),
-                                padding: const EdgeInsets.all(8),
-                              ),
-                              child: const Icon(
-                                Icons.person_add_alt,
-                                color: Colors.white,
-                                size: 22,
-                              ),
-                            ),
+                            trailing: selectedTab == 0
+                                ? ElevatedButton(
+                                    onPressed: isFriend(user)
+                                        ? null
+                                        : () {
+                                            addFriend(user);
+                                          },
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: isFriend(user)
+                                          ? Colors.green
+                                          : Colors.grey,
+                                      shape: const CircleBorder(),
+                                      padding: const EdgeInsets.all(8),
+                                    ),
+                                    child: Icon(
+                                      isFriend(user)
+                                          ? Icons.check
+                                          : Icons.person_add_alt,
+                                      color: Colors.white,
+                                      size: 22,
+                                    ),
+                                  )
+                                : null,
                           );
                         },
                       ),

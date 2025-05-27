@@ -139,9 +139,9 @@ class _TrackingPageState extends State<TrackingPage> {
     final distance = _calculateTotalDistance(_geoPoints);
 
     if (lineString.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Keine Tracking-Daten vorhanden.")),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text("No tracking data to save.")));
       return;
     }
 
@@ -217,7 +217,7 @@ class _TrackingPageState extends State<TrackingPage> {
     try {
       final date = DateTime.parse(isoString);
       return "${date.day.toString().padLeft(2, '0')}.${date.month.toString().padLeft(2, '0')}.${date.year}, "
-             "${date.hour.toString().padLeft(2, '0')}:${date.minute.toString().padLeft(2, '0')}";
+          "${date.hour.toString().padLeft(2, '0')}:${date.minute.toString().padLeft(2, '0')}";
     } catch (_) {
       return isoString;
     }
@@ -238,7 +238,9 @@ class _TrackingPageState extends State<TrackingPage> {
               Navigator.pushAndRemoveUntil(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => AppNavigator(title: 'Rocket App', initialIndex: 2),
+                  builder:
+                      (context) =>
+                          AppNavigator(title: 'Rocket App', initialIndex: 2),
                 ),
                 (route) => false,
               );
@@ -251,16 +253,17 @@ class _TrackingPageState extends State<TrackingPage> {
               Navigator.pushAndRemoveUntil(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => RoutePage(
-                    title: "Completed Run",
-                    routePoints: _lastRoutePoints,
-                    elapsedTime: _formattedTime,
-                  ),
+                  builder:
+                      (context) => RoutePage(
+                        title: "Completed Run",
+                        routePoints: _lastRoutePoints,
+                        elapsedTime: _formattedTime,
+                      ),
                 ),
                 (route) => false,
               );
             },
-            child: Text("Run anzeigen"),
+            child: Text("Show Route"),
           ),
         ],
       );
@@ -281,11 +284,7 @@ class _TrackingPageState extends State<TrackingPage> {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             if (_stopwatch.elapsed.inMinutes >= 10)
-              Icon(
-                Icons.star,
-                color: Colors.yellow,
-                size: 48,
-              ),
+              Icon(Icons.star, color: Colors.yellow, size: 48),
             Text(
               "Timer: $_formattedTime",
               style: TextStyle(fontSize: 32),
@@ -303,31 +302,53 @@ class _TrackingPageState extends State<TrackingPage> {
             _isLoadingRuns
                 ? CircularProgressIndicator()
                 : Expanded(
-                    child: _runs.isEmpty
-                        ? Text("Keine Läufe vorhanden.")
-                        : ListView.builder(
+                  child:
+                      _runs.isEmpty
+                          ? Text("No runs found.")
+                          : ListView.builder(
                             itemCount: _runs.length,
                             itemBuilder: (context, index) {
                               final run = _runs[index];
                               return Card(
-                                margin: const EdgeInsets.symmetric(vertical: 6, horizontal: 2),
+                                margin: const EdgeInsets.symmetric(
+                                  vertical: 6,
+                                  horizontal: 2,
+                                ),
                                 elevation: 2,
                                 child: ListTile(
-                                  contentPadding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-                                  leading: Icon(Icons.directions_run, color: Colors.blueAccent, size: 32),
+                                  contentPadding: const EdgeInsets.symmetric(
+                                    vertical: 8,
+                                    horizontal: 16,
+                                  ),
+                                  leading: Icon(
+                                    Icons.directions_run,
+                                    color: Colors.blueAccent,
+                                    size: 32,
+                                  ),
                                   title: Row(
                                     children: [
-                                      Icon(Icons.route, size: 18, color: Colors.grey[700]),
+                                      Icon(
+                                        Icons.route,
+                                        size: 18,
+                                        color: Colors.grey[700],
+                                      ),
                                       SizedBox(width: 6),
-                                      Text("${run.distance.toStringAsFixed(2)} km"),
+                                      Text(
+                                        "${run.distance.toStringAsFixed(2)} km",
+                                      ),
                                     ],
                                   ),
                                   subtitle: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
                                       Row(
                                         children: [
-                                          Icon(Icons.calendar_today, size: 16, color: Colors.grey[600]),
+                                          Icon(
+                                            Icons.calendar_today,
+                                            size: 16,
+                                            color: Colors.grey[600],
+                                          ),
                                           SizedBox(width: 4),
                                           Text(_formatDate(run.createdAt)),
                                         ],
@@ -335,24 +356,34 @@ class _TrackingPageState extends State<TrackingPage> {
                                       SizedBox(height: 2),
                                       Row(
                                         children: [
-                                          Icon(Icons.timer, size: 18, color: Colors.grey[700]),
+                                          Icon(
+                                            Icons.timer,
+                                            size: 18,
+                                            color: Colors.grey[700],
+                                          ),
                                           SizedBox(width: 6),
                                           Text(run.duration),
                                         ],
                                       ),
                                     ],
                                   ),
-                                  trailing: Icon(Icons.chevron_right, color: Colors.grey[600]),
+                                  trailing: Icon(
+                                    Icons.chevron_right,
+                                    color: Colors.grey[600],
+                                  ),
                                   onTap: () {
-                                    final geoPoints = parseLineString(run.route);
+                                    final geoPoints = parseLineString(
+                                      run.route,
+                                    );
                                     Navigator.push(
                                       context,
                                       MaterialPageRoute(
-                                        builder: (context) => RoutePage(
-                                          title: _formatDate(run.createdAt),
-                                          routePoints: geoPoints,
-                                          elapsedTime: run.duration,
-                                        ),
+                                        builder:
+                                            (context) => RoutePage(
+                                              title: _formatDate(run.createdAt),
+                                              routePoints: geoPoints,
+                                              elapsedTime: run.duration,
+                                            ),
                                       ),
                                     );
                                   },
@@ -360,7 +391,7 @@ class _TrackingPageState extends State<TrackingPage> {
                               );
                             },
                           ),
-                  ),
+                ),
           ],
         ),
       ),
