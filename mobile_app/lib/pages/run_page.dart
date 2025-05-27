@@ -18,7 +18,6 @@ class RunPage extends StatefulWidget {
 class _RunPageState extends State<RunPage> {
   int? dailyGoal;
   int currentSteps = 0;
-  String selectedButton = 'Steps';
   int? rocketPoints;
 
   final FlutterSecureStorage _secureStorage = const FlutterSecureStorage();
@@ -81,17 +80,11 @@ class _RunPageState extends State<RunPage> {
     }
   }
 
-  void _onButtonPressed(String button) {
-    if (button == 'Race') {
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => TrackingPage(title: 'Tracking')),
-      );
-    } else {
-      setState(() {
-        selectedButton = button;
-      });
-    }
+  void _onRacePressed() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => TrackingPage(title: 'Tracking')),
+    );
   }
 
   @override
@@ -101,71 +94,93 @@ class _RunPageState extends State<RunPage> {
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
-          if (selectedButton == 'Steps') ...[
-            /// RocketPoints-Card
-            Column(
-              children: [
-                const SizedBox(height: 20.0),
-                SizedBox(
-                  height: 100,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Center(
-                        child: IntrinsicWidth(
-                          child: Container(
-                            decoration: BoxDecoration(
-                              color: ColorConstants.secoundaryColor,
-                              borderRadius: BorderRadius.circular(16.0),
-                              border: Border.all(
-                                color: ColorConstants.purpleColor.withOpacity(0.3),
-                                width: 2.5,
+          /// RocketPoints-Card
+          Column(
+            children: [
+              const SizedBox(height: 20.0),
+              SizedBox(
+                height: 100,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Center(
+                      child: IntrinsicWidth(
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: ColorConstants.secoundaryColor,
+                            borderRadius: BorderRadius.circular(16.0),
+                            border: Border.all(
+                              color: ColorConstants.purpleColor.withOpacity(0.3),
+                              width: 2.5,
+                            ),
+                            boxShadow: [
+                              BoxShadow(
+                                color: ColorConstants.secoundaryColor.withOpacity(0.2),
+                                blurRadius: 6.0,
+                                offset: const Offset(0, 3),
                               ),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: ColorConstants.secoundaryColor.withOpacity(0.2),
-                                  blurRadius: 6.0,
-                                  offset: const Offset(0, 3),
-                                ),
-                              ],
-                            ),
-                            padding: const EdgeInsets.symmetric(
-                              vertical: 16.0,
-                              horizontal: 16.0,
-                            ),
-                            child: Center(
-                              child: Text(
-                                rocketPoints != null
-                                    ? '🚀 $rocketPoints RPs'
-                                    : '🚀 ... RPs',
-                                style: const TextStyle(
-                                  fontSize: 28.0,
-                                  fontWeight: FontWeight.bold,
-                                  color: ColorConstants.greenColor,
-                                ),
+                            ],
+                          ),
+                          padding: const EdgeInsets.symmetric(
+                            vertical: 16.0,
+                            horizontal: 16.0,
+                          ),
+                          child: Center(
+                            child: Text(
+                              rocketPoints != null
+                                  ? '🚀 $rocketPoints RPs'
+                                  : '🚀 ... RPs',
+                              style: const TextStyle(
+                                fontSize: 28.0,
+                                fontWeight: FontWeight.bold,
+                                color: ColorConstants.greenColor,
                               ),
                             ),
                           ),
                         ),
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
-                const SizedBox(height: 12.0),
-              ],
+              ),
+              const SizedBox(height: 12.0),
+            ],
+          ),
+
+          /// Progressbar
+          dailyGoal != null
+              ? StepCounterWidget(currentSteps: currentSteps, dailyGoal: dailyGoal!)
+              : const CircularProgressIndicator(),
+          const SizedBox(height: 20.0),
+
+          /// Centered Race Button
+          Center(
+            child: ElevatedButton(
+              onPressed: _onRacePressed,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: ColorConstants.greenColor,
+                foregroundColor: ColorConstants.white,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 30.0,
+                  vertical: 15.0,
+                ),
+                textStyle: const TextStyle(
+                  fontSize: 20.0,
+                  fontWeight: FontWeight.bold,
+                ),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(7.0),
+                ),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: const [
+                  Icon(Icons.directions_run, size: 24.0),
+                  SizedBox(width: 8.0),
+                  Text("Run"),
+                ],
+              ),
             ),
-
-            /// Progressbar
-            dailyGoal != null
-                ? StepCounterWidget(currentSteps: currentSteps, dailyGoal: dailyGoal!)
-                : const CircularProgressIndicator(),
-            const SizedBox(height: 20.0),
-          ],
-
-          /// Buttons
-          ButtonsWidget(
-            selectedButton: selectedButton,
-            onButtonPressed: _onButtonPressed,
           ),
         ],
       ),

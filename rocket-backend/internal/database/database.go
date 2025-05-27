@@ -41,7 +41,7 @@ type Service interface {
 	GetRocketPointsByUserID(userID uuid.UUID) (int, error)
 	GetUserIDByName(name string) (uuid.UUID, error)
 	GetTopUsers(limit int) ([]types.User, error)
-	GetAllUsers() ([]types.User, error)
+	GetAllUsers(excludeUserID *uuid.UUID) ([]types.User, error)
 
 	// daily_steps
 	UpdateDailySteps(userID uuid.UUID, steps int) error
