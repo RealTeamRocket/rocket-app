@@ -10,20 +10,20 @@ import (
 )
 
 type MockDB struct {
-	ExecuteRawSQLFunc            func(query string) (sql.Result, error)
-	QueryRowFunc                 func(query string, args ...interface{}) *sql.Row
-	HealthFunc                   func() map[string]string
-	CloseFunc                    func() error
-	SaveCredentialsFunc          func(creds types.Credentials) error
-	GetUserByEmailFunc           func(email string) (types.Credentials, error)
-	CheckEmailFunc               func(email string) error
-	SaveUserProfileFunc          func(user types.User) error
-	GetUserByIDFunc              func(userID uuid.UUID) (types.User, error)
-	UpdateRocketPointsFunc       func(userID uuid.UUID, rocketPoints int) error
-	GetRocketPointsByUserIDFunc  func(userID uuid.UUID) (int, error)
-	GetUserIDByNameFunc          func(name string) (uuid.UUID, error)
-	GetTopUsersFunc              func(limit int) ([]types.User, error)
-	GetAllUsersFunc              func() ([]types.User, error)
+	ExecuteRawSQLFunc           func(query string) (sql.Result, error)
+	QueryRowFunc                func(query string, args ...interface{}) *sql.Row
+	HealthFunc                  func() map[string]string
+	CloseFunc                   func() error
+	SaveCredentialsFunc         func(creds types.Credentials) error
+	GetUserByEmailFunc          func(email string) (types.Credentials, error)
+	CheckEmailFunc              func(email string) error
+	SaveUserProfileFunc         func(user types.User) error
+	GetUserByIDFunc             func(userID uuid.UUID) (types.User, error)
+	UpdateRocketPointsFunc      func(userID uuid.UUID, rocketPoints int) error
+	GetRocketPointsByUserIDFunc func(userID uuid.UUID) (int, error)
+	GetUserIDByNameFunc         func(name string) (uuid.UUID, error)
+	GetTopUsersFunc             func(limit int) ([]types.User, error)
+	GetAllUsersFunc              func(excludeUserID *uuid.UUID) ([]types.User, error)
 	UpdateDailyStepsFunc         func(userID uuid.UUID, steps int) error
 	GetUserStatisticsFunc        func(userID uuid.UUID) ([]types.StepStatistic, error)
 	GetSettingsByUserIDFunc      func(userID uuid.UUID) (*types.Settings, error)
@@ -46,8 +46,8 @@ type MockDB struct {
 	GetFriendsFunc               func(userID uuid.UUID) ([]types.User, error)
 	GetFriendsRankedByPointsFunc func(userID uuid.UUID) ([]types.User, error)
 	DeleteFriendFunc             func(userID, friendID uuid.UUID) error
-	SaveRunFunc                      func(userID uuid.UUID, route string, duration string, distance float64) error
-	GetAllRunsByUserFunc             func(userID uuid.UUID) ([]types.RunDTO, error)
+	SaveRunFunc                  func(userID uuid.UUID, route string, duration string, distance float64) error
+	GetAllRunsByUserFunc         func(userID uuid.UUID) ([]types.RunDTO, error)
 }
 
 func (m *MockDB) ExecuteRawSQL(query string) (sql.Result, error) {
@@ -295,9 +295,9 @@ func (m *MockDB) UpdateStepGoal(userID uuid.UUID, stepGoal int) error {
 	return nil
 }
 
-func (m *MockDB) GetAllUsers() ([]types.User, error) {
+func (m *MockDB) GetAllUsers(userId *uuid.UUID) ([]types.User, error) {
 	if m.GetAllUsersFunc != nil {
-		return m.GetAllUsersFunc()
+		return m.GetAllUsersFunc(userId)
 	}
 	return nil, nil
 }
