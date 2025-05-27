@@ -9,7 +9,7 @@ import (
 	"github.com/google/uuid"
 )
 
-func (s *Server) GetFriendsRanked(c *gin.Context) {
+func (s *Server) GetFriendsRankedHandler(c *gin.Context) {
 	userID, exists := c.Get("userID")
 	if !exists {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": custom_error.ErrUserNotFound.Error()})
@@ -40,7 +40,7 @@ func (s *Server) GetFriendsRanked(c *gin.Context) {
 	c.JSON(http.StatusOK, friends)
 }
 
-func (s *Server) GetUserRanking(c *gin.Context) {
+func (s *Server) GetUserRankingHandler(c *gin.Context) {
 	ranking, err := s.db.GetTopUsers(100)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error fetching ranking"})

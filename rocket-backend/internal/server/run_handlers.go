@@ -9,7 +9,7 @@ import (
 	"github.com/google/uuid"
 )
 
-func (s *Server) UploadRun(c *gin.Context) {
+func (s *Server) UploadRunHandler(c *gin.Context) {
 	userID, exists := c.Get("userID")
 	if !exists {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "User not authenticated"})
@@ -37,7 +37,7 @@ func (s *Server) UploadRun(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "Run data uploaded successfully"})
 }
 
-func (s *Server) GetAllRuns(c *gin.Context) {
+func (s *Server) GetAllRunsHandler(c *gin.Context) {
 	userID, exists := c.Get("userID")
 	if !exists {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "User not authenticated"})

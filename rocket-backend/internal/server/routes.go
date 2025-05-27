@@ -12,7 +12,7 @@ func (s *Server) RegisterRoutes() http.Handler {
 	r.Use(s.APIKeyMiddleware())
 	r.Use(cors.New(cors.Config{
 		AllowOrigins:     []string{"*"},
-		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"},
+		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE"},
 		AllowHeaders:     []string{"Accept", "Authorization", "Content-Type", "X-API-KEY"},
 		AllowCredentials: true, // Enable cookies/auth
 	}))
@@ -26,31 +26,31 @@ func (s *Server) RegisterRoutes() http.Handler {
 		protected := api.Group("/protected")
 		protected.Use(s.AuthMiddleware())
 		{
-			protected.GET("/", s.Authenticated)
-			protected.POST("/updateSteps", s.UpdateSteps)
+			protected.GET("/", s.AuthenticatedHandler)
+			protected.POST("/updateSteps", s.UpdateStepsHandler)
 
 			//protected.POST("/settings/update", s.UpdateSettings)
-			protected.GET("/settings", s.GetSettings)
-			protected.POST("/settings/step-goal", s.UpdateStepGoal)
-			protected.POST("/settings/image", s.UpdateImage)
+			protected.GET("/settings", s.GetSettingsHandler)
+			protected.POST("/settings/step-goal", s.UpdateStepGoalHandler)
+			protected.POST("/settings/image", s.UpdateImageHandler)
 
-			protected.POST("/user/statistics", s.getUserStatistics)
-			protected.POST("/user/image", s.GetUserImage)
-			protected.GET("/user/rocketpoints", s.GetRocketPoints)
-			protected.GET("/users", s.GetAllUsers)
+			protected.POST("/user/statistics", s.GetUserStatisticsHandler)
+			protected.POST("/user/image", s.GetUserImageHandler)
+			protected.GET("/user/rocketpoints", s.GetRocketPointsHandler)
+			protected.GET("/users", s.GetAllUsersHandler)
 
-			protected.GET("/challenges/new", s.GetDailyChallenges)
-			protected.POST("/challenges/complete", s.CompleteChallenge)
+			protected.GET("/challenges/new", s.GetDailyChallengesHandler)
+			protected.POST("/challenges/complete", s.CompleteChallengeHandler)
 
-			protected.GET("/ranking/users", s.GetUserRanking)
-			protected.GET("/ranking/friends", s.GetFriendsRanked)
+			protected.GET("/ranking/users", s.GetUserRankingHandler)
+			protected.GET("/ranking/friends", s.GetFriendsRankedHandler)
 
-			protected.GET("/friends", s.GetAllFriends)
-			protected.POST("/friends/add", s.AddFriend)
-			protected.DELETE("/friends/delete", s.DeleteFriend)
+			protected.GET("/friends", s.GetAllFriendsHandler)
+			protected.POST("/friends/add", s.AddFriendHandler)
+			protected.DELETE("/friends/delete", s.DeleteFriendHandler)
 
-			protected.POST("/runs", s.UploadRun)
-			protected.GET("/runs", s.GetAllRuns)
+			protected.POST("/runs", s.UploadRunHandler)
+			protected.GET("/runs", s.GetAllRunsHandler)
 		}
 	}
 

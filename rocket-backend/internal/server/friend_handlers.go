@@ -12,7 +12,7 @@ import (
 	"github.com/google/uuid"
 )
 
-func (s *Server) AddFriend(c *gin.Context) {
+func (s *Server) AddFriendHandler(c *gin.Context) {
 	userID, exists := c.Get("userID")
 	if !exists {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": custom_error.ErrUserNotFound.Error()})
@@ -54,7 +54,7 @@ func (s *Server) AddFriend(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "Friend added successfully"})
 }
 
-func (s *Server) DeleteFriend(c *gin.Context) {
+func (s *Server) DeleteFriendHandler(c *gin.Context) {
 	userID, exists := c.Get("userID")
 	if !exists {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "User not authenticated"})
@@ -98,7 +98,7 @@ func (s *Server) DeleteFriend(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "Friend deleted successfully"})
 }
 
-func (s *Server) GetAllFriends(c *gin.Context) {
+func (s *Server) GetAllFriendsHandler(c *gin.Context) {
 	userID, exists := c.Get("userID")
 	if !exists {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": custom_error.ErrUserNotFound.Error()})

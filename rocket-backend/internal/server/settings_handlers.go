@@ -10,7 +10,7 @@ import (
 	"github.com/google/uuid"
 )
 
-func (s *Server) GetSettings(c *gin.Context) {
+func (s *Server) GetSettingsHandler(c *gin.Context) {
 	userID, exists := c.Get("userID")
 	if !exists {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "User not authenticated"})
@@ -36,7 +36,7 @@ func (s *Server) GetSettings(c *gin.Context) {
 	c.JSON(http.StatusOK, settings)
 }
 
-func (s *Server) UpdateStepGoal(c *gin.Context) {
+func (s *Server) UpdateStepGoalHandler(c *gin.Context) {
 	userID, exists := c.Get("userID")
 	if !exists {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "User not authenticated"})
@@ -75,7 +75,7 @@ func (s *Server) UpdateStepGoal(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "Step goal updated successfully"})
 }
 
-func (s *Server) UpdateImage(c *gin.Context) {
+func (s *Server) UpdateImageHandler(c *gin.Context) {
 	userID, exists := c.Get("userID")
 	if !exists {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "User not authenticated"})

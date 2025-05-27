@@ -12,7 +12,7 @@ import (
 	"github.com/google/uuid"
 )
 
-func (s *Server) UpdateSteps(c *gin.Context) {
+func (s *Server) UpdateStepsHandler(c *gin.Context) {
 	var updateStepDTO types.UpdateStepsDTO
 	if err := c.ShouldBindJSON(&updateStepDTO); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request"})
@@ -39,7 +39,7 @@ func (s *Server) UpdateSteps(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "Daily Steps saved"})
 }
 
-func (s *Server) getUserStatistics(c *gin.Context) {
+func (s *Server) GetUserStatisticsHandler(c *gin.Context) {
 	userID, exists := c.Get("userID")
 	if !exists {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "User not authenticated"})
@@ -74,7 +74,7 @@ func (s *Server) getUserStatistics(c *gin.Context) {
 	c.JSON(http.StatusOK, stats)
 }
 
-func (s *Server) GetUserImage(c *gin.Context) {
+func (s *Server) GetUserImageHandler(c *gin.Context) {
 	var req types.GetImageDTO
 	if err := c.ShouldBindJSON(&req); err != nil {
 		userID, exists := c.Get("userID")
@@ -122,7 +122,7 @@ func (s *Server) GetUserImage(c *gin.Context) {
 	c.JSON(http.StatusOK, response)
 }
 
-func (s *Server) GetRocketPoints(c *gin.Context) {
+func (s *Server) GetRocketPointsHandler(c *gin.Context) {
 	userID, exists := c.Get("userID")
 	if !exists {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "User not authenticated"})
@@ -144,7 +144,7 @@ func (s *Server) GetRocketPoints(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"rocket_points": rocketPoints})
 }
 
-func (s *Server) GetAllUsers(c *gin.Context) {
+func (s *Server) GetAllUsersHandler(c *gin.Context) {
 	userID, exists := c.Get("userID")
 	if !exists {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "User not authenticated"})

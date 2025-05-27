@@ -34,6 +34,6 @@ func (s *Server) AuthHelloHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "Hello from auth", "user": cred.Username})
 }
 
-func (s *Server) Authenticated(c *gin.Context) {
+func (s *Server) AuthenticatedHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"authenticated": "true"})
 }
