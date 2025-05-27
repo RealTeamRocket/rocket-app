@@ -1,6 +1,7 @@
 package database
 
 import (
+	"database/sql"
 	"fmt"
 	"rocket-backend/internal/custom_error"
 	"rocket-backend/internal/types"
@@ -83,15 +84,22 @@ func (s *service) GetTopUsers(limit int) ([]types.User, error) {
 	return users, nil
 }
 
-func (s *service) GetAllUsers() ([]types.User, error) {
+func (s *service) GetAllUsers(excludeUserID *uuid.UUID) ([]types.User, error) {
 	var users []types.User
-	query := `SELECT id, username, email, rocketpoints FROM users`
-	rows, err := s.db.Query(query)
+	var rows *sql.Rows
+	var err error
+
+	if excludeUserID != nil {
+		query := `SELECT id, username, email, rocketpoints FROM users WHERE id != $1`
+		rows, err = s.db.Query(query, *excludeUserID)
+	} else {
+		query := `SELECT id, username, email, rocketpoints FROM users`
+		rows, err = s.db.Query(query)
+	}
 
 	if err != nil {
 		return nil, fmt.Errorf("%w: %v", custom_error.ErrFailedToRetrieveData, err)
 	}
-
 	defer rows.Close()
 
 	for rows.Next() {

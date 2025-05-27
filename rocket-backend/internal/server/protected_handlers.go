@@ -332,7 +332,19 @@ func (s *Server) CompleteChallenge(c *gin.Context) {
 }
 
 func (s *Server) GetAllUsers(c *gin.Context) {
-	users, err := s.db.GetAllUsers()
+	userID, exists := c.Get("userID")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "User not authenticated"})
+		return
+	}
+
+	userUUID, err := uuid.Parse(userID.(string))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid user ID format"})
+		return
+	}
+
+	users, err := s.db.GetAllUsers(&userUUID)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve users"})
 		return
