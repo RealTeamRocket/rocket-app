@@ -78,6 +78,9 @@ class _HistoryState extends State<History> {
                         LineChartData(
                           gridData: FlGridData(show: true),
                           titlesData: FlTitlesData(
+                            topTitles: AxisTitles(
+                              sideTitles: SideTitles(showTitles: false),
+                            ),
                             leftTitles: AxisTitles(
                               sideTitles: SideTitles(showTitles: true),
                             ),

@@ -78,6 +78,7 @@ type Service interface {
 	// runs
 	SaveRun(userID uuid.UUID, route string, duration string, distance float64) error
 	GetAllRunsByUser(userID uuid.UUID) ([]types.RunDTO, error)
+	DeleteRun(runID uuid.UUID) error
 }
 
 type service struct {
