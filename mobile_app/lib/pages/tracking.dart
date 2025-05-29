@@ -6,6 +6,7 @@ import 'package:flutter_osm_plugin/flutter_osm_plugin.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:mobile_app/pages/pages.dart';
 
+import '../constants/color_constants.dart';
 import '../utils/backend_api/tracking_api.dart';
 import 'route.dart';
 
@@ -228,7 +229,14 @@ class _TrackingPageState extends State<TrackingPage> {
     Widget content;
 
     if (_isTracking && _wasStarted) {
-      content = ElevatedButton(onPressed: _stopTracking, child: Text("Stop"));
+      content = ElevatedButton(
+          onPressed: _stopTracking,
+          style: ElevatedButton.styleFrom(
+            backgroundColor: ColorConstants.purpleColor,
+            foregroundColor: ColorConstants.white,
+          ),
+          child: Text("Stop")
+      );
     } else if (!_isTracking && _wasStarted) {
       content = Row(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -245,6 +253,10 @@ class _TrackingPageState extends State<TrackingPage> {
                 (route) => false,
               );
             },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: ColorConstants.purpleColor,
+              foregroundColor: ColorConstants.white,
+            ),
             child: Text("Home"),
           ),
           SizedBox(width: 20),
@@ -263,20 +275,39 @@ class _TrackingPageState extends State<TrackingPage> {
                 (route) => false,
               );
             },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: ColorConstants.purpleColor,
+              foregroundColor: ColorConstants.white,
+            ),
             child: Text("Show Route"),
           ),
         ],
       );
     } else {
-      content = ElevatedButton(onPressed: _startTracking, child: Text("Start"));
+      content = ElevatedButton(
+          onPressed: _startTracking,
+          style: ElevatedButton.styleFrom(
+            backgroundColor: ColorConstants.purpleColor,
+            foregroundColor: ColorConstants.white,
+          ),
+          child: Text("Start"),
+      );
     }
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.title),
-        backgroundColor: Colors.blueGrey[100],
+        iconTheme: IconThemeData(color: ColorConstants.white),
+        title: Text(
+          widget.title,
+          style: TextStyle(
+            color: ColorConstants.white,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        centerTitle: true,
+        backgroundColor: ColorConstants.secoundaryColor,
       ),
-      backgroundColor: Colors.blueGrey[100],
+      backgroundColor: ColorConstants.primaryColor,
       body: Padding(
         padding: EdgeInsets.all(16),
         child: Column(
@@ -287,7 +318,10 @@ class _TrackingPageState extends State<TrackingPage> {
               Icon(Icons.star, color: Colors.yellow, size: 48),
             Text(
               "Timer: $_formattedTime",
-              style: TextStyle(fontSize: 32),
+              style: TextStyle(
+                fontSize: 32,
+                color: ColorConstants.white,
+              ),
               textAlign: TextAlign.center,
             ),
             SizedBox(height: 30),
@@ -296,7 +330,11 @@ class _TrackingPageState extends State<TrackingPage> {
             Divider(),
             Text(
               "Past Runs",
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              style: TextStyle(
+                  fontSize: 20,
+                  color: ColorConstants.white,
+                  fontWeight: FontWeight.bold
+              ),
             ),
             SizedBox(height: 10),
             _isLoadingRuns
@@ -304,7 +342,12 @@ class _TrackingPageState extends State<TrackingPage> {
                 : Expanded(
                   child:
                       _runs.isEmpty
-                          ? Text("No runs found.")
+                          ? Text(
+                              "No runs found.",
+                              style: TextStyle(
+                              color: ColorConstants.white,
+                            ),
+                          )
                           : ListView.builder(
                             itemCount: _runs.length,
                             itemBuilder: (context, index) {

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_osm_plugin/flutter_osm_plugin.dart';
+import 'package:mobile_app/constants/color_constants.dart';
 import 'dart:math';
 
 import 'package:mobile_app/pages/pages.dart';
@@ -68,12 +69,21 @@ class _RoutePageState extends State<RoutePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: Text(widget.title)),
+      backgroundColor: ColorConstants.primaryColor,
       body: Column(
         children: [
           SizedBox(
             height: 500,
             child: _initPosition == null || _routePoints.isEmpty
-                ? Center(child: Text("Keine Route verfügbar"))
+                ? Center(
+                  child: Text(
+                      "Keine Route verfügbar",
+                      style: TextStyle(
+                        color: ColorConstants.white,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    )
+                  )
                 : OSMFlutter(
                     controller: _mapController,
                     osmOption: OSMOption(
