@@ -285,7 +285,7 @@ class _LeaderboardPageState extends State<LeaderboardPage> {
                                     style: ElevatedButton.styleFrom(
                                       backgroundColor: isFriend(user)
                                           ? ColorConstants.greenColor
-                                          : Colors.grey,
+                                          : Colors.grey.withValues(alpha: 0.3),
                                       shape: const CircleBorder(),
                                       padding: const EdgeInsets.all(8),
                                     ),
@@ -293,7 +293,9 @@ class _LeaderboardPageState extends State<LeaderboardPage> {
                                       isFriend(user)
                                           ? Icons.check
                                           : Icons.person_add_alt,
-                                      color: ColorConstants.white,
+                                      color: isFriend(user)
+                                          ? ColorConstants.greenColor
+                                          : ColorConstants.white,
                                       size: 22,
                                     ),
                                   )
@@ -316,15 +318,30 @@ class _LeaderboardPageState extends State<LeaderboardPage> {
           context: context,
           builder: (BuildContext context) {
             return AlertDialog(
-              title: Text(user.username),
+              backgroundColor: ColorConstants.secoundaryColor.withValues(alpha: 0.9),
+              title: Center(
+                child: Text(
+                  user.username,
+                  style: const TextStyle(color: ColorConstants.white),
+                ),
+              ),
               content: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Text('Rocketpoints: ${user.rocketPoints}'),
-                  Text('Signed up: 01.01.2023'), // Example date
-                  Text('Status: Not a friend'),
+                  Text(
+                      'Rocketpoints: ${user.rocketPoints}',
+                      style: const TextStyle(color: ColorConstants.white),
+                  ),
+                  Text(
+                      'Signed up: 01.01.2023',
+                      style: const TextStyle(color: ColorConstants.white),
+                  ), // Example date
+                  Text(
+                      'Status: Not a friend',
+                      style: const TextStyle(color: ColorConstants.white),
+                  ),
                   IconButton(
-                    icon: const Icon(Icons.person_add_alt, color: Colors.black),
+                    icon: const Icon(Icons.person_add_alt, color: ColorConstants.white),
                     onPressed: () {
                       addFriend(user);
                     },
@@ -332,10 +349,17 @@ class _LeaderboardPageState extends State<LeaderboardPage> {
                 ],
               ),
               actions: [
-                TextButton(
+                ElevatedButton(
                   onPressed: () {
                     Navigator.of(context).pop();
                   },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: ColorConstants.purpleColor,
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
                   child: const Text('Okay'),
                 ),
               ],
@@ -347,7 +371,7 @@ class _LeaderboardPageState extends State<LeaderboardPage> {
         width: size,
         height: size,
         decoration: BoxDecoration(
-          border: Border.all(color: Colors.black),
+          border: Border.all(color: ColorConstants.purpleColor.withValues(alpha: 0.3)),
           color: color,
           shape: BoxShape.circle,
           boxShadow: [
@@ -404,12 +428,16 @@ class _PodiumSpot extends StatelessWidget {
         const SizedBox(height: 8),
         Text(
           place,
-          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+          style: const TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 15,
+              color: ColorConstants.white,
+          ),
         ),
         Text(
           '$points RP',
           style: const TextStyle(
-            color: Colors.black87,
+            color: ColorConstants.purpleColor,
             fontSize: 13,
             fontWeight: FontWeight.w500,
           ),
