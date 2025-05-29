@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:mobile_app/utils/backend_api/backend_api.dart';
 
+import '../constants/color_constants.dart';
+
 class LeaderboardPage extends StatefulWidget {
   const LeaderboardPage({super.key, required this.title});
   final String title;
@@ -92,10 +94,18 @@ class _LeaderboardPageState extends State<LeaderboardPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.title),
-        backgroundColor: Colors.blueGrey[100],
+        title: Text(
+            widget.title,
+            style: TextStyle(
+              color: ColorConstants.white,
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+            ),
+        ),
+        centerTitle: true,
+        backgroundColor: ColorConstants.primaryColor,
       ),
-      backgroundColor: Colors.blueGrey[100],
+      backgroundColor: ColorConstants.primaryColor,
       body: isLoading
           ? const Center(child: CircularProgressIndicator())
           : SafeArea(
@@ -112,9 +122,9 @@ class _LeaderboardPageState extends State<LeaderboardPage> {
                           height: 44,
                           width: 200,
                           decoration: BoxDecoration(
-                            color: Colors.grey,
+                            color: ColorConstants.secoundaryColor,
                             borderRadius: BorderRadius.circular(100),
-                            border: Border.all(color: Colors.black, width: 2),
+                            border: Border.all(color: ColorConstants.purpleColor.withValues(alpha: 0.3), width: 2),
                           ),
                           child: Stack(
                             alignment: Alignment.center,
@@ -129,7 +139,7 @@ class _LeaderboardPageState extends State<LeaderboardPage> {
                                   width: 100,
                                   height: 44,
                                   decoration: BoxDecoration(
-                                    color: const Color(0xff9ba0fc),
+                                    color: ColorConstants.purpleColor,
                                     borderRadius: BorderRadius.circular(100),
                                   ),
                                 ),
@@ -145,9 +155,8 @@ class _LeaderboardPageState extends State<LeaderboardPage> {
                                       child: Text(
                                         "All",
                                         style: TextStyle(
-                                          color: selectedTab == 0
-                                              ? Colors.white
-                                              : Colors.black,
+                                          color: ColorConstants.white,
+                                          fontWeight: FontWeight.w600,
                                           fontSize: 15,
                                         ),
                                       ),
@@ -161,9 +170,8 @@ class _LeaderboardPageState extends State<LeaderboardPage> {
                                       child: Text(
                                         "Friends",
                                         style: TextStyle(
-                                          color: selectedTab == 1
-                                              ? Colors.white
-                                              : Colors.black,
+                                          color: ColorConstants.white,
+                                          fontWeight: FontWeight.w600,
                                           fontSize: 15,
                                         ),
                                       ),
@@ -249,19 +257,23 @@ class _LeaderboardPageState extends State<LeaderboardPage> {
                               style: const TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
-                                color: Colors.black,
+                                color: ColorConstants.white,
                               ),
                             ),
                             title: Text(
                               user.username,
                               style: const TextStyle(
                                 fontSize: 14,
-                                color: Colors.black,
+                                fontWeight: FontWeight.bold,
+                                color: ColorConstants.white,
                               ),
                             ),
                             subtitle: Text(
                               'Rocketpoints: ${user.rocketPoints}',
-                              style: const TextStyle(fontSize: 12),
+                              style: const TextStyle(
+                                  fontSize: 12,
+                                  color: ColorConstants.purpleColor
+                              ),
                             ),
                             trailing: selectedTab == 0
                                 ? ElevatedButton(
@@ -272,7 +284,7 @@ class _LeaderboardPageState extends State<LeaderboardPage> {
                                           },
                                     style: ElevatedButton.styleFrom(
                                       backgroundColor: isFriend(user)
-                                          ? Colors.green
+                                          ? ColorConstants.greenColor
                                           : Colors.grey,
                                       shape: const CircleBorder(),
                                       padding: const EdgeInsets.all(8),
@@ -281,7 +293,7 @@ class _LeaderboardPageState extends State<LeaderboardPage> {
                                       isFriend(user)
                                           ? Icons.check
                                           : Icons.person_add_alt,
-                                      color: Colors.white,
+                                      color: ColorConstants.white,
                                       size: 22,
                                     ),
                                   )
@@ -340,7 +352,7 @@ class _LeaderboardPageState extends State<LeaderboardPage> {
           shape: BoxShape.circle,
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.08),
+              color: Colors.black.withValues(alpha: 0.08),
               blurRadius: 6,
               offset: const Offset(0, 3),
             ),
