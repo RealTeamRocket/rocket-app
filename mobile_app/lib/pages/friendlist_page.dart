@@ -175,11 +175,12 @@ class _FriendlistPageState extends State<FriendlistPage>
           children: [
             CircleAvatar(
               radius: 28,
-              backgroundImage:
-                  friend.imageData != null
-                      ? MemoryImage(friend.imageData!)
-                      : const AssetImage('assets/avatar_placeholder.png')
-                          as ImageProvider,
+              backgroundColor: friend.imageData == null || friend.imageData!.isEmpty
+                  ? Colors.grey
+                  : null,
+              backgroundImage: friend.imageData != null && friend.imageData!.isNotEmpty
+                  ? MemoryImage(friend.imageData!)
+                  : null,
             ),
             const SizedBox(width: 16),
             Expanded(
@@ -227,11 +228,12 @@ class _FriendlistPageState extends State<FriendlistPage>
         children: [
           CircleAvatar(
             radius: 28,
-            backgroundImage:
-                user.imageData != null
-                    ? MemoryImage(user.imageData!)
-                    : const AssetImage('assets/avatar_placeholder.png')
-                        as ImageProvider,
+            backgroundColor: user.imageData == null || user.imageData!.isEmpty
+                ? Colors.grey
+                : null,
+            backgroundImage: user.imageData != null && user.imageData!.isNotEmpty
+                ? MemoryImage(user.imageData!)
+                : null,
           ),
           const SizedBox(width: 16),
           Expanded(

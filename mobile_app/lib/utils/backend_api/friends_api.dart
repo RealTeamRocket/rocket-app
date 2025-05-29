@@ -21,11 +21,11 @@ class Friend {
 
   factory Friend.fromJson(Map<String, dynamic> json) {
     Uint8List? data;
-    if (json['image_data'] != null) {
+    if (json['image_data'] != null && (json['image_data'] as String).isNotEmpty) {
       final base64Str = json['image_data'] as String;
       data = base64Decode(base64Str);
+      if (data.isEmpty) data = null;
     }
-
     return Friend(
       id: json['id'] as String,
       username: json['username'] as String,
@@ -34,6 +34,7 @@ class Friend {
       imageData: data,
     );
   }
+
 }
 
 /// Extended model for all users including image data
@@ -56,9 +57,10 @@ class UserWithImage {
 
   factory UserWithImage.fromJson(Map<String, dynamic> json) {
     Uint8List? data;
-    if (json['image_data'] != null) {
+    if (json['image_data'] != null && (json['image_data'] as String).isNotEmpty) {
       final base64Str = json['image_data'] as String;
       data = base64Decode(base64Str);
+      if (data.isEmpty) data = null;
     }
     return UserWithImage(
       id: json['id'] as String,
