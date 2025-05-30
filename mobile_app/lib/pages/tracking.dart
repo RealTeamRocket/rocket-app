@@ -8,7 +8,6 @@ import 'package:mobile_app/pages/pages.dart';
 
 import '../utils/backend_api/backend_api.dart';
 import '../constants/color_constants.dart';
-import '../utils/backend_api/tracking_api.dart';
 import 'route.dart';
 
 class TrackingPage extends StatefulWidget {
@@ -366,15 +365,37 @@ class _TrackingPageState extends State<TrackingPage> {
                                     return await showDialog(
                                       context: context,
                                       builder: (context) => AlertDialog(
-                                        title: Text('Delete Run'),
-                                        content: Text('Are you sure you want to delete this run?'),
+                                        backgroundColor: ColorConstants.secoundaryColor.withValues(alpha: 0.9),
+                                        title: Center(
+                                          child: Text(
+                                            'Delete Run',
+                                            style: TextStyle(
+                                              color: ColorConstants.white,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                        ),
+                                        content: Text(
+                                          'Are you sure you want to delete this run?',
+                                          style: TextStyle(
+                                            color: ColorConstants.white,
+                                          ),
+                                        ),
                                         actions: [
-                                          TextButton(
+                                          ElevatedButton(
                                             onPressed: () => Navigator.of(context).pop(false),
+                                            style: ElevatedButton.styleFrom(
+                                              backgroundColor: ColorConstants.purpleColor,
+                                              foregroundColor: ColorConstants.white,
+                                            ),
                                             child: Text('Cancel'),
                                           ),
-                                          TextButton(
+                                          ElevatedButton(
                                             onPressed: () => Navigator.of(context).pop(true),
+                                            style: ElevatedButton.styleFrom(
+                                              backgroundColor: Colors.red,
+                                              foregroundColor: Colors.white,
+                                            ),
                                             child: Text('Delete'),
                                           ),
                                         ],
