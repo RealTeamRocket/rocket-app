@@ -262,17 +262,15 @@ class _TrackingPageState extends State<TrackingPage> {
           SizedBox(width: 20),
           ElevatedButton(
             onPressed: () {
-              Navigator.pushAndRemoveUntil(
+              Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder:
-                      (context) => RoutePage(
-                        title: "Completed Run",
-                        routePoints: _lastRoutePoints,
-                        elapsedTime: _formattedTime,
-                      ),
+                  builder: (context) => RoutePage(
+                    title: "Completed Run",
+                    routePoints: _lastRoutePoints,
+                    elapsedTime: _formattedTime,
+                  ),
                 ),
-                (route) => false,
               );
             },
             style: ElevatedButton.styleFrom(
