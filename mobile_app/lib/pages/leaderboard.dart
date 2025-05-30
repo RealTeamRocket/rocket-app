@@ -332,18 +332,20 @@ class _LeaderboardPageState extends State<LeaderboardPage> {
                       'Rocketpoints: ${user.rocketPoints}',
                       style: const TextStyle(color: ColorConstants.white),
                   ),
-                  Text(
-                      'Signed up: 01.01.2023',
-                      style: const TextStyle(color: ColorConstants.white),
-                  ), // Example date
-                  Text(
-                      'Status: Not a friend',
-                      style: const TextStyle(color: ColorConstants.white),
-                  ),
                   IconButton(
-                    icon: const Icon(Icons.person_add_alt, color: ColorConstants.white),
-                    onPressed: () {
+                    icon: Icon(
+                      isFriend(user)
+                          ? Icons.check
+                          : Icons.person_add_alt,
+                      color: isFriend(user)
+                          ? ColorConstants.greenColor
+                          : ColorConstants.white,
+                    ),
+                    onPressed: isFriend(user)
+                        ? null
+                        : () async {
                       addFriend(user);
+                      Navigator.of(context).pop();
                     },
                   ),
                 ],
