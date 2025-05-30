@@ -353,6 +353,14 @@ class _TrackingPageState extends State<TrackingPage> {
                             itemBuilder: (context, index) {
                               final run = _runs[index];
                               return Card(
+                                shape: RoundedRectangleBorder(
+                                  side: BorderSide(
+                                    color: ColorConstants.purpleColor.withValues(alpha: 0.3),
+                                    width: 2.5,
+                                  ),
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                color: ColorConstants.secoundaryColor,
                                 margin: const EdgeInsets.symmetric(
                                   vertical: 6,
                                   horizontal: 2,
@@ -365,7 +373,7 @@ class _TrackingPageState extends State<TrackingPage> {
                                   ),
                                   leading: Icon(
                                     Icons.directions_run,
-                                    color: Colors.blueAccent,
+                                    color: ColorConstants.greenColor,
                                     size: 32,
                                   ),
                                   title: Row(
@@ -373,11 +381,14 @@ class _TrackingPageState extends State<TrackingPage> {
                                       Icon(
                                         Icons.route,
                                         size: 18,
-                                        color: Colors.grey[700],
+                                        color: ColorConstants.purpleColor,
                                       ),
                                       SizedBox(width: 6),
                                       Text(
                                         "${run.distance.toStringAsFixed(2)} km",
+                                        style: TextStyle(
+                                          color: ColorConstants.white,
+                                        ),
                                       ),
                                     ],
                                   ),
@@ -390,10 +401,15 @@ class _TrackingPageState extends State<TrackingPage> {
                                           Icon(
                                             Icons.calendar_today,
                                             size: 16,
-                                            color: Colors.grey[600],
+                                            color: ColorConstants.purpleColor,
                                           ),
                                           SizedBox(width: 4),
-                                          Text(_formatDate(run.createdAt)),
+                                          Text(
+                                            _formatDate(run.createdAt),
+                                            style: TextStyle(
+                                              color: ColorConstants.white,
+                                            ),
+                                          ),
                                         ],
                                       ),
                                       SizedBox(height: 2),
@@ -402,17 +418,22 @@ class _TrackingPageState extends State<TrackingPage> {
                                           Icon(
                                             Icons.timer,
                                             size: 18,
-                                            color: Colors.grey[700],
+                                            color: ColorConstants.purpleColor,
                                           ),
                                           SizedBox(width: 6),
-                                          Text(run.duration),
+                                          Text(
+                                            run.duration,
+                                            style: TextStyle(
+                                              color: ColorConstants.white,
+                                            ),
+                                          ),
                                         ],
                                       ),
                                     ],
                                   ),
                                   trailing: Icon(
                                     Icons.chevron_right,
-                                    color: Colors.grey[600],
+                                    color: ColorConstants.purpleColor,
                                   ),
                                   onTap: () {
                                     final geoPoints = parseLineString(
