@@ -7,6 +7,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:mobile_app/pages/pages.dart';
 
 import '../utils/backend_api/backend_api.dart';
+import '../constants/color_constants.dart';
 import 'route.dart';
 
 class TrackingPage extends StatefulWidget {
@@ -228,7 +229,14 @@ class _TrackingPageState extends State<TrackingPage> {
     Widget content;
 
     if (_isTracking && _wasStarted) {
-      content = ElevatedButton(onPressed: _stopTracking, child: Text("Stop"));
+      content = ElevatedButton(
+          onPressed: _stopTracking,
+          style: ElevatedButton.styleFrom(
+            backgroundColor: ColorConstants.purpleColor,
+            foregroundColor: ColorConstants.white,
+          ),
+          child: Text("Stop")
+      );
     } else if (!_isTracking && _wasStarted) {
       content = Row(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -245,38 +253,59 @@ class _TrackingPageState extends State<TrackingPage> {
                 (route) => false,
               );
             },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: ColorConstants.purpleColor,
+              foregroundColor: ColorConstants.white,
+            ),
             child: Text("Home"),
           ),
           SizedBox(width: 20),
           ElevatedButton(
             onPressed: () {
-              Navigator.pushAndRemoveUntil(
+              Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder:
-                      (context) => RoutePage(
-                        title: "Completed Run",
-                        routePoints: _lastRoutePoints,
-                        elapsedTime: _formattedTime,
-                      ),
+                  builder: (context) => RoutePage(
+                    title: "Completed Run",
+                    routePoints: _lastRoutePoints,
+                    elapsedTime: _formattedTime,
+                  ),
                 ),
-                (route) => false,
               );
             },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: ColorConstants.purpleColor,
+              foregroundColor: ColorConstants.white,
+            ),
             child: Text("Show Route"),
           ),
         ],
       );
     } else {
-      content = ElevatedButton(onPressed: _startTracking, child: Text("Start"));
+      content = ElevatedButton(
+          onPressed: _startTracking,
+          style: ElevatedButton.styleFrom(
+            backgroundColor: ColorConstants.purpleColor,
+            foregroundColor: ColorConstants.white,
+          ),
+          child: Text("Start"),
+      );
     }
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.title),
-        backgroundColor: Colors.blueGrey[100],
+        iconTheme: IconThemeData(color: ColorConstants.white),
+        title: Text(
+          widget.title,
+          style: TextStyle(
+            color: ColorConstants.white,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        centerTitle: true,
+        backgroundColor: ColorConstants.secoundaryColor,
       ),
-      backgroundColor: Colors.blueGrey[100],
+      backgroundColor: ColorConstants.primaryColor,
       body: Padding(
         padding: EdgeInsets.all(16),
         child: Column(
@@ -287,7 +316,10 @@ class _TrackingPageState extends State<TrackingPage> {
               Icon(Icons.star, color: Colors.yellow, size: 48),
             Text(
               "Timer: $_formattedTime",
-              style: TextStyle(fontSize: 32),
+              style: TextStyle(
+                fontSize: 32,
+                color: ColorConstants.white,
+              ),
               textAlign: TextAlign.center,
             ),
             SizedBox(height: 30),
@@ -296,7 +328,11 @@ class _TrackingPageState extends State<TrackingPage> {
             Divider(),
             Text(
               "Past Runs",
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              style: TextStyle(
+                  fontSize: 20,
+                  color: ColorConstants.white,
+                  fontWeight: FontWeight.bold
+              ),
             ),
             SizedBox(height: 10),
             _isLoadingRuns
@@ -304,7 +340,12 @@ class _TrackingPageState extends State<TrackingPage> {
                 : Expanded(
                   child:
                       _runs.isEmpty
-                          ? Text("No runs found.")
+                          ? Text(
+                              "No runs found.",
+                              style: TextStyle(
+                              color: ColorConstants.white,
+                            ),
+                          )
                           : ListView.builder(
                               itemCount: _runs.length,
                               itemBuilder: (context, index) {
@@ -322,15 +363,37 @@ class _TrackingPageState extends State<TrackingPage> {
                                     return await showDialog(
                                       context: context,
                                       builder: (context) => AlertDialog(
-                                        title: Text('Delete Run'),
-                                        content: Text('Are you sure you want to delete this run?'),
+                                        backgroundColor: ColorConstants.secoundaryColor.withValues(alpha: 0.9),
+                                        title: Center(
+                                          child: Text(
+                                            'Delete Run',
+                                            style: TextStyle(
+                                              color: ColorConstants.white,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                        ),
+                                        content: Text(
+                                          'Are you sure you want to delete this run?',
+                                          style: TextStyle(
+                                            color: ColorConstants.white,
+                                          ),
+                                        ),
                                         actions: [
-                                          TextButton(
+                                          ElevatedButton(
                                             onPressed: () => Navigator.of(context).pop(false),
+                                            style: ElevatedButton.styleFrom(
+                                              backgroundColor: ColorConstants.purpleColor,
+                                              foregroundColor: ColorConstants.white,
+                                            ),
                                             child: Text('Cancel'),
                                           ),
-                                          TextButton(
+                                          ElevatedButton(
                                             onPressed: () => Navigator.of(context).pop(true),
+                                            style: ElevatedButton.styleFrom(
+                                              backgroundColor: Colors.red,
+                                              foregroundColor: Colors.white,
+                                            ),
                                             child: Text('Delete'),
                                           ),
                                         ],
@@ -355,6 +418,14 @@ class _TrackingPageState extends State<TrackingPage> {
                                     }
                                   },
                                   child: Card(
+                                    shape: RoundedRectangleBorder(
+                                      side: BorderSide(
+                                        color: ColorConstants.purpleColor.withValues(alpha: 0.3),
+                                        width: 2.5,
+                                      ),
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                    color: ColorConstants.secoundaryColor,
                                     margin: const EdgeInsets.symmetric(
                                       vertical: 6,
                                       horizontal: 2,
@@ -367,7 +438,7 @@ class _TrackingPageState extends State<TrackingPage> {
                                       ),
                                       leading: Icon(
                                         Icons.directions_run,
-                                        color: Colors.blueAccent,
+                                        color: ColorConstants.greenColor,
                                         size: 32,
                                       ),
                                       title: Row(
@@ -375,27 +446,34 @@ class _TrackingPageState extends State<TrackingPage> {
                                           Icon(
                                             Icons.route,
                                             size: 18,
-                                            color: Colors.grey[700],
+                                            color: ColorConstants.purpleColor,
                                           ),
                                           SizedBox(width: 6),
                                           Text(
                                             "${run.distance.toStringAsFixed(2)} km",
+                                            style: TextStyle(
+                                              color: ColorConstants.white,
+                                            ),
                                           ),
                                         ],
                                       ),
                                       subtitle: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
+                                        crossAxisAlignment: CrossAxisAlignment.start,
                                         children: [
                                           Row(
                                             children: [
                                               Icon(
                                                 Icons.calendar_today,
                                                 size: 16,
-                                                color: Colors.grey[600],
+                                                color: ColorConstants.purpleColor,
                                               ),
                                               SizedBox(width: 4),
-                                              Text(_formatDate(run.createdAt)),
+                                              Text(
+                                                _formatDate(run.createdAt),
+                                                style: TextStyle(
+                                                  color: ColorConstants.white,
+                                                ),
+                                              ),
                                             ],
                                           ),
                                           SizedBox(height: 2),
@@ -404,17 +482,22 @@ class _TrackingPageState extends State<TrackingPage> {
                                               Icon(
                                                 Icons.timer,
                                                 size: 18,
-                                                color: Colors.grey[700],
+                                                color: ColorConstants.purpleColor,
                                               ),
                                               SizedBox(width: 6),
-                                              Text(run.duration),
+                                              Text(
+                                                run.duration,
+                                                style: TextStyle(
+                                                  color: ColorConstants.white,
+                                                ),
+                                              ),
                                             ],
                                           ),
                                         ],
                                       ),
                                       trailing: Icon(
                                         Icons.chevron_right,
-                                        color: Colors.grey[600],
+                                        color: ColorConstants.purpleColor,
                                       ),
                                       onTap: () {
                                         final geoPoints = parseLineString(
@@ -423,11 +506,10 @@ class _TrackingPageState extends State<TrackingPage> {
                                         Navigator.push(
                                           context,
                                           MaterialPageRoute(
-                                            builder:
-                                                (context) => RoutePage(
-                                                  title: _formatDate(run.createdAt),
-                                                  routePoints: geoPoints,
-                                                  elapsedTime: run.duration,
+                                            builder: (context) => RoutePage(
+                                              title: _formatDate(run.createdAt),
+                                              routePoints: geoPoints,
+                                              elapsedTime: run.duration,
                                                 ),
                                           ),
                                         );

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_osm_plugin/flutter_osm_plugin.dart';
+import 'package:mobile_app/constants/color_constants.dart';
 import 'dart:math';
 
 import 'package:mobile_app/pages/pages.dart';
@@ -67,13 +68,35 @@ class _RoutePageState extends State<RoutePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(widget.title)),
+      appBar: AppBar(
+        iconTheme: IconThemeData(
+          color: ColorConstants.white,
+        ),
+        title: Text(
+          widget.title,
+          style: TextStyle(
+            color: ColorConstants.white,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        centerTitle: true,
+        backgroundColor: ColorConstants.secoundaryColor,
+      ),
+      backgroundColor: ColorConstants.secoundaryColor,
       body: Column(
         children: [
           SizedBox(
             height: 500,
             child: _initPosition == null || _routePoints.isEmpty
-                ? Center(child: Text("Keine Route verfügbar"))
+                ? Center(
+                  child: Text(
+                      "No route available",
+                      style: TextStyle(
+                        color: ColorConstants.white,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    )
+                  )
                 : OSMFlutter(
                     controller: _mapController,
                     osmOption: OSMOption(
@@ -120,7 +143,7 @@ class _RoutePageState extends State<RoutePage> {
           ),
           Container(
             padding: const EdgeInsets.all(16.0),
-            color: Colors.blueAccent,
+            color: ColorConstants.secoundaryColor,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -132,6 +155,7 @@ class _RoutePageState extends State<RoutePage> {
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
+                        color: ColorConstants.white
                       ),
                     ),
                     Text(
@@ -139,6 +163,7 @@ class _RoutePageState extends State<RoutePage> {
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
+                        color: ColorConstants.white
                       ),
                     ),
                   ],
@@ -155,6 +180,10 @@ class _RoutePageState extends State<RoutePage> {
                         (route) => false,
                       );
                     },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: ColorConstants.purpleColor,
+                      foregroundColor: ColorConstants.white,
+                    ),
                     child: Text("Back To App"),
                   ),
                 ),

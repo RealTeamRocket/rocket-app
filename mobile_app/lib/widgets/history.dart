@@ -33,7 +33,7 @@ class _HistoryState extends State<History> {
     return Padding(
       padding: const EdgeInsets.all(16.0),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           const Text(
             'History',
@@ -82,7 +82,25 @@ class _HistoryState extends State<History> {
                               sideTitles: SideTitles(showTitles: false),
                             ),
                             leftTitles: AxisTitles(
-                              sideTitles: SideTitles(showTitles: true),
+                              sideTitles: SideTitles(showTitles: false),
+                            ),
+                            rightTitles: AxisTitles(
+                              sideTitles: SideTitles(
+                                showTitles: true,
+                                getTitlesWidget: (value, meta) {
+                                  return Padding(
+                                    padding: const EdgeInsets.only(left: 8),
+                                    child: Text(
+                                      value.toInt().toString(),
+                                      style: const TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 12,
+                                      ),
+                                    ),
+                                  );
+                                },
+                                reservedSize: 44,
+                              ),
                             ),
                             bottomTitles: AxisTitles(
                               sideTitles: SideTitles(
@@ -91,11 +109,14 @@ class _HistoryState extends State<History> {
                                   final days = userStatistics
                                       .map((e) => e.day)
                                       .toList();
-                                  return Text(
-                                    days[value.toInt() % days.length],
-                                    style: const TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 12,
+                                  return Padding(
+                                    padding: const EdgeInsets.only(top: 8),
+                                    child: Text(
+                                      days[value.toInt() % days.length],
+                                      style: const TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 12,
+                                      ),
                                     ),
                                   );
                                 },
@@ -125,6 +146,7 @@ class _HistoryState extends State<History> {
                       style: const TextStyle(
                         color: ColorConstants.white,
                         fontSize: 18,
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
                   ],

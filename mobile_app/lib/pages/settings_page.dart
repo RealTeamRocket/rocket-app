@@ -126,6 +126,7 @@ class _SettingsPageState extends State<SettingsPage> {
         ),
         backgroundColor: ColorConstants.secoundaryColor,
         iconTheme: const IconThemeData(color: Colors.white),
+        centerTitle: true,
       ),
       backgroundColor: ColorConstants.primaryColor,
       body: _isLoading

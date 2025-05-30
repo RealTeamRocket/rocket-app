@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:mobile_app/utils/backend_api/backend_api.dart';
 
+import '../constants/color_constants.dart';
+
 class LeaderboardPage extends StatefulWidget {
   const LeaderboardPage({super.key, required this.title});
   final String title;
@@ -92,10 +94,18 @@ class _LeaderboardPageState extends State<LeaderboardPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.title),
-        backgroundColor: Colors.blueGrey[100],
+        title: Text(
+            widget.title,
+            style: TextStyle(
+              color: ColorConstants.white,
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+            ),
+        ),
+        centerTitle: true,
+        backgroundColor: ColorConstants.primaryColor,
       ),
-      backgroundColor: Colors.blueGrey[100],
+      backgroundColor: ColorConstants.primaryColor,
       body: isLoading
           ? const Center(child: CircularProgressIndicator())
           : SafeArea(
@@ -112,9 +122,9 @@ class _LeaderboardPageState extends State<LeaderboardPage> {
                           height: 44,
                           width: 200,
                           decoration: BoxDecoration(
-                            color: Colors.grey,
+                            color: ColorConstants.secoundaryColor,
                             borderRadius: BorderRadius.circular(100),
-                            border: Border.all(color: Colors.black, width: 2),
+                            border: Border.all(color: ColorConstants.purpleColor.withValues(alpha: 0.3), width: 2),
                           ),
                           child: Stack(
                             alignment: Alignment.center,
@@ -129,7 +139,7 @@ class _LeaderboardPageState extends State<LeaderboardPage> {
                                   width: 100,
                                   height: 44,
                                   decoration: BoxDecoration(
-                                    color: const Color(0xff9ba0fc),
+                                    color: ColorConstants.purpleColor,
                                     borderRadius: BorderRadius.circular(100),
                                   ),
                                 ),
@@ -145,9 +155,8 @@ class _LeaderboardPageState extends State<LeaderboardPage> {
                                       child: Text(
                                         "All",
                                         style: TextStyle(
-                                          color: selectedTab == 0
-                                              ? Colors.white
-                                              : Colors.black,
+                                          color: ColorConstants.white,
+                                          fontWeight: FontWeight.w600,
                                           fontSize: 15,
                                         ),
                                       ),
@@ -161,9 +170,8 @@ class _LeaderboardPageState extends State<LeaderboardPage> {
                                       child: Text(
                                         "Friends",
                                         style: TextStyle(
-                                          color: selectedTab == 1
-                                              ? Colors.white
-                                              : Colors.black,
+                                          color: ColorConstants.white,
+                                          fontWeight: FontWeight.w600,
                                           fontSize: 15,
                                         ),
                                       ),
@@ -247,21 +255,25 @@ class _LeaderboardPageState extends State<LeaderboardPage> {
                             leading: Text(
                               '${displayedUsers.length < 3 ? index + 1 : index + 4}.',
                               style: const TextStyle(
-                                fontSize: 16,
+                                fontSize: 18,
                                 fontWeight: FontWeight.bold,
-                                color: Colors.black,
+                                color: ColorConstants.white,
                               ),
                             ),
                             title: Text(
                               user.username,
                               style: const TextStyle(
-                                fontSize: 14,
-                                color: Colors.black,
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                color: ColorConstants.white,
                               ),
                             ),
                             subtitle: Text(
                               'Rocketpoints: ${user.rocketPoints}',
-                              style: const TextStyle(fontSize: 12),
+                              style: const TextStyle(
+                                  fontSize: 14,
+                                  color: ColorConstants.purpleColor
+                              ),
                             ),
                             trailing: selectedTab == 0
                                 ? ElevatedButton(
@@ -272,8 +284,8 @@ class _LeaderboardPageState extends State<LeaderboardPage> {
                                           },
                                     style: ElevatedButton.styleFrom(
                                       backgroundColor: isFriend(user)
-                                          ? Colors.green
-                                          : Colors.grey,
+                                          ? ColorConstants.greenColor
+                                          : Colors.grey.withValues(alpha: 0.3),
                                       shape: const CircleBorder(),
                                       padding: const EdgeInsets.all(8),
                                     ),
@@ -281,7 +293,9 @@ class _LeaderboardPageState extends State<LeaderboardPage> {
                                       isFriend(user)
                                           ? Icons.check
                                           : Icons.person_add_alt,
-                                      color: Colors.white,
+                                      color: isFriend(user)
+                                          ? ColorConstants.greenColor
+                                          : ColorConstants.white,
                                       size: 22,
                                     ),
                                   )
@@ -304,26 +318,50 @@ class _LeaderboardPageState extends State<LeaderboardPage> {
           context: context,
           builder: (BuildContext context) {
             return AlertDialog(
-              title: Text(user.username),
+              backgroundColor: ColorConstants.secoundaryColor.withValues(alpha: 0.9),
+              title: Center(
+                child: Text(
+                  user.username,
+                  style: const TextStyle(color: ColorConstants.white),
+                ),
+              ),
               content: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Text('Rocketpoints: ${user.rocketPoints}'),
-                  Text('Signed up: 01.01.2023'), // Example date
-                  Text('Status: Not a friend'),
+                  Text(
+                      'Rocketpoints: ${user.rocketPoints}',
+                      style: const TextStyle(color: ColorConstants.white),
+                  ),
                   IconButton(
-                    icon: const Icon(Icons.person_add_alt, color: Colors.black),
-                    onPressed: () {
+                    icon: Icon(
+                      isFriend(user)
+                          ? Icons.check
+                          : Icons.person_add_alt,
+                      color: isFriend(user)
+                          ? ColorConstants.greenColor
+                          : ColorConstants.white,
+                    ),
+                    onPressed: isFriend(user)
+                        ? null
+                        : () async {
                       addFriend(user);
+                      Navigator.of(context).pop();
                     },
                   ),
                 ],
               ),
               actions: [
-                TextButton(
+                ElevatedButton(
                   onPressed: () {
                     Navigator.of(context).pop();
                   },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: ColorConstants.purpleColor,
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
                   child: const Text('Okay'),
                 ),
               ],
@@ -335,12 +373,12 @@ class _LeaderboardPageState extends State<LeaderboardPage> {
         width: size,
         height: size,
         decoration: BoxDecoration(
-          border: Border.all(color: Colors.black),
+          border: Border.all(color: ColorConstants.purpleColor.withValues(alpha: 0.3)),
           color: color,
           shape: BoxShape.circle,
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.08),
+              color: Colors.black.withValues(alpha: 0.08),
               blurRadius: 6,
               offset: const Offset(0, 3),
             ),
@@ -357,7 +395,7 @@ class _LeaderboardPageState extends State<LeaderboardPage> {
                   : user.username,
               style: const TextStyle(
                 color: Colors.black,
-                fontSize: 12,
+                fontSize: 14,
                 fontWeight: FontWeight.bold,
               ),
               textAlign: TextAlign.center,
@@ -392,13 +430,17 @@ class _PodiumSpot extends StatelessWidget {
         const SizedBox(height: 8),
         Text(
           place,
-          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+          style: const TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 18,
+              color: ColorConstants.white,
+          ),
         ),
         Text(
           '$points RP',
           style: const TextStyle(
-            color: Colors.black87,
-            fontSize: 13,
+            color: ColorConstants.purpleColor,
+            fontSize: 15,
             fontWeight: FontWeight.w500,
           ),
         ),
