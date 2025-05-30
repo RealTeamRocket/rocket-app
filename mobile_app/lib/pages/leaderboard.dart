@@ -255,7 +255,7 @@ class _LeaderboardPageState extends State<LeaderboardPage> {
                             leading: Text(
                               '${displayedUsers.length < 3 ? index + 1 : index + 4}.',
                               style: const TextStyle(
-                                fontSize: 16,
+                                fontSize: 18,
                                 fontWeight: FontWeight.bold,
                                 color: ColorConstants.white,
                               ),
@@ -263,7 +263,7 @@ class _LeaderboardPageState extends State<LeaderboardPage> {
                             title: Text(
                               user.username,
                               style: const TextStyle(
-                                fontSize: 14,
+                                fontSize: 16,
                                 fontWeight: FontWeight.bold,
                                 color: ColorConstants.white,
                               ),
@@ -271,7 +271,7 @@ class _LeaderboardPageState extends State<LeaderboardPage> {
                             subtitle: Text(
                               'Rocketpoints: ${user.rocketPoints}',
                               style: const TextStyle(
-                                  fontSize: 12,
+                                  fontSize: 14,
                                   color: ColorConstants.purpleColor
                               ),
                             ),
@@ -393,7 +393,7 @@ class _LeaderboardPageState extends State<LeaderboardPage> {
                   : user.username,
               style: const TextStyle(
                 color: Colors.black,
-                fontSize: 12,
+                fontSize: 14,
                 fontWeight: FontWeight.bold,
               ),
               textAlign: TextAlign.center,
@@ -430,7 +430,7 @@ class _PodiumSpot extends StatelessWidget {
           place,
           style: const TextStyle(
               fontWeight: FontWeight.bold,
-              fontSize: 15,
+              fontSize: 18,
               color: ColorConstants.white,
           ),
         ),
@@ -438,7 +438,7 @@ class _PodiumSpot extends StatelessWidget {
           '$points RP',
           style: const TextStyle(
             color: ColorConstants.purpleColor,
-            fontSize: 13,
+            fontSize: 15,
             fontWeight: FontWeight.w500,
           ),
         ),
