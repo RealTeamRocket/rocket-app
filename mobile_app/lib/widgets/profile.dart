@@ -41,6 +41,29 @@ class _ProfileState extends State<Profile> {
     }
   }
 
+  void _showImageDialog(Uint8List imageData) {
+    showDialog(
+      context: context,
+      builder: (context) => Dialog(
+        backgroundColor: Colors.transparent,
+        child: GestureDetector(
+          onTap: () => Navigator.of(context).pop(),
+          child: Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(16),
+              color: Colors.black.withOpacity(0.8),
+            ),
+            padding: const EdgeInsets.all(16),
+            child: Image.memory(
+              imageData,
+              fit: BoxFit.contain,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -57,18 +80,32 @@ class _ProfileState extends State<Profile> {
                   backgroundColor: Colors.grey,
                   child: CircularProgressIndicator(),
                 );
-              } else if (snapshot.hasError || snapshot.data == null || snapshot.data!.data == null) {
-                return const CircleAvatar(
-                  radius: 50,
-                  backgroundColor: Colors.grey,
-                );
-              } else {
-                // If the image is successfully fetched and not null, display it
-                final userImage = snapshot.data!;
-                final imageData = base64Decode(userImage.data!);
+              } else if (snapshot.hasError || snapshot.data == null || snapshot.data!.data == null || snapshot.data!.data!.isEmpty) {
+                // Show first letter of username if available
+                final username = (snapshot.data != null && snapshot.data!.username.isNotEmpty)
+                    ? snapshot.data!.username[0].toUpperCase()
+                    : '';
                 return CircleAvatar(
                   radius: 50,
-                  backgroundImage: MemoryImage(Uint8List.fromList(imageData)),
+                  backgroundColor: Colors.grey,
+                  child: Text(
+                    username,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 36,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                );
+              } else {
+                final userImage = snapshot.data!;
+                final imageData = base64Decode(userImage.data!);
+                return GestureDetector(
+                  onTap: () => _showImageDialog(Uint8List.fromList(imageData)),
+                  child: CircleAvatar(
+                    radius: 50,
+                    backgroundImage: MemoryImage(Uint8List.fromList(imageData)),
+                  ),
                 );
               }
             },
@@ -96,7 +133,6 @@ class _ProfileState extends State<Profile> {
                   ),
                 );
               } else {
-                // Display the username
                 final username = snapshot.data!.username;
                 return Text(
                   username,

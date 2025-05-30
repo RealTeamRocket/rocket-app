@@ -163,7 +163,7 @@ class MyTaskHandler extends TaskHandler {
 
     await prefs.setInt('currentSteps', _stepsToday);
     FlutterForegroundTask.updateService(
-      notificationTitle: 'Schritte heute',
+      notificationTitle: 'Steps Today',
       notificationText: '$_stepsToday',
     );
 

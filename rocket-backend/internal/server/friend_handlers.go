@@ -67,15 +67,13 @@ func (s *Server) DeleteFriendHandler(c *gin.Context) {
 		return
 	}
 
-	var friendName struct {
-		FriendName string `json:"friend_name"`
-	}
-	if err := c.ShouldBindJSON(&friendName); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request body"})
+	friendName := c.Param("name")
+	if friendName == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "friend_name is required"})
 		return
 	}
 
-	friendID, err := s.db.GetUserIDByName(friendName.FriendName)
+	friendID, err := s.db.GetUserIDByName(friendName)
 	if err != nil {
 		if errors.Is(err, custom_error.ErrUserNotFound) {
 			c.JSON(http.StatusNotFound, gin.H{"error": "Friend not found"})

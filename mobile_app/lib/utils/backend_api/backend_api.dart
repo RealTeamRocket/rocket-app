@@ -7,6 +7,6 @@ export 'register_api.dart';
 export 'ranking_api.dart';
 export 'friends_api.dart';
 export 'settings_api.dart';
-export 'tracking_api.dart';
+export 'run_api.dart';
 export 'rocketpoints_api.dart';
 export 'user_api.dart';
