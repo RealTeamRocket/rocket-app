@@ -6,7 +6,7 @@ import 'package:flutter_osm_plugin/flutter_osm_plugin.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:mobile_app/pages/pages.dart';
 
-import '../utils/backend_api/tracking_api.dart';
+import '../utils/backend_api/backend_api.dart';
 import 'route.dart';
 
 class TrackingPage extends StatefulWidget {
@@ -306,91 +306,137 @@ class _TrackingPageState extends State<TrackingPage> {
                       _runs.isEmpty
                           ? Text("No runs found.")
                           : ListView.builder(
-                            itemCount: _runs.length,
-                            itemBuilder: (context, index) {
-                              final run = _runs[index];
-                              return Card(
-                                margin: const EdgeInsets.symmetric(
-                                  vertical: 6,
-                                  horizontal: 2,
-                                ),
-                                elevation: 2,
-                                child: ListTile(
-                                  contentPadding: const EdgeInsets.symmetric(
-                                    vertical: 8,
-                                    horizontal: 16,
+                              itemCount: _runs.length,
+                              itemBuilder: (context, index) {
+                                final run = _runs[index];
+                                return Dismissible(
+                                  key: Key(run.id),
+                                  direction: DismissDirection.endToStart,
+                                  background: Container(
+                                    color: Colors.red,
+                                    alignment: Alignment.centerRight,
+                                    padding: EdgeInsets.symmetric(horizontal: 20),
+                                    child: Icon(Icons.delete, color: Colors.white),
                                   ),
-                                  leading: Icon(
-                                    Icons.directions_run,
-                                    color: Colors.blueAccent,
-                                    size: 32,
-                                  ),
-                                  title: Row(
-                                    children: [
-                                      Icon(
-                                        Icons.route,
-                                        size: 18,
-                                        color: Colors.grey[700],
-                                      ),
-                                      SizedBox(width: 6),
-                                      Text(
-                                        "${run.distance.toStringAsFixed(2)} km",
-                                      ),
-                                    ],
-                                  ),
-                                  subtitle: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Row(
-                                        children: [
-                                          Icon(
-                                            Icons.calendar_today,
-                                            size: 16,
-                                            color: Colors.grey[600],
+                                  confirmDismiss: (direction) async {
+                                    return await showDialog(
+                                      context: context,
+                                      builder: (context) => AlertDialog(
+                                        title: Text('Delete Run'),
+                                        content: Text('Are you sure you want to delete this run?'),
+                                        actions: [
+                                          TextButton(
+                                            onPressed: () => Navigator.of(context).pop(false),
+                                            child: Text('Cancel'),
                                           ),
-                                          SizedBox(width: 4),
-                                          Text(_formatDate(run.createdAt)),
+                                          TextButton(
+                                            onPressed: () => Navigator.of(context).pop(true),
+                                            child: Text('Delete'),
+                                          ),
                                         ],
                                       ),
-                                      SizedBox(height: 2),
-                                      Row(
+                                    );
+                                  },
+                                  onDismissed: (direction) async {
+                                    final storage = FlutterSecureStorage();
+                                    final jwt = await storage.read(key: 'jwt_token');
+                                    try {
+                                      await TrackingApi.deleteRun(jwt!, run.id);
+                                      setState(() {
+                                        _runs.removeAt(index);
+                                      });
+                                      ScaffoldMessenger.of(context).showSnackBar(
+                                        SnackBar(content: Text("Run deleted.")),
+                                      );
+                                    } catch (e) {
+                                      ScaffoldMessenger.of(context).showSnackBar(
+                                        SnackBar(content: Text("Failed to delete run: $e")),
+                                      );
+                                    }
+                                  },
+                                  child: Card(
+                                    margin: const EdgeInsets.symmetric(
+                                      vertical: 6,
+                                      horizontal: 2,
+                                    ),
+                                    elevation: 2,
+                                    child: ListTile(
+                                      contentPadding: const EdgeInsets.symmetric(
+                                        vertical: 8,
+                                        horizontal: 16,
+                                      ),
+                                      leading: Icon(
+                                        Icons.directions_run,
+                                        color: Colors.blueAccent,
+                                        size: 32,
+                                      ),
+                                      title: Row(
                                         children: [
                                           Icon(
-                                            Icons.timer,
+                                            Icons.route,
                                             size: 18,
                                             color: Colors.grey[700],
                                           ),
                                           SizedBox(width: 6),
-                                          Text(run.duration),
+                                          Text(
+                                            "${run.distance.toStringAsFixed(2)} km",
+                                          ),
                                         ],
                                       ),
-                                    ],
-                                  ),
-                                  trailing: Icon(
-                                    Icons.chevron_right,
-                                    color: Colors.grey[600],
-                                  ),
-                                  onTap: () {
-                                    final geoPoints = parseLineString(
-                                      run.route,
-                                    );
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder:
-                                            (context) => RoutePage(
-                                              title: _formatDate(run.createdAt),
-                                              routePoints: geoPoints,
-                                              elapsedTime: run.duration,
-                                            ),
+                                      subtitle: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Row(
+                                            children: [
+                                              Icon(
+                                                Icons.calendar_today,
+                                                size: 16,
+                                                color: Colors.grey[600],
+                                              ),
+                                              SizedBox(width: 4),
+                                              Text(_formatDate(run.createdAt)),
+                                            ],
+                                          ),
+                                          SizedBox(height: 2),
+                                          Row(
+                                            children: [
+                                              Icon(
+                                                Icons.timer,
+                                                size: 18,
+                                                color: Colors.grey[700],
+                                              ),
+                                              SizedBox(width: 6),
+                                              Text(run.duration),
+                                            ],
+                                          ),
+                                        ],
                                       ),
-                                    );
-                                  },
-                                ),
-                              );
-                            },
-                          ),
+                                      trailing: Icon(
+                                        Icons.chevron_right,
+                                        color: Colors.grey[600],
+                                      ),
+                                      onTap: () {
+                                        final geoPoints = parseLineString(
+                                          run.route,
+                                        );
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder:
+                                                (context) => RoutePage(
+                                                  title: _formatDate(run.createdAt),
+                                                  routePoints: geoPoints,
+                                                  elapsedTime: run.duration,
+                                                ),
+                                          ),
+                                        );
+                                      },
+                                    ),
+                                  ),
+                                );
+                              },
+                            ),
                 ),
           ],
         ),

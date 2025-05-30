@@ -41,3 +41,15 @@ func (s *service) GetAllRunsByUser(userID uuid.UUID) ([]types.RunDTO, error) {
     }
     return runs, nil
 }
+
+func (s *service) DeleteRun(runID uuid.UUID) error {
+	query := `
+		DELETE FROM runs
+		WHERE id = $1
+	`
+	_, err := s.db.Exec(query, runID)
+	if err != nil {
+		return err
+	}
+	return nil
+}

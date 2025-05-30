@@ -47,10 +47,11 @@ func (s *Server) RegisterRoutes() http.Handler {
 
 			protected.GET("/friends", s.GetAllFriendsHandler)
 			protected.POST("/friends/add", s.AddFriendHandler)
-			protected.DELETE("/friends/delete", s.DeleteFriendHandler)
+			protected.DELETE("/friends/:name", s.DeleteFriendHandler)
 
 			protected.POST("/runs", s.UploadRunHandler)
 			protected.GET("/runs", s.GetAllRunsHandler)
+			protected.DELETE("/runs/:id", s.DeleteRunHandler)
 		}
 	}
 

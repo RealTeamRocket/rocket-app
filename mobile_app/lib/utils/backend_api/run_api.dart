@@ -56,4 +56,14 @@ class TrackingApi {
     final List<dynamic> data = jsonDecode(response.body);
     return data.map((json) => RunModel.fromJson(json)).toList();
   }
+
+  static Future<void> deleteRun(String jwt, String runId) async {
+    final response = await BaseApi.delete(
+      '/api/v1/protected/runs/$runId',
+      headers: {'Authorization': 'Bearer $jwt'},
+    );
+    if (response.statusCode != 200) {
+      throw Exception('Failed to delete run');
+    }
+  }
 }

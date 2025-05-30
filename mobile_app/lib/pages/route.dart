@@ -108,7 +108,7 @@ class _RoutePageState extends State<RoutePage> {
                             _routePoints[i + 1],
                             roadType: RoadType.foot,
                             roadOption: RoadOption(
-                              roadColor: Colors.yellow,
+                              roadColor: Colors.red,
                               roadWidth: 8,
                             ),
                           );
