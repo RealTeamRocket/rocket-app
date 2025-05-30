@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 import '../constants/color_constants.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
@@ -173,26 +175,31 @@ class _FriendlistPageState extends State<FriendlistPage>
         ),
         child: Row(
           children: [
-            CircleAvatar(
-              radius: 28,
-              backgroundColor: friend.imageData == null || friend.imageData!.isEmpty
-                  ? Colors.grey
+            GestureDetector(
+              onTap: friend.imageData != null && friend.imageData!.isNotEmpty
+                  ? () => _showImageDialog(friend.imageData!)
                   : null,
-              backgroundImage: friend.imageData != null && friend.imageData!.isNotEmpty
-                  ? MemoryImage(friend.imageData!)
-                  : null,
-              child: (friend.imageData == null || friend.imageData!.isEmpty)
-                  ? Text(
-                      friend.username.isNotEmpty
-                          ? friend.username[0].toUpperCase()
-                          : '',
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    )
-                  : null,
+              child: CircleAvatar(
+                radius: 28,
+                backgroundColor: friend.imageData == null || friend.imageData!.isEmpty
+                    ? Colors.grey
+                    : null,
+                backgroundImage: friend.imageData != null && friend.imageData!.isNotEmpty
+                    ? MemoryImage(friend.imageData!)
+                    : null,
+                child: (friend.imageData == null || friend.imageData!.isEmpty)
+                    ? Text(
+                        friend.username.isNotEmpty
+                            ? friend.username[0].toUpperCase()
+                            : '',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      )
+                    : null,
+              ),
             ),
             const SizedBox(width: 16),
             Expanded(
@@ -238,26 +245,31 @@ class _FriendlistPageState extends State<FriendlistPage>
       ),
       child: Row(
         children: [
-          CircleAvatar(
-            radius: 28,
-            backgroundColor: user.imageData == null || user.imageData!.isEmpty
-                ? Colors.grey
+          GestureDetector(
+            onTap: user.imageData != null && user.imageData!.isNotEmpty
+                ? () => _showImageDialog(user.imageData!)
                 : null,
-            backgroundImage: user.imageData != null && user.imageData!.isNotEmpty
-                ? MemoryImage(user.imageData!)
-                : null,
-            child: (user.imageData == null || user.imageData!.isEmpty)
-                ? Text(
-                    user.username.isNotEmpty
-                        ? user.username[0].toUpperCase()
-                        : '',
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  )
-                : null,
+            child: CircleAvatar(
+              radius: 28,
+              backgroundColor: user.imageData == null || user.imageData!.isEmpty
+                  ? Colors.grey
+                  : null,
+              backgroundImage: user.imageData != null && user.imageData!.isNotEmpty
+                  ? MemoryImage(user.imageData!)
+                  : null,
+              child: (user.imageData == null || user.imageData!.isEmpty)
+                  ? Text(
+                      user.username.isNotEmpty
+                          ? user.username[0].toUpperCase()
+                          : '',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    )
+                  : null,
+            ),
           ),
           const SizedBox(width: 16),
           Expanded(
@@ -342,5 +354,28 @@ class _FriendlistPageState extends State<FriendlistPage>
       _overlayEntry?.remove();
       _overlayEntry = null;
     });
+  }
+
+  void _showImageDialog(Uint8List imageData) {
+    showDialog(
+      context: context,
+      builder: (context) => Dialog(
+        backgroundColor: Colors.transparent,
+        child: GestureDetector(
+          onTap: () => Navigator.of(context).pop(),
+          child: Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(16),
+              color: Colors.black.withOpacity(0.8),
+            ),
+            padding: const EdgeInsets.all(16),
+            child: Image.memory(
+              imageData,
+              fit: BoxFit.contain,
+            ),
+          ),
+        ),
+      ),
+    );
   }
 }
