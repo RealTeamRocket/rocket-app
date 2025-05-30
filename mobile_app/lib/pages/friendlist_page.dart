@@ -181,6 +181,18 @@ class _FriendlistPageState extends State<FriendlistPage>
               backgroundImage: friend.imageData != null && friend.imageData!.isNotEmpty
                   ? MemoryImage(friend.imageData!)
                   : null,
+              child: (friend.imageData == null || friend.imageData!.isEmpty)
+                  ? Text(
+                      friend.username.isNotEmpty
+                          ? friend.username[0].toUpperCase()
+                          : '',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    )
+                  : null,
             ),
             const SizedBox(width: 16),
             Expanded(
@@ -233,6 +245,18 @@ class _FriendlistPageState extends State<FriendlistPage>
                 : null,
             backgroundImage: user.imageData != null && user.imageData!.isNotEmpty
                 ? MemoryImage(user.imageData!)
+                : null,
+            child: (user.imageData == null || user.imageData!.isEmpty)
+                ? Text(
+                    user.username.isNotEmpty
+                        ? user.username[0].toUpperCase()
+                        : '',
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  )
                 : null,
           ),
           const SizedBox(width: 16),

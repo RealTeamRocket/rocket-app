@@ -80,10 +80,22 @@ class _ProfileState extends State<Profile> {
                   backgroundColor: Colors.grey,
                   child: CircularProgressIndicator(),
                 );
-              } else if (snapshot.hasError || snapshot.data == null || snapshot.data!.data == null) {
-                return const CircleAvatar(
+              } else if (snapshot.hasError || snapshot.data == null || snapshot.data!.data == null || snapshot.data!.data!.isEmpty) {
+                // Show first letter of username if available
+                final username = (snapshot.data != null && snapshot.data!.username.isNotEmpty)
+                    ? snapshot.data!.username[0].toUpperCase()
+                    : '';
+                return CircleAvatar(
                   radius: 50,
                   backgroundColor: Colors.grey,
+                  child: Text(
+                    username,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 36,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
                 );
               } else {
                 final userImage = snapshot.data!;
