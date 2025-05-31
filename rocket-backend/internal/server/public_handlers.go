@@ -123,3 +123,8 @@ func (s *Server) RegisterHandler(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{"message": "User registered successfully"})
 }
+
+func (s *Server) LogoutHandler(c *gin.Context) {
+	c.SetCookie("jwt_token", "", -1, "/", "", true, true)
+	c.JSON(http.StatusOK, gin.H{"message": "Logged out successfully"})
+}
