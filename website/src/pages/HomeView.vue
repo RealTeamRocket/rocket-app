@@ -1,6 +1,6 @@
 <template>
-  <div class="container mt-5 text-center">
     <Navbar />
+  <div class="container mt-5 text-center">
     <div v-if="!isLoggedIn">
       <h1>Welcome to Rocket App</h1>
       <p>Track your steps, reach your goals, and blast off to a healthier you!</p>
