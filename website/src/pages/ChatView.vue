@@ -1,6 +1,6 @@
 <template>
+  <Navbar />
   <div class="container mt-5 text-center">
-    <Navbar />
     <h2>Rocket App Chat</h2>
     <p>Welcome to the chat! 🚀</p>
   </div>

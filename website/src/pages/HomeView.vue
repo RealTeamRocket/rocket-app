@@ -7,21 +7,36 @@
     </div>
     <div class="dashboard-main">
       <div class="dashboard-left">
-        <StatsCards :stats="stats" />
-        <StepChart :data="chartData" />
+        <template v-if="isLoggedIn">
+          <StatsCards :stats="stats" />
+          <StepChart :data="chartData" />
+        </template>
+        <template v-else>
+          <div class="skeleton-card" />
+          <div class="skeleton-chart" />
+        </template>
       </div>
       <div class="dashboard-right">
-        <ActivityPanel />
+        <template v-if="isLoggedIn">
+          <ActivityPanel />
+        </template>
+        <template v-else>
+          <div class="skeleton-panel" />
+        </template>
       </div>
     </div>
   </div>
 </template>
+
 
 <script setup lang="ts">
 import Navbar from '../components/Navbar.vue'
 import StatsCards from '../components/StatsCards.vue'
 import StepChart from '../components/StepChart.vue'
 import ActivityPanel from '../components/ActivityPanel.vue'
+import { useAuth } from '../utils/useAuth'
+
+const { isLoggedIn } = useAuth()
 
 const stats = {
   totalSteps: 56000,
@@ -54,5 +69,28 @@ const chartData = [7000, 8000, 9000, 10000, 12000, 8000, 7000]
 }
 .dashboard-right {
   flex: 1;
+}
+
+.skeleton-card,
+.skeleton-chart,
+.skeleton-panel {
+  background: #e5e7eb;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  animation: pulse 1.5s infinite;
+}
+.skeleton-card {
+  height: 120px;
+}
+.skeleton-chart {
+  height: 240px;
+}
+.skeleton-panel {
+  height: 400px;
+}
+@keyframes pulse {
+  0% { opacity: 1; }
+  50% { opacity: 0.5; }
+  100% { opacity: 1; }
 }
 </style>

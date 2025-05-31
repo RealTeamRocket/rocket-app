@@ -11,8 +11,8 @@
       </div>
       <div class="navbar-right">
         <template v-if="!isLoggedIn">
-          <router-link to="/login" class="custom-btn custom-btn-outline">Login</router-link>
-          <router-link to="/register" class="custom-btn custom-btn-primary">Register</router-link>
+          <router-link to="/login" class="nav-auth-btn nav-auth-login">Login</router-link>
+          <router-link to="/register" class="nav-auth-btn nav-auth-register">Register</router-link>
         </template>
         <template v-else>
           <div class="user-info dropdown" @click="toggleDropdown" @blur="closeDropdown" tabindex="0">
@@ -80,14 +80,14 @@ onMounted(() => {
   display: flex;
   align-items: center;
   gap: 1.5rem;
-  padding-left: 2rem;  /* Add left padding */
+  padding-left: 2rem;
 }
 
 .navbar-right {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  padding-right: 2rem; /* Add right padding */
+  padding-right: 2rem;
 }
 
 .navbar-brand {
@@ -168,24 +168,44 @@ onMounted(() => {
   margin-left: 0.2rem;
 }
 
-.btn-outline-light {
-  border-color: #fff;
-  color: #fff;
+.nav-auth-btn {
+  padding: 0.35rem 1.1rem;
+  border-radius: 6px;
+  font-size: 1rem;
+  font-weight: 500;
+  border: none;
+  outline: none;
+  text-decoration: none;
+  transition: background 0.18s, color 0.18s, border 0.18s;
+  margin-left: 0.3rem;
+  margin-right: 0.3rem;
+  cursor: pointer;
+  display: inline-block;
 }
 
-.btn-outline-light:hover {
+.nav-auth-login {
+  background: transparent;
+  color: #fff;
+  border: 1.5px solid #fff;
+}
+
+.nav-auth-login:hover {
   background: #fff;
   color: #1e3c72;
+  border-color: #fff;
+  text-decoration: none;
 }
 
-.btn-primary {
+.nav-auth-register {
   background: #ffb347;
-  border: none;
   color: #1e3c72;
+  border: 1.5px solid #ffb347;
 }
 
-.btn-primary:hover {
+.nav-auth-register:hover {
   background: #ffd580;
   color: #1e3c72;
+  border-color: #ffd580;
+  text-decoration: none;
 }
 </style>

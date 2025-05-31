@@ -21,7 +21,6 @@ const routes = [
   { path: '/:pathMatch(.*)*', redirect: '/' }
 ]
 
-
 const router = createRouter({
   history: createWebHistory(),
   routes,
@@ -29,7 +28,7 @@ const router = createRouter({
 
 router.beforeEach((to, from, next) => {
   const { isLoggedIn } = useAuth()
-  const publicPages = ['/login', '/register']
+  const publicPages = ['/', '/login', '/register']
   const authRequired = !publicPages.includes(to.path)
   if (authRequired && !isLoggedIn.value) {
     return next('/login')

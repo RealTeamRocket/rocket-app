@@ -1,5 +1,5 @@
-```rocket-app/website/src/pages/FriendlistView.vue#L1-15
 <template>
+  <Navbar />
   <div class="friendlist-page">
     <h1>Friendlist</h1>
     <p>This is a placeholder for the Friendlist page.</p>
@@ -7,7 +7,7 @@
 </template>
 
 <script setup lang="ts">
-// Add logic for Friendlist page here in the future
+import Navbar from '../components/Navbar.vue'
 </script>
 
 <style scoped>
@@ -15,4 +15,3 @@
   padding: 2rem;
 }
 </style>
-```

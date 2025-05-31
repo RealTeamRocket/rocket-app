@@ -1,5 +1,5 @@
-```rocket-app/website/src/pages/HighscoreView.vue#L1-15
 <template>
+  <Navbar />
   <div class="highscore-page">
     <h1>Highscore</h1>
     <p>This is the Highscore page. Here you will see the top scores and rankings.</p>
@@ -7,7 +7,7 @@
 </template>
 
 <script setup lang="ts">
-// Placeholder for Highscore logic
+import Navbar from '../components/Navbar.vue'
 </script>
 
 <style scoped>
@@ -15,4 +15,3 @@
   padding: 2rem;
 }
 </style>
-```
