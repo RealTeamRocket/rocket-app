@@ -25,5 +25,11 @@ export default {
   logout(): Promise<AxiosResponse> {
     console.log("Logging out")
     return publicAxiosApi.post('/logout', {}, { withCredentials: true })
+  },
+
+  getUserStatistics(id?: string): Promise<AxiosResponse> {
+    const data = id ? { id } : {};
+    const config = { withCredentials: true };
+    return protectedAxiosApi.post('/user/statistics', data, config);
   }
 }

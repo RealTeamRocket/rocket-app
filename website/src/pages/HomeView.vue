@@ -9,7 +9,7 @@
       <div class="dashboard-left">
         <template v-if="isLoggedIn">
           <StatsCards :stats="stats" />
-          <StepChart :data="chartData" />
+          <StepChart :data="chartData" :labels="chartLabels"/>
         </template>
         <template v-else>
           <div class="skeleton-card" />
@@ -28,23 +28,66 @@
   </div>
 </template>
 
-
 <script setup lang="ts">
+import { ref, onMounted, watch } from 'vue'
 import Navbar from '../components/Navbar.vue'
 import StatsCards from '../components/StatsCards.vue'
 import StepChart from '../components/StepChart.vue'
 import ActivityPanel from '../components/ActivityPanel.vue'
 import { useAuth } from '../utils/useAuth'
+import api from '../api/backend-api'
+
+type StepStatistic = {
+  day: string
+  steps: number
+}
 
 const { isLoggedIn } = useAuth()
 
-const stats = {
-  totalSteps: 56000,
-  avgSteps: 8000,
-  bestDay: 'Wednesday',
-  bestSteps: 12000
+const stats = ref({
+  totalSteps: 0,
+  avgSteps: 0,
+  bestDay: '',
+  bestSteps: 0
+})
+const chartData = ref<number[]>([])
+const chartLabels = ref<string[]>([])
+
+const fetchStats = async () => {
+  try {
+    const res = await api.getUserStatistics()
+    const dailyStats: StepStatistic[] = res.data // or res.data.daily_steps if wrapped
+
+    // Calculate stats
+    const totalSteps = dailyStats.reduce((sum, s) => sum + s.steps, 0)
+    const avgSteps = Math.round(totalSteps / dailyStats.length)
+    const best = dailyStats.reduce(
+      (prev, curr) => (curr.steps > prev.steps ? curr : prev),
+      dailyStats[0]
+    )
+
+    stats.value = {
+      totalSteps,
+      avgSteps,
+      bestDay: best.day,
+      bestSteps: best.steps
+    }
+    chartData.value = dailyStats.map((s) => s.steps)
+    chartLabels.value = dailyStats.map((s) => s.day) // <-- dynamic labels
+  } catch (e) {
+    // Optionally handle error
+    stats.value = { totalSteps: 0, avgSteps: 0, bestDay: '', bestSteps: 0 }
+    chartData.value = []
+    chartLabels.value = []
+  }
 }
-const chartData = [7000, 8000, 9000, 10000, 12000, 8000, 7000]
+
+onMounted(() => {
+  if (isLoggedIn.value) fetchStats()
+})
+watch(isLoggedIn, (val) => {
+  if (val) fetchStats()
+})
 </script>
 
 <style scoped>
@@ -89,8 +132,14 @@ const chartData = [7000, 8000, 9000, 10000, 12000, 8000, 7000]
   height: 400px;
 }
 @keyframes pulse {
-  0% { opacity: 1; }
-  50% { opacity: 0.5; }
-  100% { opacity: 1; }
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+  100% {
+    opacity: 1;
+  }
 }
 </style>

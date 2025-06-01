@@ -11,14 +11,11 @@ import Chart from 'chart.js/auto'
 
 const props = defineProps<{
   data: number[]
+  labels: string[]
 }>()
 
 const chartRef = ref<HTMLCanvasElement | null>(null)
 let chartInstance: any = null
-
-const labels = [
-  'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'
-]
 
 const renderChart = () => {
   if (chartInstance) {
@@ -29,7 +26,7 @@ const renderChart = () => {
   chartInstance = new Chart(chartRef.value, {
     type: 'bar',
     data: {
-      labels,
+      labels: props.labels,
       datasets: [
         {
           label: 'Steps',
