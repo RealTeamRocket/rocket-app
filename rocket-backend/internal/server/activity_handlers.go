@@ -26,5 +26,10 @@ func (s *Server) GetActivityHandler(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"activities": activities})
+	user, err := s.db.GetUserByID(userUUID)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch user data"})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"username": user.Username ,"activities": activities})
 }

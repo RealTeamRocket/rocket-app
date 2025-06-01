@@ -68,10 +68,10 @@ const activities = ref<Activity[]>([])
 onMounted(async () => {
   try {
     const res = await api.getActivityFeed()
+    const username = res.data.username
     const backendActivities: BackendActivity[] = res.data.activities
-    console.log('Fetched activities:', backendActivities)
     activities.value = backendActivities.map(act => ({
-      name: act.name,
+      name: act.name === 'You' ? username : act.name,
       initials: getInitials(act.name),
       color: getColor(act.name),
       description: act.message,
@@ -112,7 +112,14 @@ onMounted(async () => {
   gap: 1rem;
   padding: 0.75rem 0;
   border-bottom: 1px solid #f4f8fb;
-  transition: background 0.2s;
+  transition: background 0.2s, box-shadow 0.2s;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.activity-item:hover {
+  background: #f0f4fa;
+  box-shadow: 0 2px 8px rgba(42, 82, 152, 0.04);
 }
 
 .activity-item:last-child {
@@ -120,7 +127,22 @@ onMounted(async () => {
 }
 
 .activity-item.user-activity {
-  background: #f4f8fb;
+  background: #eaf3ff;
+  position: relative;
+}
+
+.activity-item.user-activity::after {
+  content: "You";
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: #2a5298;
+  color: #fff;
+  font-size: 0.7rem;
+  padding: 0.15rem 0.5rem;
+  border-radius: 8px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
 }
 
 .avatar {
