@@ -1,6 +1,7 @@
 package server
 
 import (
+	"fmt"
 	"net/http"
 
 	"rocket-backend/internal/types"
@@ -33,6 +34,9 @@ func (s *Server) UploadRunHandler(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to save run"})
 		return
 	}
+
+	message := "Completed a " + fmt.Sprintf("%.2f", runData.Distance) + " km run in " + fmt.Sprintf("%.2f", runData.Duration) + " minutes"
+	err = s.db.SaveActivity(userUUID, message)
 
 	c.JSON(http.StatusOK, gin.H{"message": "Run data uploaded successfully"})
 }

@@ -68,6 +68,7 @@ type Service interface {
 	CompleteChallenge(UserID uuid.UUID, dto types.CompleteChallengesDTO) error
 	IsNewDayForUser(userID uuid.UUID) (bool, error)
 	CleanUpChallengesForUser(userID uuid.UUID) error
+	GetChallengeByID(challengeID uuid.UUID) (*types.Challenge, error)
 
 	// friends
 	AddFriend(userID, friendID uuid.UUID) error
@@ -79,6 +80,10 @@ type Service interface {
 	SaveRun(userID uuid.UUID, route string, duration string, distance float64) error
 	GetAllRunsByUser(userID uuid.UUID) ([]types.RunDTO, error)
 	DeleteRun(runID uuid.UUID) error
+
+	// activities
+	SaveActivity(userID uuid.UUID, message string) error
+	GetActivitiesForUserAndFriends(userID uuid.UUID) ([]types.ActivityWithUser, error)
 }
 
 type service struct {

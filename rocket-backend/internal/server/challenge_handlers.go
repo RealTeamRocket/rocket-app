@@ -83,5 +83,15 @@ func (s *Server) CompleteChallengeHandler(c *gin.Context) {
 		return
 	}
 
+	// save activity
+	challenge, err := s.db.GetChallengeByID(pointsDTO.ChallengeID)
+	if err != nil {
+		challenge.Text = "Unknown challenge"
+	}
+
+	message := "Completed a daily challenge: " + challenge.Text
+	err = s.db.SaveActivity(userUUID, message)
+
+
 	c.JSON(http.StatusOK, gin.H{"message": "Challenge completed successfully"})
 }
