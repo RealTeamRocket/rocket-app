@@ -20,12 +20,6 @@
 import { ref, onMounted } from 'vue'
 import api from '../api/backend-api'
 
-interface BackendActivity {
-  name: string
-  time: string
-  message: string
-}
-
 interface Activity {
   name: string
   initials: string
@@ -35,7 +29,6 @@ interface Activity {
   isUser?: boolean
 }
 
-// Utility: Get initials (first two letters, or "YO" for "You")
 function getInitials(name: string) {
   if (name === 'You') return 'YO'
   const parts = name.split(' ')
@@ -69,7 +62,7 @@ onMounted(async () => {
   try {
     const { username, activities: backendActivities } = (await api.getActivityFeed()).data
     activities.value = backendActivities.map(({ name, time, message }) => {
-      const displayName = name === 'You' ? username : name
+      const displayName = name === 'You' ? username: name
       return {
         name: displayName,
         initials: getInitials(displayName),
