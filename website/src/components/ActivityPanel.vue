@@ -67,18 +67,19 @@ const activities = ref<Activity[]>([])
 
 onMounted(async () => {
   try {
-    const res = await api.getActivityFeed()
-    const username = res.data.username
-    const backendActivities: BackendActivity[] = res.data.activities
-    activities.value = backendActivities.map(act => ({
-      name: act.name === 'You' ? username : act.name,
-      initials: getInitials(act.name),
-      color: getColor(act.name),
-      description: act.message,
-      time: formatRelativeTime(act.time),
-      isUser: act.name === 'You'
-    }))
-  } catch (e) {
+    const { username, activities: backendActivities } = (await api.getActivityFeed()).data
+    activities.value = backendActivities.map(({ name, time, message }) => {
+      const displayName = name === 'You' ? username : name
+      return {
+        name: displayName,
+        initials: getInitials(displayName),
+        color: getColor(displayName),
+        description: message,
+        time: formatRelativeTime(time),
+        isUser: name === 'You'
+      }
+    })
+  } catch {
     activities.value = []
   }
 })
