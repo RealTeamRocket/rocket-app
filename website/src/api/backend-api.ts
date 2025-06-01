@@ -31,5 +31,8 @@ export default {
     const data = id ? { id } : {};
     const config = { withCredentials: true };
     return protectedAxiosApi.post('/user/statistics', data, config);
+  },
+  getActivityFeed(): Promise<AxiosResponse> {
+    return protectedAxiosApi.get('/activites', { withCredentials: true });
   }
 }

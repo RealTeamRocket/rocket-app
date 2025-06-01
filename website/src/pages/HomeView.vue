@@ -56,7 +56,7 @@ const chartLabels = ref<string[]>([])
 const fetchStats = async () => {
   try {
     const res = await api.getUserStatistics()
-    const dailyStats: StepStatistic[] = res.data // or res.data.daily_steps if wrapped
+    const dailyStats: StepStatistic[] = res.data
 
     // Calculate stats
     const totalSteps = dailyStats.reduce((sum, s) => sum + s.steps, 0)
@@ -73,9 +73,8 @@ const fetchStats = async () => {
       bestSteps: best.steps
     }
     chartData.value = dailyStats.map((s) => s.steps)
-    chartLabels.value = dailyStats.map((s) => s.day) // <-- dynamic labels
+    chartLabels.value = dailyStats.map((s) => s.day)
   } catch (e) {
-    // Optionally handle error
     stats.value = { totalSteps: 0, avgSteps: 0, bestDay: '', bestSteps: 0 }
     chartData.value = []
     chartLabels.value = []

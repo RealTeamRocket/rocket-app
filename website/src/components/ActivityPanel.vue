@@ -17,7 +17,14 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
+import api from '../api/backend-api'
+
+interface BackendActivity {
+  name: string
+  time: string
+  message: string
+}
 
 interface Activity {
   name: string
@@ -28,54 +35,60 @@ interface Activity {
   isUser?: boolean
 }
 
-const activities = ref<Activity[]>([
-  {
-    name: 'You',
-    initials: 'YO',
-    color: '#2a5298',
-    description: 'completed a 5km run 🚀',
-    time: 'just now',
-    isUser: true,
-  },
-  {
-    name: 'Alex Kim',
-    initials: 'AK',
-    color: '#f39c12',
-    description: 'walked 8,000 steps',
-    time: '5 min ago',
-  },
-  {
-    name: 'Samira Lee',
-    initials: 'SL',
-    color: '#27ae60',
-    description: 'achieved a new daily record!',
-    time: '20 min ago',
-  },
-  {
-    name: 'Jordan P.',
-    initials: 'JP',
-    color: '#8e44ad',
-    description: 'shared a cycling route',
-    time: '1 hr ago',
-  },
-  {
-    name: 'You',
-    initials: 'YO',
-    color: '#2a5298',
-    description: 'beat your weekly goal 🎉',
-    time: '2 hrs ago',
-    isUser: true,
-  },
-])
+// Utility: Get initials (first two letters, or "YO" for "You")
+function getInitials(name: string) {
+  if (name === 'You') return 'YO'
+  const parts = name.split(' ')
+  if (parts.length === 1) return name.substring(0, 2).toUpperCase()
+  return (parts[0][0] + (parts[1]?.[0] || '')).toUpperCase()
+}
+
+// Utility: Deterministic color from name
+function getColor(name: string) {
+  const colors = ['#2a5298', '#f39c12', '#27ae60', '#8e44ad', '#e74c3c', '#16a085']
+  let hash = 0
+  for (let i = 0; i < name.length; i++) hash = name.charCodeAt(i) + ((hash << 5) - hash)
+  return colors[Math.abs(hash) % colors.length]
+}
+
+function formatRelativeTime(iso: string): string {
+  const now = new Date()
+  const then = new Date(iso)
+  const diff = Math.floor((now.getTime() - then.getTime()) / 1000)
+  if (diff < 60) return 'just now'
+  if (diff < 3600) return `${Math.floor(diff / 60)} min ago`
+  if (diff < 86400) return `${Math.floor(diff / 3600)} hr ago`
+  const days = Math.floor(diff / 86400)
+  if (days === 1) return 'yesterday'
+  return `${days} days ago`
+}
+
+const activities = ref<Activity[]>([])
+
+onMounted(async () => {
+  try {
+    const res = await api.getActivityFeed()
+    const backendActivities: BackendActivity[] = res.data.activities
+    console.log('Fetched activities:', backendActivities)
+    activities.value = backendActivities.map(act => ({
+      name: act.name,
+      initials: getInitials(act.name),
+      color: getColor(act.name),
+      description: act.message,
+      time: formatRelativeTime(act.time),
+      isUser: act.name === 'You'
+    }))
+  } catch (e) {
+    activities.value = []
+  }
+})
 </script>
 
 <style scoped>
 .activity-panel {
-  background: #fff;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(30,60,114,0.08);
-  padding: 1.5rem 1rem;
-  margin-bottom: 2rem;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
 }
 
 .panel-title {
@@ -90,6 +103,7 @@ const activities = ref<Activity[]>([
   list-style: none;
   padding: 0;
   margin: 0;
+  overflow-y: auto;
 }
 
 .activity-item {
