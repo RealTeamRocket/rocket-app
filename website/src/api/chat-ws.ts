@@ -1,6 +1,7 @@
 type ChatMessage = {
   username: string
   message: string
+  timestamp: string
 }
 
 type MessageHandler = (msg: ChatMessage) => void

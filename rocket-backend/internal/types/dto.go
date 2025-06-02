@@ -66,4 +66,5 @@ type ActivityWithUser struct {
 type ChatMessage struct {
 	Username string `json:"username"`
 	Message  string `json:"message"`
+	Timestamp string `json:"timestamp"`
 }

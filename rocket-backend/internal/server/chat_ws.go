@@ -6,6 +6,7 @@ import (
 	"rocket-backend/internal/types"
 	"rocket-backend/pkg/logger"
 	"sync"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
@@ -108,6 +109,7 @@ func (s *Server) ChatWebSocketHandler(hub *ChatHub) gin.HandlerFunc {
 			outgoing := types.ChatMessage{
 				Username: user.Username,
 				Message:  incoming.Message,
+				Timestamp: time.Now().Format(time.RFC3339),
 			}
 			outBytes, _ := json.Marshal(outgoing)
 			hub.broadcast <- outBytes

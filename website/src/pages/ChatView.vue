@@ -1,9 +1,6 @@
 <template>
   <Navbar />
-  <div
-    class="chatview-wrapper d-flex flex-column align-items-center justify-content-center"
-    style="min-height: 100vh; background: #f5f7fa"
-  >
+  <div class="chatview-wrapper d-flex flex-column align-items-center justify-content-center">
     <ChatRoom :user="user"/>
   </div>
 </template>

@@ -19,6 +19,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import api from '../api/backend-api'
+import { getColor } from '../utils/colorUtils'
 
 interface Activity {
   name: string
@@ -34,14 +35,6 @@ function getInitials(name: string) {
   const parts = name.split(' ')
   if (parts.length === 1) return name.substring(0, 2).toUpperCase()
   return (parts[0][0] + (parts[1]?.[0] || '')).toUpperCase()
-}
-
-// Utility: Deterministic color from name
-function getColor(name: string) {
-  const colors = ['#2a5298', '#f39c12', '#27ae60', '#8e44ad', '#e74c3c', '#16a085']
-  let hash = 0
-  for (let i = 0; i < name.length; i++) hash = name.charCodeAt(i) + ((hash << 5) - hash)
-  return colors[Math.abs(hash) % colors.length]
 }
 
 function formatRelativeTime(iso: string): string {
