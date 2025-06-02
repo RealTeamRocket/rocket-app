@@ -1,6 +1,10 @@
 package types
 
-import "github.com/google/uuid"
+import (
+	"time"
+
+	"github.com/google/uuid"
+)
 
 type RegisterDTO struct {
 	Email    string `json:"email"`
@@ -51,4 +55,10 @@ type RunDTO struct {
     Duration string  `json:"duration"`
     Distance float64 `json:"distance"`
     CreatedAt string `json:"created_at"`
+}
+
+type ActivityWithUser struct {
+	Name    string    `json:"name"`
+	Time    time.Time `json:"time"`
+	Message string    `json:"message"`
 }

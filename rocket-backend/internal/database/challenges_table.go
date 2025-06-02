@@ -219,3 +219,19 @@ func (s *service) CleanUpChallengesForUser(userID uuid.UUID) error {
 
 	return nil
 }
+
+func (s *service) GetChallengeByID(challengeID uuid.UUID) (*types.Challenge, error) {
+	query := `
+		SELECT id, description AS text, points_reward AS points
+		FROM challenges
+		WHERE id = $1
+	`
+	var challenge types.Challenge
+	err := s.db.QueryRow(query, challengeID).Scan(&challenge.ID, &challenge.Text, &challenge.Points)
+	if err != nil {
+		logger.Error("Failed to fetch challenge by ID", err)
+		return nil, fmt.Errorf("failed to fetch challenge by ID: %v", err)
+	}
+
+	return &challenge, nil
+}

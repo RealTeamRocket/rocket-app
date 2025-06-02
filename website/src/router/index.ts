@@ -1,15 +1,39 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '../pages/HomeView.vue'
+import LoginView from '../pages/LoginView.vue'
+import RegisterView from '../pages/RegisterView.vue'
+import ChatView from '../pages/ChatView.vue'
+import HighscoreView from '../pages/HighscoreView.vue'
+import FriendlistView from '../pages/FriendlistView.vue'
+import ChallengesView from '../pages/ChallengesView.vue'
+import RunsView from '../pages/RunsView.vue'
+import { useAuth } from '../utils/useAuth'
+
+const routes = [
+  { path: '/', component: HomeView },
+  { path: '/login', component: LoginView },
+  { path: '/register', component: RegisterView },
+  { path: '/chat', component: ChatView },
+  { path: '/highscore', component: HighscoreView },
+  { path: '/friendlist', component: FriendlistView },
+  { path: '/challenges', component: ChallengesView },
+  { path: '/runs', component: RunsView },
+  { path: '/:pathMatch(.*)*', redirect: '/' }
+]
 
 const router = createRouter({
-  history: createWebHistory(import.meta.env.BASE_URL),
-  routes: [
-    {
-      path: '/',
-      name: 'home',
-      component: HomeView,
-    },
-  ],
+  history: createWebHistory(),
+  routes,
+})
+
+router.beforeEach((to, from, next) => {
+  const { isLoggedIn } = useAuth()
+  const publicPages = ['/', '/login', '/register']
+  const authRequired = !publicPages.includes(to.path)
+  if (authRequired && !isLoggedIn.value) {
+    return next('/login')
+  }
+  next()
 })
 
 export default router

@@ -9,7 +9,7 @@ import (
 
 func (s *Server) RegisterRoutes() http.Handler {
 	r := gin.Default()
-	r.Use(s.APIKeyMiddleware())
+	// r.Use(s.APIKeyMiddleware())
 	r.Use(cors.New(cors.Config{
 		AllowOrigins:     []string{"*"},
 		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE"},
@@ -22,6 +22,7 @@ func (s *Server) RegisterRoutes() http.Handler {
 		api.GET("/health", s.HealthHandler)
 		api.POST("/register", s.RegisterHandler)
 		api.POST("/login", s.LoginHandler)
+		api.POST("/logout", s.LogoutHandler)
 
 		protected := api.Group("/protected")
 		protected.Use(s.AuthMiddleware())
@@ -52,6 +53,8 @@ func (s *Server) RegisterRoutes() http.Handler {
 			protected.POST("/runs", s.UploadRunHandler)
 			protected.GET("/runs", s.GetAllRunsHandler)
 			protected.DELETE("/runs/:id", s.DeleteRunHandler)
+
+			protected.GET("/activites", s.GetActivityHandler)
 		}
 	}
 

@@ -1,6 +1,9 @@
 package types
 
-import "github.com/google/uuid"
+import (
+	"github.com/google/uuid"
+	"time"
+)
 
 type Credentials struct {
 	ID        uuid.UUID `json:"id"`
@@ -28,4 +31,11 @@ type UserImage struct {
 	ID   uuid.UUID `json:"id"`
 	Name string    `json:"name"`
 	Data []byte    `json:"data"`
+}
+
+type Activity struct {
+	ID      uuid.UUID `json:"id"`
+	UserID  uuid.UUID `json:"user_id"`
+	Time    time.Time `json:"time"`
+	Message string    `json:"message"`
 }

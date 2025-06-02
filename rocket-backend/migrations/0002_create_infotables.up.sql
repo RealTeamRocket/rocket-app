@@ -65,3 +65,11 @@ CREATE TABLE runs (
     duration VARCHAR(16),
     distance REAL
 );
+
+CREATE TABLE activities (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID NOT NULL REFERENCES users(id),
+    time TIMESTAMP NOT NULL DEFAULT now(),
+    message TEXT NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);

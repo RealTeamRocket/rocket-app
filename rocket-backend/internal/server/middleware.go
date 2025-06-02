@@ -16,13 +16,20 @@ func (s *Server) AuthMiddleware() gin.HandlerFunc {
 
 	return func(c *gin.Context) {
 		authHeader := c.GetHeader("Authorization")
-		if authHeader == "" {
-			c.JSON(http.StatusUnauthorized, gin.H{"error": "Authorization header required"})
-			c.Abort()
-			return
+		var tokenString string
+
+		if authHeader != "" {
+			tokenString = strings.TrimPrefix(authHeader, "Bearer ")
+		} else {
+			cookie, err := c.Cookie("jwt_token")
+			if err != nil || cookie == "" {
+				c.JSON(http.StatusUnauthorized, gin.H{"error": "Authorization header or jwt_token cookie required"})
+				c.Abort()
+				return
+			}
+			tokenString = cookie
 		}
 
-		tokenString := strings.TrimPrefix(authHeader, "Bearer ")
 		token, err := authService.ParseToken(tokenString)
 		if err != nil || !token.Valid {
 			c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid token"})

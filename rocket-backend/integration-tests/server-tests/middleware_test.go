@@ -45,7 +45,7 @@ var _ = Describe("AuthMiddleware", func() {
 			router.ServeHTTP(recorder, req)
 
 			Expect(recorder.Code).To(Equal(http.StatusUnauthorized))
-			Expect(recorder.Body.String()).To(ContainSubstring("Authorization header required"))
+			Expect(recorder.Body.String()).To(ContainSubstring("Authorization header or jwt_token cookie required"))
 		})
 	})
 
