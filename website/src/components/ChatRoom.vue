@@ -29,7 +29,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onBeforeUnmount, nextTick, computed } from 'vue'
+import { ref, defineProps, onMounted, onBeforeUnmount, nextTick, computed } from 'vue'
 import { ChatWebSocket, getChatWebSocketURL } from '@/api/chat-ws'
 import ChatMessage from './ChatMessage.vue'
 
@@ -39,15 +39,23 @@ type LocalMessage = {
   mine: boolean
 }
 
+const props = defineProps<{
+  user: {
+    id: string
+    username: string
+    rocket_points: number
+  }
+}>()
+
 const messages = ref<LocalMessage[]>([])
 const input = ref('')
 const ws = ref<ChatWebSocket | null>(null)
 const messagesContainer = ref<HTMLElement | null>(null)
 
 function getUsername(): string {
-  const user = localStorage.getItem('username')
-  return user || 'Me'
+  return props.user?.username || 'Me'
 }
+
 
 const reversedMessages = computed(() => [...messages.value].reverse())
 
@@ -60,6 +68,7 @@ function scrollToTop() {
 }
 
 function handleIncomingMessage(msg: { username: string; message: string }) {
+  if (msg.username === getUsername()) return
   messages.value.push({
     username: msg.username,
     message: msg.message,

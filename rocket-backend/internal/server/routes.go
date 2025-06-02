@@ -38,6 +38,7 @@ func (s *Server) RegisterRoutes() http.Handler {
 			protected.POST("/settings/step-goal", s.UpdateStepGoalHandler)
 			protected.POST("/settings/image", s.UpdateImageHandler)
 
+			protected.GET("/user", s.GetUserHandler)
 			protected.POST("/user/statistics", s.GetUserStatisticsHandler)
 			protected.POST("/user/image", s.GetUserImageHandler)
 			protected.GET("/user/rocketpoints", s.GetRocketPointsHandler)
