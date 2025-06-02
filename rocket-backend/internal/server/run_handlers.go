@@ -35,7 +35,7 @@ func (s *Server) UploadRunHandler(c *gin.Context) {
 		return
 	}
 
-	message := "Completed a " + fmt.Sprintf("%.2f", runData.Distance) + " km run in " + fmt.Sprintf("%.2f", runData.Duration) + " minutes"
+	message := "Completed a " + fmt.Sprintf("%.2f", runData.Distance) + " km run in " + runData.Duration + " minutes"
 	err = s.db.SaveActivity(userUUID, message)
 
 	c.JSON(http.StatusOK, gin.H{"message": "Run data uploaded successfully"})
