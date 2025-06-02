@@ -62,3 +62,8 @@ type ActivityWithUser struct {
 	Time    time.Time `json:"time"`
 	Message string    `json:"message"`
 }
+
+type ChatMessage struct {
+	Username string `json:"username"`
+	Message  string `json:"message"`
+}

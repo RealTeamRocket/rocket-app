@@ -19,6 +19,9 @@ func (s *Server) RegisterRoutes() http.Handler {
 
 	api := r.Group("/api/v1")
 	{
+		chatHub := NewChatHub()
+		go chatHub.Run()
+
 		api.GET("/health", s.HealthHandler)
 		api.POST("/register", s.RegisterHandler)
 		api.POST("/login", s.LoginHandler)
@@ -55,6 +58,11 @@ func (s *Server) RegisterRoutes() http.Handler {
 			protected.DELETE("/runs/:id", s.DeleteRunHandler)
 
 			protected.GET("/activites", s.GetActivityHandler)
+
+			protected.GET("/ws/chat", s.ChatWebSocketHandler(chatHub))
+			// protected.POST("/chat/messages", s.SendMessageHandler)
+			// protected.GET("/chat/messages", s.GetMessagesHandler)
+			// protected.POST("/chat/messages/:id/react", s.ReactToMessageHandler)
 		}
 	}
 
