@@ -61,9 +61,6 @@ func (s *Server) RegisterRoutes() http.Handler {
 			protected.GET("/activites", s.GetActivityHandler)
 
 			protected.GET("/ws/chat", s.ChatWebSocketHandler(chatHub))
-			// protected.POST("/chat/messages", s.SendMessageHandler)
-			// protected.GET("/chat/messages", s.GetMessagesHandler)
-			// protected.POST("/chat/messages/:id/react", s.ReactToMessageHandler)
 		}
 	}
 

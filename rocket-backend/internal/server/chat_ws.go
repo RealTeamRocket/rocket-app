@@ -111,6 +111,11 @@ func (s *Server) ChatWebSocketHandler(hub *ChatHub) gin.HandlerFunc {
 				Message:  incoming.Message,
 				Timestamp: time.Now().Format(time.RFC3339),
 			}
+
+			err = s.db.SaveChatMessage(userUUID, incoming.Message, outgoing.Timestamp)
+			if err != nil {
+				logger.Error("Failed to save chat message: ", err)
+			}
 			outBytes, _ := json.Marshal(outgoing)
 			hub.broadcast <- outBytes
 		}

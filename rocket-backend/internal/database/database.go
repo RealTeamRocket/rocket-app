@@ -84,6 +84,9 @@ type Service interface {
 	// activities
 	SaveActivity(userID uuid.UUID, message string) error
 	GetActivitiesForUserAndFriends(userID uuid.UUID) ([]types.ActivityWithUser, error)
+
+	// chat
+	SaveChatMessage(userID uuid.UUID, message string, timestamp string) error
 }
 
 type service struct {
