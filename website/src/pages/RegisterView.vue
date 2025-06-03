@@ -51,7 +51,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-import api from '../api/backend-api'
+import api from '@/api/backend-api'
 
 const username = ref('')
 const email = ref('')

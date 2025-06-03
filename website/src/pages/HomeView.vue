@@ -30,12 +30,12 @@
 
 <script setup lang="ts">
 import { ref, onMounted, watch } from 'vue'
-import Navbar from '../components/Navbar.vue'
-import StatsCards from '../components/StatsCards.vue'
-import StepChart from '../components/StepChart.vue'
-import ActivityPanel from '../components/ActivityPanel.vue'
-import { useAuth } from '../utils/useAuth'
-import api from '../api/backend-api'
+import Navbar from '@/components/Navbar.vue'
+import StatsCards from '@/components/StatsCards.vue'
+import StepChart from '@/components/StepChart.vue'
+import ActivityPanel from '@/components/ActivityPanel.vue'
+import { useAuth } from '@/utils/useAuth'
+import api from '@/api/backend-api'
 
 type StepStatistic = {
   day: string

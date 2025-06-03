@@ -36,7 +36,7 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import { useAuth } from '../utils/useAuth'
+import { useAuth } from '@/utils/useAuth'
 
 const email = ref('')
 const password = ref('')

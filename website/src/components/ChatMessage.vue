@@ -31,7 +31,7 @@
 </template>
 
 <script setup lang="ts">
-import { getColor } from '../utils/colorUtils'
+import { getColor } from '@/utils/colorUtils'
 
 const props = defineProps<{
   username: string

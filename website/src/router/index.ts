@@ -1,13 +1,13 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import HomeView from '../pages/HomeView.vue'
-import LoginView from '../pages/LoginView.vue'
-import RegisterView from '../pages/RegisterView.vue'
-import ChatView from '../pages/ChatView.vue'
-import HighscoreView from '../pages/HighscoreView.vue'
-import FriendlistView from '../pages/FriendlistView.vue'
-import ChallengesView from '../pages/ChallengesView.vue'
-import RunsView from '../pages/RunsView.vue'
-import { useAuth } from '../utils/useAuth'
+import HomeView from '@/pages/HomeView.vue'
+import LoginView from '@/pages/LoginView.vue'
+import RegisterView from '@/pages/RegisterView.vue'
+import ChatView from '@/pages/ChatView.vue'
+import HighscoreView from '@/pages/HighscoreView.vue'
+import FriendlistView from '@/pages/FriendlistView.vue'
+import ChallengesView from '@/pages/ChallengesView.vue'
+import RunsView from '@/pages/RunsView.vue'
+import { useAuth } from '@/utils/useAuth'
 
 const routes = [
   { path: '/', component: HomeView },

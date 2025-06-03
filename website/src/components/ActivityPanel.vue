@@ -18,8 +18,8 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import api from '../api/backend-api'
-import { getColor } from '../utils/colorUtils'
+import api from '@/api/backend-api'
+import { getColor } from '@/utils/colorUtils'
 
 interface Activity {
   name: string

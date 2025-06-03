@@ -6,10 +6,10 @@
 </template>
 
 <script setup lang="ts">
-import Navbar from '../components/Navbar.vue'
-import ChatRoom from '../components/ChatRoom.vue'
+import Navbar from '@/components/Navbar.vue'
+import ChatRoom from '@/components/ChatRoom.vue'
 import { ref, onMounted } from 'vue'
-import api from '../api/backend-api'
+import api from '@/api/backend-api'
 
 const user = ref({
   id: '',

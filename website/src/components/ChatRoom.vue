@@ -32,8 +32,8 @@
 
 <script setup lang="ts">
 import { ref, defineProps, onMounted, onBeforeUnmount, nextTick, computed } from 'vue'
-import { ChatWebSocket, getChatWebSocketURL } from '@/api/chat-ws'
 import ChatMessage from './ChatMessage.vue'
+import { ChatWebSocket, getChatWebSocketURL } from '@/api/chat-ws'
 import api from '@/api/backend-api'
 
 type LocalMessage = {
