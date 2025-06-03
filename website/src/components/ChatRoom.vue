@@ -10,7 +10,7 @@
         :username="msg.mine ? '' : msg.username"
         :message="msg.message"
         :mine="msg.mine"
-        :reactions="0"
+        :reactions="msg.reactions || 0"
         :timestamp="msg.timestamp"
       />
     </div>
@@ -32,12 +32,14 @@
 import { ref, defineProps, onMounted, onBeforeUnmount, nextTick, computed } from 'vue'
 import { ChatWebSocket, getChatWebSocketURL } from '@/api/chat-ws'
 import ChatMessage from './ChatMessage.vue'
+import api from '@/api/backend-api'
 
 type LocalMessage = {
   username: string
   message: string
   mine: boolean
   timestamp: string
+  reactions?: number
 }
 
 const props = defineProps<{
@@ -73,7 +75,7 @@ function handleIncomingMessage(msg: { username: string; message: string; timesta
     username: msg.username,
     message: msg.message,
     mine: msg.username === getUsername(),
-    timestamp: msg.timestamp, // Add this
+    timestamp: msg.timestamp,
   })
   scrollToTop()
 }
@@ -92,7 +94,25 @@ function sendMessage() {
   scrollToTop()
 }
 
-onMounted(() => {
+onMounted(async () => {
+  // 1. Load chat history from backend
+  try {
+    const response = await api.getChatHistory()
+    if (response.status === 200 && Array.isArray(response.data.messages)) {
+      messages.value = response.data.messages.map((msg: any) => ({
+        username: msg.username,
+        message: msg.message,
+        mine: msg.username === 'You',
+        timestamp: msg.timestamp,
+        reactions: msg.reactions ?? 0,
+      }))
+      scrollToTop()
+    }
+  } catch (e) {
+    console.error('Failed to load chat history', e)
+  }
+
+  // 2. Setup websocket for live chat
   const chatWS = new ChatWebSocket(getChatWebSocketURL())
   ws.value = chatWS
   chatWS.connect(handleIncomingMessage)

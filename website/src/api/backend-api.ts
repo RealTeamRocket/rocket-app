@@ -37,5 +37,8 @@ export default {
   },
   getUser(): Promise<AxiosResponse> {
     return protectedAxiosApi.get('/user', { withCredentials: true });
+  },
+  getChatHistory(): Promise<AxiosResponse> {
+    return protectedAxiosApi.get('/chat/history', { withCredentials: true });
   }
 }

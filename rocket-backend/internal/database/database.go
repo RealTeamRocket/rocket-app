@@ -87,6 +87,7 @@ type Service interface {
 
 	// chat
 	SaveChatMessage(userID uuid.UUID, message string, timestamp string) error
+	GetChatMessages(userID uuid.UUID) ([]types.ChatMessage, error)
 }
 
 type service struct {

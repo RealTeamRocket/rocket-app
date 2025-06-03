@@ -110,6 +110,7 @@ func (s *Server) ChatWebSocketHandler(hub *ChatHub) gin.HandlerFunc {
 				Username: user.Username,
 				Message:  incoming.Message,
 				Timestamp: time.Now().Format(time.RFC3339),
+				Reactions: 0,
 			}
 
 			err = s.db.SaveChatMessage(userUUID, incoming.Message, outgoing.Timestamp)

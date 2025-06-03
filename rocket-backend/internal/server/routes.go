@@ -61,6 +61,7 @@ func (s *Server) RegisterRoutes() http.Handler {
 			protected.GET("/activites", s.GetActivityHandler)
 
 			protected.GET("/ws/chat", s.ChatWebSocketHandler(chatHub))
+			protected.GET("/chat/history", s.GetChatHistoryHandler)
 		}
 	}
 
