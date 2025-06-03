@@ -1,7 +1,12 @@
 type ChatMessage = {
+  id?: string
   username: string
   message: string
   timestamp: string
+  reactions?: number
+  hasReacted?: boolean
+  type?: string
+  messageId?: string
 }
 
 type MessageHandler = (msg: ChatMessage) => void
@@ -16,38 +21,34 @@ export class ChatWebSocket {
   }
 
   connect(onMessage: MessageHandler) {
-    // Use ws:// for local, wss:// for production
-    // Cookies (jwt_token) will be sent automatically
     this.ws = new WebSocket(this.url)
     this.onMessageHandler = onMessage
 
-    this.ws.onopen = () => {
-      // Connection established
-    }
+    this.ws.onopen = () => {}
 
     this.ws.onmessage = (event: MessageEvent) => {
       try {
         const data = JSON.parse(event.data)
-        if (data.username && data.message) {
-          this.onMessageHandler && this.onMessageHandler(data)
-        }
+        this.onMessageHandler && this.onMessageHandler(data)
       } catch (e) {
         // Ignore malformed messages
       }
     }
 
-    this.ws.onclose = () => {
-      // Handle close if needed
-    }
-
-    this.ws.onerror = (err) => {
-      // Handle error if needed
-    }
+    this.ws.onclose = () => {}
+    this.ws.onerror = (err) => {}
   }
 
   sendMessage(message: string) {
     if (this.ws && this.ws.readyState === WebSocket.OPEN) {
       this.ws.send(JSON.stringify({ message }))
+    }
+  }
+
+  sendReaction(messageId: string) {
+    if (this.ws && this.ws.readyState === WebSocket.OPEN) {
+      console.log('WebSocket: sending reaction for messageId', messageId)
+      this.ws.send(JSON.stringify({ type: "reaction", messageId }))
     }
   }
 

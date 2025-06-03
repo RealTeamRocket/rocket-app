@@ -50,7 +50,6 @@ function formatTime(ts: string) {
 }
 
 function handleReaction() {
-  // Prevent reacting to own messages
   if (props.mine) return
   if (typeof props.onReact === 'function' && !props.hasReacted) {
     props.onReact()

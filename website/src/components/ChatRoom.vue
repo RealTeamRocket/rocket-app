@@ -73,41 +73,46 @@ function scrollToTop() {
   })
 }
 
-function handleIncomingMessage(msg: { username: string; message: string; timestamp: string }) {
-  if (msg.username === getUsername()) return
-  messages.value.push({
-    username: msg.username,
-    message: msg.message,
-    mine: msg.username === getUsername(),
-    timestamp: msg.timestamp,
-    reactions: 0,
-    hasReacted: false,
-  })
-  scrollToTop()
+function handleIncomingWS(data: any) {
+  if (data.type === "reaction" && data.messageId) {
+    // Find the message and update its reactions/count
+    const msg = messages.value.find(m => m.id === data.messageId)
+    if (msg) {
+      msg.reactions = data.reactions
+      // Optionally, set hasReacted if the reaction is from this user
+      if (data.username === getUsername()) {
+        msg.hasReacted = true
+      }
+    }
+  } else if (data.username && data.message) {
+    // Handle new chat message as before
+    messages.value.push({
+      id: data.id, // If backend provides it
+      username: data.username,
+      message: data.message,
+      mine: data.username === 'You' || data.username === getUsername(),
+      timestamp: data.timestamp,
+      reactions: data.reactions ?? 0,
+      hasReacted: false,
+    })
+    scrollToTop()
+  }
 }
 
 function sendMessage() {
   const text = input.value.trim()
   if (!text || !ws.value) return
   ws.value.sendMessage(text)
-  messages.value.push({
-    username: getUsername(),
-    message: text,
-    mine: true,
-    timestamp: new Date().toISOString(),
-    reactions: 0,
-    hasReacted: false,
-  })
   input.value = ''
   scrollToTop()
 }
 
-// Placeholder for reaction logic
 function handleReact(msg: LocalMessage) {
-  if (msg.hasReacted) return
-  msg.reactions = (msg.reactions || 0) + 1
+  if (msg.hasReacted || msg.mine || !msg.id || !ws.value) return
+  console.log('Sending reaction for message id:', msg.id)
+  ws.value.sendReaction(msg.id)
+  // Optimistic UI update (optional)
   msg.hasReacted = true
-  // In the future, call the backend API here
 }
 
 onMounted(async () => {
@@ -119,10 +124,10 @@ onMounted(async () => {
         id: msg.id,
         username: msg.username,
         message: msg.message,
-        mine: msg.username === 'You',
+        mine: msg.username === 'You' || msg.username === getUsername(),
         timestamp: msg.timestamp,
         reactions: msg.reactions ?? 0,
-        hasReacted: false, // Will be set by backend in the future
+        hasReacted: false, // Should be set by backend in the future
       }))
       scrollToTop()
     }
@@ -130,10 +135,10 @@ onMounted(async () => {
     console.error('Failed to load chat history', e)
   }
 
-  // 2. Setup websocket for live chat
+  // 2. Setup websocket for live chat and reactions
   const chatWS = new ChatWebSocket(getChatWebSocketURL())
   ws.value = chatWS
-  chatWS.connect(handleIncomingMessage)
+  chatWS.connect(handleIncomingWS)
   scrollToTop()
 })
 

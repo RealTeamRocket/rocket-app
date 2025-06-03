@@ -9,23 +9,24 @@ import (
 	"github.com/google/uuid"
 )
 
-func (s *service) SaveChatMessage(userID uuid.UUID, message string, timestamp string) error {
-
+func (s *service) SaveChatMessage(userID uuid.UUID, message string, timestamp string) (uuid.UUID, error) {
 	query := `
 		INSERT INTO chat_messages (user_id, message, timestamp)
 		VALUES ($1, $2, $3)
+		RETURNING id
 	`
-	_, err := s.db.Exec(query, userID, message, timestamp)
+	var id uuid.UUID
+	err := s.db.QueryRow(query, userID, message, timestamp).Scan(&id)
 	if err != nil {
-		logger.Error("Failed to save chat message", err)
-		return fmt.Errorf("%w: %v", custom_error.ErrFailedToSave, err)
+		logger.Error("Failed to save chat message and return ID", err)
+		return uuid.Nil, fmt.Errorf("%w: %v", custom_error.ErrFailedToSave, err)
 	}
-	return nil
+	return id, nil
 }
 
 func (s *service) GetChatMessages(userID uuid.UUID) ([]types.ChatMessage, error) {
 	query := `
-		SELECT cm.user_id, u.username, cm.message, cm.timestamp
+		SELECT cm.id, cm.user_id, u.username, cm.message, cm.timestamp
 		FROM chat_messages cm
 		JOIN users u ON cm.user_id = u.id
 		ORDER BY cm.timestamp ASC
@@ -41,14 +42,30 @@ func (s *service) GetChatMessages(userID uuid.UUID) ([]types.ChatMessage, error)
 	for rows.Next() {
 		var msg types.ChatMessage
 		var dbUserID uuid.UUID
-		if err := rows.Scan(&dbUserID, &msg.Username, &msg.Message, &msg.Timestamp); err != nil {
+		if err := rows.Scan(&msg.ID, &dbUserID, &msg.Username, &msg.Message, &msg.Timestamp); err != nil {
 			logger.Error("Failed to scan chat message", err)
 			continue
 		}
 		if dbUserID == userID {
 			msg.Username = "You"
 		}
-		msg.Reactions = 0
+		// Count reactions for this message
+		count, err := s.CountReactionsForMessage(msg.ID)
+		if err != nil {
+			logger.Error("Failed to count reactions for message", err)
+			msg.Reactions = 0
+		} else {
+			msg.Reactions = count
+		}
+		// Check if the current user has reacted to this message
+		hasReacted := false
+		checkQuery := `SELECT 1 FROM chat_messages_reactions WHERE message_id = $1 AND user_id = $2 LIMIT 1`
+		row := s.db.QueryRow(checkQuery, msg.ID, userID)
+		var dummy int
+		if err := row.Scan(&dummy); err == nil {
+			hasReacted = true
+		}
+		msg.HasReacted = hasReacted
 		messages = append(messages, msg)
 	}
 	if err := rows.Err(); err != nil {
@@ -56,4 +73,21 @@ func (s *service) GetChatMessages(userID uuid.UUID) ([]types.ChatMessage, error)
 		return nil, fmt.Errorf("%w: %v", custom_error.ErrFailedToLoad, err)
 	}
 	return messages, nil
+}
+
+func (s *service) AddReactionToChatMessage(userID uuid.UUID, messageID uuid.UUID) error {
+	query := `
+        INSERT INTO chat_messages_reactions (message_id, user_id)
+        VALUES ($1, $2)
+        ON CONFLICT DO NOTHING
+    `
+    _, err := s.db.Exec(query, messageID, userID)
+    return err
+}
+
+func (s *service) CountReactionsForMessage(messageID uuid.UUID) (int, error) {
+    var count int
+    query := `SELECT COUNT(*) FROM chat_messages_reactions WHERE message_id = $1`
+    err := s.db.QueryRow(query, messageID).Scan(&count)
+    return count, err
 }

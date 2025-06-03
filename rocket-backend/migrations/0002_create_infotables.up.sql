@@ -85,6 +85,6 @@ CREATE TABLE chat_messages_reactions (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     message_id UUID NOT NULL REFERENCES chat_messages(id) ON DELETE CASCADE,
     user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-    reaction VARCHAR(50) NOT NULL,
-    UNIQUE (message_id, user_id)
-)
+    created_at TIMESTAMP NOT NULL DEFAULT now(),
+    CONSTRAINT unique_message_user UNIQUE (message_id, user_id)
+);

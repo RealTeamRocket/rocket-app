@@ -95,30 +95,74 @@ func (s *Server) ChatWebSocketHandler(hub *ChatHub) gin.HandlerFunc {
 		for {
 			_, msg, err := conn.ReadMessage()
 			if err != nil {
+				logger.Info("WebSocket: connection closed or error reading message:", err)
 				break
 			}
-			// Unmarshal the incoming message
-			var incoming struct {
-				Message string `json:"message"`
-			}
+			// Try to unmarshal as a generic map
+			var incoming map[string]interface{}
 			if err := json.Unmarshal(msg, &incoming); err != nil {
-				logger.Error("Failed to unmarshal incoming message: " ,err)
+				logger.Error("Failed to unmarshal incoming message: ", err)
 				continue
 			}
-			// Create the outgoing message with username
-			outgoing := types.ChatMessage{
-				Username: user.Username,
-				Message:  incoming.Message,
-				Timestamp: time.Now().Format(time.RFC3339),
-				Reactions: 0,
-			}
 
-			err = s.db.SaveChatMessage(userUUID, incoming.Message, outgoing.Timestamp)
-			if err != nil {
-				logger.Error("Failed to save chat message: ", err)
+			msgType, _ := incoming["type"].(string)
+			switch msgType {
+			case "reaction":
+				// Handle reaction
+				messageIDStr, _ := incoming["messageId"].(string)
+				messageID, err := uuid.Parse(messageIDStr)
+				if err != nil {
+					logger.Error("Invalid messageId for reaction: ", err)
+					continue
+				}
+				// Add reaction in DB
+				dbErr := s.db.AddReactionToChatMessage(userUUID, messageID)
+				if dbErr != nil {
+					logger.Error("Failed to add reaction to chat message:", dbErr)
+				}
+				// Get new count
+				count, countErr := s.db.CountReactionsForMessage(messageID)
+				if countErr != nil {
+					logger.Error("Failed to count reactions for message:", countErr)
+				}
+				// Broadcast reaction event
+				reactionEvent := map[string]any{
+					"type":      "reaction",
+					"messageId": messageID.String(),
+					"username":  user.Username,
+					"reactions": count,
+				}
+				outBytes, _ := json.Marshal(reactionEvent)
+				hub.broadcast <- outBytes
+			default:
+				// Handle normal chat message as before
+				var incomingMsg struct {
+					Message string `json:"message"`
+				}
+				if err := json.Unmarshal(msg, &incomingMsg); err != nil {
+					logger.Error("Failed to unmarshal incoming chat message: ", err)
+					continue
+				}
+				// Save the message and get its ID
+				timestamp := time.Now().Format(time.RFC3339)
+				msgID, err := s.db.SaveChatMessage(userUUID, incomingMsg.Message, timestamp)
+				if err != nil {
+					logger.Error("Failed to save chat message: ", err)
+					continue
+				} else {
+					logger.Info("Chat message saved for user:", userUUID.String(), "with id:", msgID.String())
+				}
+				outgoing := types.ChatMessage{
+					ID:        msgID,
+					Username:  user.Username,
+					Message:   incomingMsg.Message,
+					Timestamp: timestamp,
+					Reactions: 0,
+				}
+				outBytes, _ := json.Marshal(outgoing)
+				logger.Info("WebSocket: broadcasting chat message:", outgoing)
+				hub.broadcast <- outBytes
 			}
-			outBytes, _ := json.Marshal(outgoing)
-			hub.broadcast <- outBytes
 		}
 	}
 }
