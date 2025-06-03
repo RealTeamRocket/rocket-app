@@ -127,7 +127,7 @@ onMounted(async () => {
         mine: msg.username === 'You' || msg.username === getUsername(),
         timestamp: msg.timestamp,
         reactions: msg.reactions ?? 0,
-        hasReacted: false, // Should be set by backend in the future
+        hasReacted: msg.hasReacted ?? false,
       }))
       scrollToTop()
     }

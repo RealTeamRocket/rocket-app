@@ -64,9 +64,10 @@ type ActivityWithUser struct {
 }
 
 type ChatMessage struct {
-	ID uuid.UUID `json:"id"`
-	Username string `json:"username"`
-	Message  string `json:"message"`
-	Timestamp string `json:"timestamp"`
-	Reactions int   `json:"reactions"`
+	ID        uuid.UUID `json:"id"`
+	Username  string    `json:"username"`
+	Message   string    `json:"message"`
+	Timestamp string    `json:"timestamp"`
+	Reactions int       `json:"reactions"`
+	HasReacted bool     `json:"hasReacted"`
 }
