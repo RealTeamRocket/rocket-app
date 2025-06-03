@@ -6,12 +6,14 @@
     >
       <ChatMessage
         v-for="(msg, idx) in reversedMessages"
-        :key="idx"
+        :key="msg.id || idx"
         :username="msg.mine ? '' : msg.username"
         :message="msg.message"
         :mine="msg.mine"
         :reactions="msg.reactions || 0"
         :timestamp="msg.timestamp"
+        :hasReacted="msg.hasReacted || false"
+        :onReact="() => handleReact(msg)"
       />
     </div>
     <form class="chat-input-form d-flex border-top p-2 bg-white" @submit.prevent="sendMessage">
@@ -35,11 +37,13 @@ import ChatMessage from './ChatMessage.vue'
 import api from '@/api/backend-api'
 
 type LocalMessage = {
+  id?: string
   username: string
   message: string
   mine: boolean
   timestamp: string
-  reactions?: number
+  reactions: number
+  hasReacted: boolean
 }
 
 const props = defineProps<{
@@ -76,6 +80,8 @@ function handleIncomingMessage(msg: { username: string; message: string; timesta
     message: msg.message,
     mine: msg.username === getUsername(),
     timestamp: msg.timestamp,
+    reactions: 0,
+    hasReacted: false,
   })
   scrollToTop()
 }
@@ -89,9 +95,19 @@ function sendMessage() {
     message: text,
     mine: true,
     timestamp: new Date().toISOString(),
+    reactions: 0,
+    hasReacted: false,
   })
   input.value = ''
   scrollToTop()
+}
+
+// Placeholder for reaction logic
+function handleReact(msg: LocalMessage) {
+  if (msg.hasReacted) return
+  msg.reactions = (msg.reactions || 0) + 1
+  msg.hasReacted = true
+  // In the future, call the backend API here
 }
 
 onMounted(async () => {
@@ -100,11 +116,13 @@ onMounted(async () => {
     const response = await api.getChatHistory()
     if (response.status === 200 && Array.isArray(response.data.messages)) {
       messages.value = response.data.messages.map((msg: any) => ({
+        id: msg.id,
         username: msg.username,
         message: msg.message,
         mine: msg.username === 'You',
         timestamp: msg.timestamp,
         reactions: msg.reactions ?? 0,
+        hasReacted: false, // Will be set by backend in the future
       }))
       scrollToTop()
     }
