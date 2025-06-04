@@ -233,12 +233,12 @@ Future<void> _requestPermissions() async {
     if (await Permission.activityRecognition.isPermanentlyDenied) {
       await openAppSettings();
     }
-    if (!await FlutterForegroundTask.isIgnoringBatteryOptimizations) {
-      await FlutterForegroundTask.requestIgnoreBatteryOptimization();
-    }
-    if (!await FlutterForegroundTask.canScheduleExactAlarms) {
-      await FlutterForegroundTask.openAlarmsAndRemindersSettings();
-    }
+    // if (!await FlutterForegroundTask.isIgnoringBatteryOptimizations) {
+    //   await FlutterForegroundTask.requestIgnoreBatteryOptimization();
+    // }
+    // if (!await FlutterForegroundTask.canScheduleExactAlarms) {
+    //   await FlutterForegroundTask.openAlarmsAndRemindersSettings();
+    // }
   }
 }
 
