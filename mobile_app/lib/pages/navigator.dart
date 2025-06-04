@@ -46,6 +46,7 @@ class _AppNavigatorState extends State<AppNavigator> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: ColorConstants.secoundaryColor,
+        automaticallyImplyLeading: false,
         title: SizedBox(
           height: kToolbarHeight,
           child: Stack(
@@ -54,7 +55,10 @@ class _AppNavigatorState extends State<AppNavigator> {
                 alignment: Alignment.center,
                 child: Text(
                   widget.title,
-                  style: TextStyle(color: ColorConstants.white),
+                  style: TextStyle(
+                    color: ColorConstants.white,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
               if (_selectedIndex == 4)
