@@ -85,12 +85,12 @@ function handleReaction() {
   justify-content: center;
 }
 .reaction-badge.right {
-  top: -7px;
-  right: -7px;
+  top: -10px;
+  right: -10px;
 }
 .reaction-badge.left {
-  top: -7px;
-  left: -7px;
+  top: -10px;
+  left: -10px;
 }
 .reaction-badge span {
   font-size: 0.65em;
