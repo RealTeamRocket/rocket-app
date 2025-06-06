@@ -1,8 +1,8 @@
 <template>
   <Navbar />
-  <div class="friendlist-page">
-    <h1>Friendlist</h1>
-    <p>This is a placeholder for the Friendlist page.</p>
+  <div class="settings-page">
+    <h1>Settings</h1>
+    <p>This is the Settings page. Here you will see settings and can change them.</p>
   </div>
 </template>
 
@@ -11,7 +11,7 @@ import Navbar from '@/components/Navbar.vue'
 </script>
 
 <style scoped>
-.friendlist-page {
+settings-pagesettings-page {
   padding: 2rem;
 }
 </style>

@@ -1,8 +1,8 @@
 <template>
   <Navbar />
-  <div class="friendlist-page">
-    <h1>Friendlist</h1>
-    <p>This is a placeholder for the Friendlist page.</p>
+  <div class="profile-page">
+    <h1>Profile</h1>
+    <p>This is the profile page. Here you will see the stats and infos about a specific user.</p>
   </div>
 </template>
 
@@ -11,7 +11,7 @@ import Navbar from '@/components/Navbar.vue'
 </script>
 
 <style scoped>
-.friendlist-page {
+.profile-page {
   padding: 2rem;
 }
 </style>

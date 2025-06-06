@@ -34,5 +34,11 @@ export default {
   },
   getActivityFeed(): Promise<AxiosResponse> {
     return protectedAxiosApi.get('/activites', { withCredentials: true });
+  },
+  getUser(): Promise<AxiosResponse> {
+    return protectedAxiosApi.get('/user', { withCredentials: true });
+  },
+  getChatHistory(): Promise<AxiosResponse> {
+    return protectedAxiosApi.get('/chat/history', { withCredentials: true });
   }
 }

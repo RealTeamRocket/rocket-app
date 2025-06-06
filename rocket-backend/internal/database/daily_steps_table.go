@@ -9,25 +9,29 @@ import (
 	"github.com/google/uuid"
 )
 
+func (s *service) saveStepMilestoneActivities(userID uuid.UUID, oldSteps, newSteps int) {
+	milestone := 2000
+	for threshold := ((oldSteps/milestone)+1)*milestone; threshold <= newSteps; threshold += milestone {
+		message := fmt.Sprintf("🎉 Has reached %d steps today! 🚀", threshold)
+		_ = s.SaveActivity(userID, message)
+	}
+}
+
 func (s *service) UpdateDailySteps(userID uuid.UUID, steps int) error {
 	currentDate := time.Now().Format("2006-01-02")
 
-	// Check if the user already has a record for today
 	var existingSteps int
 	queryCheck := `SELECT steps_taken FROM daily_steps WHERE user_id = $1 AND date = $2`
 	err := s.db.QueryRow(queryCheck, userID, currentDate).Scan(&existingSteps)
 
 	if err != nil {
-		// No record for today, insert new record and award rocket points
 		id := uuid.New()
 		queryInsert := `INSERT INTO daily_steps (id, user_id, steps_taken, date) VALUES ($1, $2, $3, $4)`
 		_, err := s.db.Exec(queryInsert, id, userID, steps, currentDate)
 		if err != nil {
-			// Log and return error if the insert fails
 			logger.Error("Error inserting daily steps: %v\n", err)
 			return fmt.Errorf("failed to insert daily steps: %w", err)
 		}
-		// Award rocket points for all steps (steps/10)
 		rocketPoints := steps / 10
 		if rocketPoints > 0 {
 			if err := s.UpdateRocketPoints(userID, rocketPoints); err != nil {
@@ -35,6 +39,7 @@ func (s *service) UpdateDailySteps(userID uuid.UUID, steps int) error {
 				return fmt.Errorf("failed to update rocket points: %w", err)
 			}
 		}
+		s.saveStepMilestoneActivities(userID, 0, steps)
 	} else {
 		// If an entry exists, update the steps and rocket points only if the new steps are greater than the existing steps
 		if steps > existingSteps {
@@ -43,11 +48,9 @@ func (s *service) UpdateDailySteps(userID uuid.UUID, steps int) error {
 				queryUpdate := `UPDATE daily_steps SET steps_taken = $1 WHERE user_id = $2 AND date = $3`
 				_, err := s.db.Exec(queryUpdate, steps, userID, currentDate)
 				if err != nil {
-					// Log and return error if the update fails
 					logger.Error("Error updating daily steps: %v\n", err)
 					return fmt.Errorf("failed to update daily steps: %w", err)
 				}
-				// Award rocket points for the difference in steps (stepDiff/10)
 				rocketPoints := stepDiff / 10
 				if rocketPoints > 0 {
 					if err := s.UpdateRocketPoints(userID, rocketPoints); err != nil {
@@ -55,6 +58,7 @@ func (s *service) UpdateDailySteps(userID uuid.UUID, steps int) error {
 						return fmt.Errorf("failed to update rocket points: %w", err)
 					}
 				}
+				s.saveStepMilestoneActivities(userID, existingSteps, steps)
 			}
 		}
 	}

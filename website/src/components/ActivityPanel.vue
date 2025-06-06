@@ -18,7 +18,8 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import api from '../api/backend-api'
+import api from '@/api/backend-api'
+import { getColor } from '@/utils/colorUtils'
 
 interface Activity {
   name: string
@@ -34,14 +35,6 @@ function getInitials(name: string) {
   const parts = name.split(' ')
   if (parts.length === 1) return name.substring(0, 2).toUpperCase()
   return (parts[0][0] + (parts[1]?.[0] || '')).toUpperCase()
-}
-
-// Utility: Deterministic color from name
-function getColor(name: string) {
-  const colors = ['#2a5298', '#f39c12', '#27ae60', '#8e44ad', '#e74c3c', '#16a085']
-  let hash = 0
-  for (let i = 0; i < name.length; i++) hash = name.charCodeAt(i) + ((hash << 5) - hash)
-  return colors[Math.abs(hash) % colors.length]
 }
 
 function formatRelativeTime(iso: string): string {
@@ -80,9 +73,14 @@ onMounted(async () => {
 
 <style scoped>
 .activity-panel {
-    height: 100%;
+    height: 580px;
     display: flex;
     flex-direction: column;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(42, 82, 152, 0.06);
+    padding: 1.5rem 1rem;
+    overflow: hidden;
 }
 
 .panel-title {
@@ -97,7 +95,10 @@ onMounted(async () => {
   list-style: none;
   padding: 0;
   margin: 0;
+  flex: 1 1 auto;
   overflow-y: auto;
+  min-height: 0;
+  max-height: 100%;
 }
 
 .activity-item {

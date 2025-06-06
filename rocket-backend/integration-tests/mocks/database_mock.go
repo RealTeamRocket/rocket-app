@@ -52,6 +52,11 @@ type MockDB struct {
 	GetChallengeByIDFunc               func(challengeID uuid.UUID) (*types.Challenge, error)
 	SaveActivityFunc                   func(userID uuid.UUID, message string) error
 	GetActivitiesForUserAndFriendsFunc func(userID uuid.UUID) ([]types.ActivityWithUser, error)
+	SaveChatMessageFunc                func(userID uuid.UUID, message string, timestamp string) (uuid.UUID, error)
+	GetChatMessagesFunc                func(userID uuid.UUID) ([]types.ChatMessage, error)
+	AddReactionToChatMessageFunc       func(userID uuid.UUID, messageID uuid.UUID) error
+	CountReactionsForMessageFunc       func(messageID uuid.UUID) (int, error)
+	GetIDByMessageIDFunc               func(messageID uuid.UUID) (uuid.UUID, error)
 }
 
 func (m *MockDB) ExecuteRawSQL(query string) (sql.Result, error) {
@@ -346,4 +351,39 @@ func (m *MockDB) DeleteRun(runID uuid.UUID) error {
 		return m.DeleteRunFunc(runID)
 	}
 	return nil
+}
+
+func (m *MockDB) SaveChatMessage(userID uuid.UUID, message string, timestamp string) (uuid.UUID, error) {
+	if m.SaveChatMessageFunc != nil {
+		return m.SaveChatMessageFunc(userID, message, timestamp)
+	}
+	return uuid.Nil, nil
+}
+
+func (m *MockDB) GetChatMessages(userID uuid.UUID) ([]types.ChatMessage, error) {
+	if m.GetChatMessagesFunc != nil {
+		return m.GetChatMessagesFunc(userID)
+	}
+	return nil, nil
+}
+
+func (m *MockDB) AddReactionToChatMessage(userID uuid.UUID, messageID uuid.UUID) error {
+	if m.AddReactionToChatMessageFunc != nil {
+		return m.AddReactionToChatMessageFunc(userID, messageID)
+	}
+	return nil
+}
+
+func (m *MockDB) CountReactionsForMessage(messageID uuid.UUID) (int, error) {
+	if m.CountReactionsForMessageFunc != nil {
+		return m.CountReactionsForMessageFunc(messageID)
+	}
+	return 0, nil
+}
+
+func (m *MockDB) GetIDByMessageID(messageID uuid.UUID) (uuid.UUID, error) {
+	if m.GetIDByMessageIDFunc != nil {
+		return m.GetIDByMessageIDFunc(messageID)
+	}
+	return uuid.Nil, nil
 }
