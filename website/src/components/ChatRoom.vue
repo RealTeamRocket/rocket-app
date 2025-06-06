@@ -4,17 +4,22 @@
       class="chat-messages flex-grow-1 overflow-auto px-2 py-3 d-flex flex-column-reverse"
       ref="messagesContainer"
     >
-      <ChatMessage
-        v-for="(msg, idx) in reversedMessages"
-        :key="msg.id || idx"
-        :username="msg.mine ? '' : msg.username"
-        :message="msg.message"
-        :mine="msg.mine"
-        :reactions="msg.reactions || 0"
-        :timestamp="msg.timestamp"
-        :hasReacted="msg.hasReacted || false"
-        :onReact="() => handleReact(msg)"
-      />
+      <template v-for="(item, idx) in messagesWithDates" :key="item.type === 'date' ? 'date-' + item.date + '-' + idx : item.msg.id || idx">
+        <ChatDateSeparator
+          v-if="item.type === 'date'"
+          :date="item.date"
+        />
+        <ChatMessage
+          v-else
+          :username="item.msg.mine ? '' : item.msg.username"
+          :message="item.msg.message"
+          :mine="item.msg.mine"
+          :reactions="item.msg.reactions || 0"
+          :timestamp="item.msg.timestamp"
+          :hasReacted="item.msg.hasReacted || false"
+          :onReact="() => handleReact(item.msg)"
+        />
+      </template>
     </div>
     <form class="chat-input-form d-flex border-top p-2 bg-white" @submit.prevent="sendMessage">
       <input
@@ -33,6 +38,7 @@
 <script setup lang="ts">
 import { ref, defineProps, onMounted, onBeforeUnmount, nextTick, computed } from 'vue'
 import ChatMessage from './ChatMessage.vue'
+import ChatDateSeparator from './ChatDateSeparator.vue'
 import { ChatWebSocket, getChatWebSocketURL } from '@/api/chat-ws'
 import api from '@/api/backend-api'
 
@@ -63,7 +69,20 @@ function getUsername(): string {
   return props.user?.username || 'Me'
 }
 
-const reversedMessages = computed(() => [...messages.value].reverse())
+const messagesWithDates = computed(() => {
+  const result: Array<{ type: 'date', date: string } | { type: 'msg', msg: LocalMessage }> = []
+  let lastDate = ''
+  for (let i = 0; i < messages.value.length; i++) {
+    const msg = messages.value[i]
+    const msgDate = msg.timestamp ? msg.timestamp.split('T')[0] : ''
+    if (msgDate && msgDate !== lastDate) {
+      result.push({ type: 'date', date: msgDate })
+      lastDate = msgDate
+    }
+    result.push({ type: 'msg', msg })
+  }
+  return result.reverse()
+})
 
 function scrollToTop() {
   nextTick(() => {
