@@ -91,3 +91,14 @@ func (s *service) CountReactionsForMessage(messageID uuid.UUID) (int, error) {
     err := s.db.QueryRow(query, messageID).Scan(&count)
     return count, err
 }
+
+func (s *service) GetIDByMessageID(messageID uuid.UUID) (uuid.UUID, error) {
+	query := `SELECT user_id FROM chat_messages WHERE id = $1`
+	var userID uuid.UUID
+	err := s.db.QueryRow(query, messageID).Scan(&userID)
+	if err != nil {
+		logger.Error("Failed to get user ID by message ID", err)
+		return uuid.Nil, fmt.Errorf("%w: %v", custom_error.ErrFailedToRetrieveData, err)
+	}
+	return userID, nil
+}

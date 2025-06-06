@@ -90,6 +90,7 @@ type Service interface {
 	GetChatMessages(userID uuid.UUID) ([]types.ChatMessage, error)
 	AddReactionToChatMessage(userID uuid.UUID, messageID uuid.UUID) error
 	CountReactionsForMessage(messageID uuid.UUID) (int, error)
+	GetIDByMessageID(messageID uuid.UUID) (uuid.UUID, error)
 }
 
 type service struct {

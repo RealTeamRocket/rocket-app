@@ -125,6 +125,14 @@ func (s *Server) ChatWebSocketHandler(hub *ChatHub) gin.HandlerFunc {
 				if countErr != nil {
 					logger.Error("Failed to count reactions for message:", countErr)
 				}
+				resiver, err := s.db.GetIDByMessageID(messageID)
+				if err != nil {
+					logger.Error("Failed to get user ID by message ID:", err)
+				}
+				err = s.db.UpdateRocketPoints(resiver, 10)
+				if err != nil {
+					logger.Error("Failed to add reaction points for user:", userUUID.String(), "error:", err)
+				}
 				// Broadcast reaction event
 				reactionEvent := map[string]any{
 					"type":      "reaction",
