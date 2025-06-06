@@ -73,9 +73,14 @@ onMounted(async () => {
 
 <style scoped>
 .activity-panel {
-    height: 100%;
+    height: 580px;
     display: flex;
     flex-direction: column;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(42, 82, 152, 0.06);
+    padding: 1.5rem 1rem;
+    overflow: hidden;
 }
 
 .panel-title {
@@ -90,7 +95,10 @@ onMounted(async () => {
   list-style: none;
   padding: 0;
   margin: 0;
+  flex: 1 1 auto;
   overflow-y: auto;
+  min-height: 0;
+  max-height: 100%;
 }
 
 .activity-item {
