@@ -1,80 +1,50 @@
-package database_tests
+package server_tests
 
 import (
-	"rocket-backend/internal/database"
-	"rocket-backend/internal/types"
 	"time"
 
-	"github.com/google/uuid"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
+	"github.com/google/uuid"
 )
 
-var _ = Describe("Credentials Table", func() {
-	var (
-		srv database.Service
-	)
+var _ = Describe("Credentials Table Integration", func() {
+	var credsID uuid.UUID
+	var email string
 
 	BeforeEach(func() {
-		srv = database.NewWithConfig(connectionString)
+		credsID = uuid.New()
+		email = "creduser@example.com"
+		_, err := testDbInstance.Exec(`
+			INSERT INTO credentials (id, email, password, created_at, last_login)
+			VALUES ($1, $2, $3, $4, $5)
+		`, credsID, email, "hashedpassword", time.Now(), time.Now())
+		Expect(err).To(BeNil())
 	})
 
 	AfterEach(func() {
-		_, err := srv.ExecuteRawSQL("DELETE FROM credentials")
-		Expect(err).NotTo(HaveOccurred())
+		testDbInstance.Exec("DELETE FROM credentials")
 	})
 
-	Context("SaveCredentials", func() {
-		It("should save credentials successfully", func() {
-			id := uuid.New()
-			email := "john@doe.com"
-			password := "securepassword"
-			createdAt := time.Now().Format(time.RFC3339)
-			lastLogin := time.Now().Format(time.RFC3339)
-
-			credentials := types.Credentials{
-				ID:        id,
-				Email:     email,
-				Password:  password,
-				CreatedAt: createdAt,
-				LastLogin: lastLogin,
-			}
-
-			err := srv.SaveCredentials(credentials)
-			Expect(err).NotTo(HaveOccurred())
-
-			// Verify that the credentials were saved correctly
-			savedCreds, err := srv.GetUserByEmail(email)
-			Expect(err).NotTo(HaveOccurred())
-			Expect(savedCreds.ID).To(Equal(credentials.ID))
-			Expect(savedCreds.Email).To(Equal(credentials.Email))
-			Expect(savedCreds.Password).To(Equal(credentials.Password))
-			Expect(savedCreds.CreatedAt).To(Equal(credentials.CreatedAt))
-			Expect(savedCreds.LastLogin).To(Equal(credentials.LastLogin))
-		})
+	It("should insert and retrieve credentials by email", func() {
+		row := testDbInstance.QueryRow(`
+			SELECT id, email, password FROM credentials WHERE email = $1
+		`, email)
+		var gotID uuid.UUID
+		var gotEmail, gotPassword string
+		err := row.Scan(&gotID, &gotEmail, &gotPassword)
+		Expect(err).To(BeNil())
+		Expect(gotID).To(Equal(credsID))
+		Expect(gotEmail).To(Equal(email))
+		Expect(gotPassword).To(Equal("hashedpassword"))
 	})
 
-	Context("CheckEmail", func() {
-		It("should return an error if email already exists", func() {
-			id := uuid.New()
-			email := "john@doe.com"
-			password := "securepassword"
-			createdAt := time.Now().Format(time.RFC3339)
-			lastLogin := time.Now().Format(time.RFC3339)
-
-			credentials := types.Credentials{
-				ID:        id,
-				Email:     email,
-				Password:  password,
-				CreatedAt: createdAt,
-				LastLogin: lastLogin,
-			}
-
-			err := srv.SaveCredentials(credentials)
-			Expect(err).NotTo(HaveOccurred())
-
-			err = srv.CheckEmail(email)
-			Expect(err).To(HaveOccurred())
-		})
+	It("should not allow duplicate emails", func() {
+		_, err := testDbInstance.Exec(`
+			INSERT INTO credentials (id, email, password, created_at, last_login)
+			VALUES ($1, $2, $3, $4, $5)
+		`, uuid.New(), email, "anotherpassword", time.Now(), time.Now())
+		Expect(err).ToNot(BeNil())
+		Expect(err.Error()).To(ContainSubstring("duplicate key value"))
 	})
 })

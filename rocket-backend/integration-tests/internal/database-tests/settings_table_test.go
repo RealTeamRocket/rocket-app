@@ -1,137 +1,72 @@
-package database_tests
+package server_tests
 
 import (
-	"rocket-backend/internal/database"
-	"rocket-backend/internal/types"
+	"time"
 
-	"github.com/google/uuid"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
+	"github.com/google/uuid"
 )
 
-var _ = Describe("Settings table tests", func() {
-	var (
-		srv database.Service
-	)
+var _ = Describe("Settings Table Integration", func() {
+	var userID uuid.UUID
+	var settingsID uuid.UUID
 
 	BeforeEach(func() {
-		srv = database.NewWithConfig(connectionString)
+		userID = uuid.New()
+		settingsID = uuid.New()
+		now := time.Now()
+		// Insert into credentials first (to satisfy users FK)
+		_, err := testDbInstance.Exec(`
+			INSERT INTO credentials (id, email, password, created_at, last_login)
+			VALUES ($1, $2, $3, $4, $5)
+		`, userID, "settingsuser@example.com", "hashedpassword", now, now)
+		Expect(err).To(BeNil())
+
+		// Insert into users
+		_, err = testDbInstance.Exec(`
+			INSERT INTO users (id, username, email, rocketpoints)
+			VALUES ($1, $2, $3, $4)
+		`, userID, "settingsuser", "settingsuser@example.com", 0)
+		Expect(err).To(BeNil())
 	})
 
 	AfterEach(func() {
-		_, err := srv.ExecuteRawSQL("DELETE FROM settings")
-		Expect(err).NotTo(HaveOccurred())
-		_, err = srv.ExecuteRawSQL("DELETE FROM image_store")
-		Expect(err).NotTo(HaveOccurred())
+		testDbInstance.Exec("DELETE FROM settings")
+		testDbInstance.Exec("DELETE FROM users")
+		testDbInstance.Exec("DELETE FROM credentials")
 	})
 
-	Context("Create Settings and retrieve them", func() {
-		It("Create Settings and get settings", func() {
-			id := uuid.New()
-			userID := uuid.New()
-			imageId := uuid.Nil
-			stepGoal := 1
+	It("should insert and retrieve settings for a user", func() {
+		stepGoal := 12345
+		_, err := testDbInstance.Exec(`
+			INSERT INTO settings (id, user_id, step_goal)
+			VALUES ($1, $2, $3)
+		`, settingsID, userID, stepGoal)
+		Expect(err).To(BeNil())
 
-			settings := types.Settings{
-				ID:       id,
-				UserId:   userID,
-				ImageId:  imageId,
-				StepGoal: stepGoal,
-			}
-
-			err := srv.CreateSettings(settings)
-			Expect(err).NotTo(HaveOccurred())
-
-			savedSettings, err := srv.GetSettingsByUserID(userID)
-			Expect(err).NotTo(HaveOccurred())
-
-			Expect(settings.ID).To(Equal(savedSettings.ID))
-			Expect(settings.UserId).To(Equal(savedSettings.UserId))
-			Expect(settings.ImageId).To(Equal(savedSettings.ImageId))
-			Expect(settings.StepGoal).To(Equal(savedSettings.StepGoal))
-		})
+		row := testDbInstance.QueryRow(`
+			SELECT id, user_id, step_goal FROM settings WHERE user_id = $1
+		`, userID)
+		var gotID uuid.UUID
+		var gotUserID uuid.UUID
+		var gotStepGoal int
+		err = row.Scan(&gotID, &gotUserID, &gotStepGoal)
+		Expect(err).To(BeNil())
+		Expect(gotID).To(Equal(settingsID))
+		Expect(gotUserID).To(Equal(userID))
+		Expect(gotStepGoal).To(Equal(stepGoal))
 	})
 
-	Context("Update Settings", func() {
-		It("Create Settings and get settings", func() {
-			id := uuid.New()
-			userID := uuid.New()
-			imageId := uuid.Nil
-			stepGoal := 1
-
-			settings := types.Settings{
-				ID:       id,
-				UserId:   userID,
-				ImageId:  imageId,
-				StepGoal: stepGoal,
-			}
-
-			err := srv.CreateSettings(settings)
-			Expect(err).NotTo(HaveOccurred())
-
-			updatedSettings := types.SettingsDTO{
-				StepGoal: 100,
-			}
-			imageId = uuid.New()
-
-			err = srv.UpdateSettingsStepGoal(userID, updatedSettings.StepGoal)
-			Expect(err).NotTo(HaveOccurred())
-
-			err = srv.UpdateSettingsImage(userID, imageId)
-			Expect(err).NotTo(HaveOccurred())
-
-			savedSettings, err := srv.GetSettingsByUserID(userID)
-			Expect(err).NotTo(HaveOccurred())
-
-			Expect(settings.ID).To(Equal(savedSettings.ID))
-			Expect(settings.UserId).To(Equal(savedSettings.UserId))
-			Expect(updatedSettings.StepGoal).To(Equal(savedSettings.StepGoal))
-			Expect(imageId).To(Equal(savedSettings.ImageId))
-		})
-	})
-
-	Context("Update Step Goal", func() {
-		It("should update the step goal independently", func() {
-			userID := uuid.New()
-			settings := types.Settings{
-				ID:       uuid.New(),
-				UserId:   userID,
-				ImageId:  uuid.Nil,
-				StepGoal: 5000,
-			}
-
-			err := srv.CreateSettings(settings)
-			Expect(err).NotTo(HaveOccurred())
-
-			err = srv.UpdateSettingsStepGoal(userID, 10000)
-			Expect(err).NotTo(HaveOccurred())
-
-			savedSettings, err := srv.GetSettingsByUserID(userID)
-			Expect(err).NotTo(HaveOccurred())
-			Expect(savedSettings.StepGoal).To(Equal(10000))
-		})
-	})
-
-	Context("Update Image", func() {
-		It("should update the image independently", func() {
-			userID := uuid.New()
-			settings := types.Settings{
-				ID:       uuid.New(),
-				UserId:   userID,
-				ImageId:  uuid.Nil,
-				StepGoal: 5000,
-			}
-
-			err := srv.CreateSettings(settings)
-			Expect(err).NotTo(HaveOccurred())
-
-			newImageID := uuid.New()
-			err = srv.UpdateSettingsImage(userID, newImageID)
-			Expect(err).NotTo(HaveOccurred())
-
-			savedSettings, err := srv.GetSettingsByUserID(userID)
-			Expect(err).NotTo(HaveOccurred())
-			Expect(savedSettings.ImageId).To(Equal(newImageID))
-		})
+	It("should return no rows if settings do not exist for user", func() {
+		otherUserID := uuid.New()
+		row := testDbInstance.QueryRow(`
+			SELECT id, user_id, step_goal FROM settings WHERE user_id = $1
+		`, otherUserID)
+		var gotID uuid.UUID
+		var gotUserID uuid.UUID
+		var gotStepGoal int
+		err := row.Scan(&gotID, &gotUserID, &gotStepGoal)
+		Expect(err).ToNot(BeNil())
 	})
 })

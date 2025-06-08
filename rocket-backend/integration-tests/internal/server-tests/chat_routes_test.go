@@ -38,7 +38,6 @@ var _ = Describe("Chat Handlers API", func() {
 	})
 
 	It("should show sent chat message in chat history", func() {
-		// Send a message via websocket
 		httpURL := baseURL + "/protected/ws/chat"
 		u, err := url.Parse(httpURL)
 		Expect(err).To(BeNil())
@@ -57,7 +56,6 @@ var _ = Describe("Chat Handlers API", func() {
 		// Wait for the message to be processed and stored
 		time.Sleep(300 * time.Millisecond)
 
-		// Now get chat history
 		req, _ := http.NewRequest("GET", baseURL+"/protected/chat/history", nil)
 		req.Header.Set("Authorization", "Bearer "+token)
 		resp, err := http.DefaultClient.Do(req)

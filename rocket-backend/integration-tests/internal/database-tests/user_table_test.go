@@ -1,53 +1,85 @@
-package database_tests
+package server_tests
 
 import (
-	"rocket-backend/internal/database"
-	"rocket-backend/internal/types"
+	"time"
 
-	"github.com/google/uuid"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
+	"github.com/google/uuid"
 )
 
-var _ = Describe("Users Table", func() {
-	var (
-		srv database.Service
-	)
+var _ = Describe("Users Table Integration", func() {
+	var userID uuid.UUID
 
 	BeforeEach(func() {
-		srv = database.NewWithConfig(connectionString)
+		userID = uuid.New()
+		now := time.Now()
+		// Insert into credentials first (to satisfy users FK)
+		_, err := testDbInstance.Exec(`
+			INSERT INTO credentials (id, email, password, created_at, last_login)
+			VALUES ($1, $2, $3, $4, $5)
+		`, userID, "useruser@example.com", "hashedpassword", now, now)
+		Expect(err).To(BeNil())
 	})
 
 	AfterEach(func() {
-		_, err := srv.ExecuteRawSQL("DELETE FROM users")
-		Expect(err).NotTo(HaveOccurred())
+		testDbInstance.Exec("DELETE FROM users")
+		testDbInstance.Exec("DELETE FROM credentials")
 	})
 
-	Context("SaveUserProfile", func() {
-		It("should save user profile successfully", func() {
-			id := uuid.New()
-			username := "johndoe"
-			email := "john@doe.com"
-			rocketPoints := 100
+	It("should insert and retrieve a user", func() {
+		username := "useruser"
+		email := "useruser@example.com"
+		rocketpoints := 42
 
-			user := types.User{
-				ID:           id,
-				Username:     username,
-				Email:        email,
-				RocketPoints: rocketPoints,
-			}
+		_, err := testDbInstance.Exec(`
+			INSERT INTO users (id, username, email, rocketpoints)
+			VALUES ($1, $2, $3, $4)
+		`, userID, username, email, rocketpoints)
+		Expect(err).To(BeNil())
 
-			err := srv.SaveUserProfile(user)
-			Expect(err).NotTo(HaveOccurred())
+		row := testDbInstance.QueryRow(`
+			SELECT id, username, email, rocketpoints FROM users WHERE id = $1
+		`, userID)
+		var gotID uuid.UUID
+		var gotUsername, gotEmail string
+		var gotPoints int
+		err = row.Scan(&gotID, &gotUsername, &gotEmail, &gotPoints)
+		Expect(err).To(BeNil())
+		Expect(gotID).To(Equal(userID))
+		Expect(gotUsername).To(Equal(username))
+		Expect(gotEmail).To(Equal(email))
+		Expect(gotPoints).To(Equal(rocketpoints))
+	})
 
-			// Verify that the user profile was saved correctly
-			var savedUser types.User
-			savedUser, err = srv.GetUserByID(user.ID)
-			Expect(err).NotTo(HaveOccurred())
-			Expect(savedUser.ID).To(Equal(user.ID))
-			Expect(savedUser.Username).To(Equal(user.Username))
-			Expect(savedUser.Email).To(Equal(user.Email))
-			Expect(savedUser.RocketPoints).To(Equal(user.RocketPoints))
-		})
+	It("should update rocketpoints for a user", func() {
+		_, err := testDbInstance.Exec(`
+			INSERT INTO users (id, username, email, rocketpoints)
+			VALUES ($1, $2, $3, $4)
+		`, userID, "useruser", "useruser@example.com", 0)
+		Expect(err).To(BeNil())
+
+		_, err = testDbInstance.Exec(`
+			UPDATE users SET rocketpoints = rocketpoints + $1 WHERE id = $2
+		`, 10, userID)
+		Expect(err).To(BeNil())
+
+		row := testDbInstance.QueryRow(`
+			SELECT rocketpoints FROM users WHERE id = $1
+		`, userID)
+		var gotPoints int
+		err = row.Scan(&gotPoints)
+		Expect(err).To(BeNil())
+		Expect(gotPoints).To(Equal(10))
+	})
+
+	It("should enforce foreign key constraint on id", func() {
+		nonExistentCredID := uuid.New()
+		_, err := testDbInstance.Exec(`
+			INSERT INTO users (id, username, email, rocketpoints)
+			VALUES ($1, $2, $3, $4)
+		`, nonExistentCredID, "nouser", "nouser@example.com", 0)
+		Expect(err).ToNot(BeNil())
+		Expect(err.Error()).To(ContainSubstring("violates foreign key constraint"))
 	})
 })

@@ -202,7 +202,7 @@ func truncateTables(db *sql.DB) error {
 	return err
 }
 
-func TestDatabaseIntegration(t *testing.T) {
+func TestServerIntegration(t *testing.T) {
 	RegisterFailHandler(Fail)
 	RunSpecs(t, "Database Integration Tests Suite")
 }

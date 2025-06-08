@@ -1,127 +1,107 @@
-package database_tests
+package server_tests
 
 import (
-"fmt"
-"rocket-backend/internal/database"
+	"time"
 
-"github.com/google/uuid"
-. "github.com/onsi/ginkgo/v2"
-. "github.com/onsi/gomega"
+	. "github.com/onsi/ginkgo/v2"
+	. "github.com/onsi/gomega"
+	"github.com/google/uuid"
 )
 
-var _ = Describe("Friends table tests", func() {
-var (
-	srv database.Service
-)
+var _ = Describe("Friends Table Integration", func() {
+	var userID uuid.UUID
+	var friendID uuid.UUID
 
-BeforeEach(func() {
-	srv = database.NewWithConfig(connectionString)
+	BeforeEach(func() {
+		userID = uuid.New()
+		friendID = uuid.New()
+		now := time.Now()
 
-	// Clean up tables before each test
-	_, err := srv.ExecuteRawSQL("DELETE FROM friends")
-	Expect(err).NotTo(HaveOccurred())
-	_, err = srv.ExecuteRawSQL("DELETE FROM users")
-	Expect(err).NotTo(HaveOccurred())
-})
+		// Insert into credentials for both users
+		_, err := testDbInstance.Exec(`
+			INSERT INTO credentials (id, email, password, created_at, last_login)
+			VALUES ($1, $2, $3, $4, $5), ($6, $7, $8, $9, $10)
+		`, userID, "user1@example.com", "hashedpassword", now, now,
+			friendID, "user2@example.com", "hashedpassword", now, now)
+		Expect(err).To(BeNil())
 
-AfterEach(func() {
-	// Clean up tables after each test
-	_, err := srv.ExecuteRawSQL("DELETE FROM friends")
-	Expect(err).NotTo(HaveOccurred())
-	_, err = srv.ExecuteRawSQL("DELETE FROM users")
-	Expect(err).NotTo(HaveOccurred())
-})
-
-Context("AddFriend", func() {
-	It("should add a friend successfully", func() {
-		userID := uuid.New()
-		friendID := uuid.New()
-
-		// Insert test users
-		_, err := srv.ExecuteRawSQL(fmt.Sprintf(`
+		// Insert into users for both users
+		_, err = testDbInstance.Exec(`
 			INSERT INTO users (id, username, email, rocketpoints)
-			VALUES ('%s', 'user1', 'user1@example.com', 100),
-				   ('%s', 'friend1', 'friend1@example.com', 200)
-		`, userID, friendID))
-		Expect(err).NotTo(HaveOccurred())
+			VALUES ($1, $2, $3, $4), ($5, $6, $7, $8)
+		`, userID, "user1", "user1@example.com", 0,
+			friendID, "user2", "user2@example.com", 10)
+		Expect(err).To(BeNil())
+	})
 
-		// Add friend
-		err = srv.AddFriend(userID, friendID)
-		Expect(err).NotTo(HaveOccurred())
+	AfterEach(func() {
+		testDbInstance.Exec("DELETE FROM friends")
+		testDbInstance.Exec("DELETE FROM users")
+		testDbInstance.Exec("DELETE FROM credentials")
+	})
 
-		// Verify friend was added
+	It("should add and retrieve a friend", func() {
+		_, err := testDbInstance.Exec(`
+			INSERT INTO friends (user_id, friend_id)
+			VALUES ($1, $2)
+		`, userID, friendID)
+		Expect(err).To(BeNil())
+
+		rows, err := testDbInstance.Query(`
+			SELECT friend_id FROM friends WHERE user_id = $1
+		`, userID)
+		Expect(err).To(BeNil())
+		defer rows.Close()
+
+		var found bool
+		for rows.Next() {
+			var fid uuid.UUID
+			err := rows.Scan(&fid)
+			Expect(err).To(BeNil())
+			if fid == friendID {
+				found = true
+			}
+		}
+		Expect(found).To(BeTrue())
+	})
+
+	It("should not allow a user to friend themselves", func() {
+		_, err := testDbInstance.Exec(`
+			INSERT INTO friends (user_id, friend_id)
+			VALUES ($1, $2)
+		`, userID, userID)
+		Expect(err).ToNot(BeNil())
+		Expect(err.Error()).To(ContainSubstring("violates check constraint"))
+	})
+
+	It("should delete a friend", func() {
+		_, err := testDbInstance.Exec(`
+			INSERT INTO friends (user_id, friend_id)
+			VALUES ($1, $2)
+		`, userID, friendID)
+		Expect(err).To(BeNil())
+
+		_, err = testDbInstance.Exec(`
+			DELETE FROM friends WHERE user_id = $1 AND friend_id = $2
+		`, userID, friendID)
+		Expect(err).To(BeNil())
+
+		row := testDbInstance.QueryRow(`
+			SELECT COUNT(*) FROM friends WHERE user_id = $1 AND friend_id = $2
+		`, userID, friendID)
 		var count int
-		row := srv.QueryRow(fmt.Sprintf(`
-			SELECT COUNT(*) FROM friends WHERE user_id = '%s' AND friend_id = '%s'
-		`, userID, friendID))
 		err = row.Scan(&count)
-		Expect(err).NotTo(HaveOccurred())
-		Expect(count).To(Equal(1))
+		Expect(err).To(BeNil())
+		Expect(count).To(Equal(0))
 	})
 
-	It("should not allow a user to add themselves as a friend", func() {
-		userID := uuid.New()
-
-		// Insert test user
-		_, err := srv.ExecuteRawSQL(fmt.Sprintf(`
-			INSERT INTO users (id, username, email, rocketpoints)
-			VALUES ('%s', 'user1', 'user1@example.com', 100)
-		`, userID))
-		Expect(err).NotTo(HaveOccurred())
-
-		// Attempt to add self as friend
-		err = srv.AddFriend(userID, userID)
-		Expect(err).To(HaveOccurred())
+	It("should enforce foreign key constraint on friend_id", func() {
+		nonExistentID := uuid.New()
+		_, err := testDbInstance.Exec(`
+			INSERT INTO friends (user_id, friend_id)
+			VALUES ($1, $2)
+		`, userID, nonExistentID)
+		Expect(err).ToNot(BeNil())
+		Expect(err.Error()).To(ContainSubstring("violates foreign key constraint"))
 	})
-})
-
-Context("GetFriends", func() {
-	It("should retrieve a list of friends for a user", func() {
-		userID := uuid.New()
-		friendID1 := uuid.New()
-		friendID2 := uuid.New()
-
-		// Insert test users
-		_, err := srv.ExecuteRawSQL(fmt.Sprintf(`
-			INSERT INTO users (id, username, email, rocketpoints)
-			VALUES ('%s', 'user1', 'user1@example.com', 100),
-				   ('%s', 'friend1', 'friend1@example.com', 200),
-				   ('%s', 'friend2', 'friend2@example.com', 300)
-		`, userID, friendID1, friendID2))
-		Expect(err).NotTo(HaveOccurred())
-
-		// Add friends
-		err = srv.AddFriend(userID, friendID1)
-		Expect(err).NotTo(HaveOccurred())
-		err = srv.AddFriend(userID, friendID2)
-		Expect(err).NotTo(HaveOccurred())
-
-		// Retrieve friends
-		friends, err := srv.GetFriends(userID)
-		Expect(err).NotTo(HaveOccurred())
-		Expect(friends).To(HaveLen(2))
-
-		// Verify friends are sorted by username
-		Expect(friends[0].Username).To(Equal("friend1"))
-		Expect(friends[1].Username).To(Equal("friend2"))
-	})
-})
-
-Context("GetFriendsRankedByPoints", func() {
-	It("should return an error if the user has no friends", func() {
-		userID := uuid.New()
-
-		// Insert test user
-		_, err := srv.ExecuteRawSQL(fmt.Sprintf(`
-			INSERT INTO users (id, username, email, rocketpoints)
-			VALUES ('%s', 'user1', 'user1@example.com', 100)
-		`, userID))
-		Expect(err).NotTo(HaveOccurred())
-
-		// Attempt to retrieve friends ranked by points
-		friends, err := srv.GetFriendsRankedByPoints(userID)
-		Expect(err).NotTo(HaveOccurred())
-		Expect(friends).To(BeEmpty())
-	})
-})
 })

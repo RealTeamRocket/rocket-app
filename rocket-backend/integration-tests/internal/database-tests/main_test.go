@@ -1,20 +1,23 @@
-package database_tests
+package server_tests
 
 import (
 	"context"
 	"database/sql"
 	"errors"
 	"fmt"
+	"net/http"
 	"os"
 	"path/filepath"
+	"rocket-backend/internal/database"
+	"rocket-backend/internal/server"
 	"rocket-backend/pkg/logger"
 	"runtime"
 	"testing"
 	"time"
 
 	"github.com/golang-migrate/migrate/v4"
-	_ "github.com/golang-migrate/migrate/v4/database/postgres" // used by migrator
-	_ "github.com/golang-migrate/migrate/v4/source/file"       // used by migrator
+	_ "github.com/golang-migrate/migrate/v4/database/postgres"
+	_ "github.com/golang-migrate/migrate/v4/source/file"
 	_ "github.com/jackc/pgx/v5/stdlib"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -43,18 +46,39 @@ type TestDatabase struct {
 }
 
 var testDB *TestDatabase
+var testServer *http.Server
+var baseURL string
+var port = 8090
 
 var _ = BeforeSuite(func() {
 	testDB = SetupTestDatabase()
 	testDbInstance = testDB.DbInstance
+
+	// Start API server for all tests in this package
+	connStr := fmt.Sprintf("postgres://%s:%s@%s/%s?sslmode=disable", DbUser, DbPass, testDB.DbAddress, DbName)
+	dbService := database.NewWithConfig(connStr)
+	testServer = &http.Server{
+		Addr:    fmt.Sprintf(":%d", port),
+		Handler: server.NewServerWithDB(dbService, port, "testsecret").RegisterRoutes(),
+	}
+	go testServer.ListenAndServe()
+	time.Sleep(1 * time.Second)
+	baseURL = fmt.Sprintf("http://localhost:%d/api/v1", port)
 })
 
 var _ = AfterSuite(func() {
+	if testServer != nil {
+		testServer.Close()
+	}
 	testDB.TearDown()
 })
 
+var _ = AfterEach(func() {
+	err := truncateTables(testDbInstance)
+	Expect(err).To(BeNil())
+})
+
 func SetupTestDatabase() *TestDatabase {
-	// setup db container
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*60)
 	defer cancel()
 
@@ -63,7 +87,6 @@ func SetupTestDatabase() *TestDatabase {
 		logger.Fatal("failed to setup test", err)
 	}
 
-	// migrate db schema
 	err = migrateDb(dbAddr)
 	if err != nil {
 		logger.Fatal("failed to perform db migration", err)
@@ -78,7 +101,6 @@ func SetupTestDatabase() *TestDatabase {
 
 func (tdb *TestDatabase) TearDown() {
 	tdb.DbInstance.Close()
-	// remove test container
 	_ = tdb.container.Terminate(context.Background())
 }
 
@@ -146,7 +168,7 @@ func migrateDb(dbAddr string) error {
 	if !ok {
 		return fmt.Errorf("failed to get path")
 	}
-	pathToMigrationFiles := filepath.Join(filepath.Dir(path), "../../../test-migrations")
+	pathToMigrationFiles := filepath.Join(filepath.Dir(path), "../../../migrations")
 
 	databaseURL := fmt.Sprintf("postgres://%s:%s@%s/%s?sslmode=disable", DbUser, DbPass, dbAddr, DbName)
 	m, err := migrate.New(fmt.Sprintf("file:%s", pathToMigrationFiles), databaseURL)
@@ -163,6 +185,21 @@ func migrateDb(dbAddr string) error {
 	logger.Debug("migration done")
 
 	return nil
+}
+
+// Truncate all tables for test isolation
+func truncateTables(db *sql.DB) error {
+	_, err := db.Exec(`
+		DO $$
+		DECLARE
+			r RECORD;
+		BEGIN
+			FOR r IN (SELECT tablename FROM pg_tables WHERE schemaname = 'public') LOOP
+				EXECUTE 'TRUNCATE TABLE ' || quote_ident(r.tablename) || ' RESTART IDENTITY CASCADE;';
+			END LOOP;
+		END$$;
+	`)
+	return err
 }
 
 func TestDatabaseIntegration(t *testing.T) {

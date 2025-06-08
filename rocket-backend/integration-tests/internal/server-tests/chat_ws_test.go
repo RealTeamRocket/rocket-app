@@ -28,22 +28,18 @@ var _ = Describe("Chat WebSocket API", func() {
 		Expect(err).To(BeNil())
 		u.Scheme = "ws"
 
-		// Add JWT as Authorization header
 		header := http.Header{}
 		header.Set("Authorization", "Bearer "+token)
 
-		// Connect to websocket
 		ws, resp, err := websocket.DefaultDialer.Dial(u.String(), header)
 		Expect(err).To(BeNil(), fmt.Sprintf("WebSocket dial failed: %v (HTTP status: %d)", err, resp.StatusCode))
 		defer ws.Close()
 
-		// Send a chat message
 		msg := map[string]string{"message": "hello from integration test"}
 		msgBytes, _ := json.Marshal(msg)
 		err = ws.WriteMessage(websocket.TextMessage, msgBytes)
 		Expect(err).To(BeNil())
 
-		// Receive the broadcasted message
 		ws.SetReadDeadline(time.Now().Add(2 * time.Second))
 		_, respBytes, err := ws.ReadMessage()
 		Expect(err).To(BeNil())
