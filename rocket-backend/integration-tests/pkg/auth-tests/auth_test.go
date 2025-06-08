@@ -81,7 +81,6 @@ var _ = Describe("Auth Service", func() {
 			tokenString, err := token.SignedString([]byte(jwtSecret))
 			Expect(err).NotTo(HaveOccurred())
 
-			// Wait for the token to expire
 			time.Sleep(time.Second * 2)
 
 			parsedToken, err := authService.ParseToken(tokenString)
