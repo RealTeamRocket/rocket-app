@@ -30,10 +30,14 @@ const router = createRouter({
   routes,
 })
 
-router.beforeEach((to, from, next) => {
-  const { isLoggedIn } = useAuth()
+router.beforeEach(async (to, from, next) => {
+  const { isLoggedIn, checkAuth } = useAuth()
   const publicPages = ['/', '/login', '/register']
   const authRequired = !publicPages.includes(to.path)
+
+  // Always check auth before proceeding
+  await checkAuth()
+
   if (authRequired && !isLoggedIn.value) {
     return next('/login')
   }
