@@ -16,8 +16,8 @@ import (
 	"time"
 
 	"github.com/golang-migrate/migrate/v4"
-	_ "github.com/golang-migrate/migrate/v4/database/postgres" // used by migrator
-	_ "github.com/golang-migrate/migrate/v4/source/file"       // used by migrator
+	_ "github.com/golang-migrate/migrate/v4/database/postgres"
+	_ "github.com/golang-migrate/migrate/v4/source/file"
 	_ "github.com/jackc/pgx/v5/stdlib"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -74,13 +74,11 @@ var _ = AfterSuite(func() {
 })
 
 var _ = AfterEach(func() {
-	// Truncate all tables after each test for isolation
 	err := truncateTables(testDbInstance)
 	Expect(err).To(BeNil())
 })
 
 func SetupTestDatabase() *TestDatabase {
-	// setup db container
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*60)
 	defer cancel()
 
@@ -89,7 +87,6 @@ func SetupTestDatabase() *TestDatabase {
 		logger.Fatal("failed to setup test", err)
 	}
 
-	// migrate db schema
 	err = migrateDb(dbAddr)
 	if err != nil {
 		logger.Fatal("failed to perform db migration", err)
@@ -104,7 +101,6 @@ func SetupTestDatabase() *TestDatabase {
 
 func (tdb *TestDatabase) TearDown() {
 	tdb.DbInstance.Close()
-	// remove test container
 	_ = tdb.container.Terminate(context.Background())
 }
 
@@ -193,7 +189,6 @@ func migrateDb(dbAddr string) error {
 
 // Truncate all tables for test isolation
 func truncateTables(db *sql.DB) error {
-	// Disable triggers to avoid FK issues, then truncate all tables and restart identities
 	_, err := db.Exec(`
 		DO $$
 		DECLARE

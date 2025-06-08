@@ -63,7 +63,6 @@ var _ = Describe("Activity Handlers API", func() {
 	})
 
 	It("should create an activity in the DB by uploading a run", func() {
-		// Upload a run (as before)
 		runPayload := map[string]any{
 			"route":    "LINESTRING(0 0,1 1)",
 			"duration": "30",
@@ -78,13 +77,11 @@ var _ = Describe("Activity Handlers API", func() {
 		defer resp.Body.Close()
 		Expect(resp.StatusCode).To(Equal(200))
 
-		// Query the DB directly for activities
 		var count int
 		err = testDB.DbInstance.QueryRow("SELECT COUNT(*) FROM activities").Scan(&count)
 		Expect(err).To(BeNil())
-		Expect(count).To(Equal(1)) // or >= 1 if other activities may exist
+		Expect(count).To(Equal(1))
 
-		// Optionally, fetch and print the message
 		var message string
 		err = testDB.DbInstance.QueryRow("SELECT message FROM activities ORDER BY time DESC LIMIT 1").Scan(&message)
 		Expect(err).To(BeNil())

@@ -66,7 +66,6 @@ var _ = Describe("Protected Handlers API", func() {
 		Expect(err).To(BeNil())
 		defer resp2.Body.Close()
 		Expect(resp2.StatusCode).To(Equal(200))
-		// Optionally check response body
 	})
 
 	It("should get user image (default empty)", func() {

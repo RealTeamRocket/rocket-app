@@ -19,7 +19,7 @@ var _ = Describe("Public Handlers API", func() {
 	})
 
 	It("should register a user", func() {
-		payload := map[string]interface{}{
+		payload := map[string]any{
 			"email":    "test@example.com",
 			"password": "password123",
 			"username": "testuser",
@@ -30,13 +30,13 @@ var _ = Describe("Public Handlers API", func() {
 		defer resp.Body.Close()
 		Expect(resp.StatusCode).To(Equal(200))
 		b, _ := io.ReadAll(resp.Body)
-		var result map[string]interface{}
+		var result map[string]any
 		_ = json.Unmarshal(b, &result)
 		Expect(result["message"]).To(Equal("User registered successfully"))
 	})
 
 	It("should not register a user with duplicate email", func() {
-		payload := map[string]interface{}{
+		payload := map[string]any{
 			"email":    "dupe@example.com",
 			"password": "password123",
 			"username": "dupeuser",
@@ -52,14 +52,14 @@ var _ = Describe("Public Handlers API", func() {
 		defer resp2.Body.Close()
 		Expect(resp2.StatusCode).To(Equal(400))
 		b, _ := io.ReadAll(resp2.Body)
-		var result map[string]interface{}
+		var result map[string]any
 		_ = json.Unmarshal(b, &result)
 		Expect(result["error"]).To(Equal("Email already exists"))
 	})
 
 	It("should login a user", func() {
 		// Register first
-		payload := map[string]interface{}{
+		payload := map[string]any{
 			"email":    "login@example.com",
 			"password": "password123",
 			"username": "loginuser",
@@ -70,7 +70,7 @@ var _ = Describe("Public Handlers API", func() {
 		resp.Body.Close()
 
 		// Login
-		loginPayload := map[string]interface{}{
+		loginPayload := map[string]any{
 			"email":    "login@example.com",
 			"password": "password123",
 		}
@@ -80,14 +80,14 @@ var _ = Describe("Public Handlers API", func() {
 		defer resp.Body.Close()
 		Expect(resp.StatusCode).To(Equal(200))
 		b, _ := io.ReadAll(resp.Body)
-		var result map[string]interface{}
+		var result map[string]any
 		_ = json.Unmarshal(b, &result)
 		Expect(result).To(HaveKey("token"))
 	})
 
 	It("should not login with wrong password", func() {
 		// Register first
-		payload := map[string]interface{}{
+		payload := map[string]any{
 			"email":    "wrongpass@example.com",
 			"password": "password123",
 			"username": "wrongpassuser",
@@ -98,7 +98,7 @@ var _ = Describe("Public Handlers API", func() {
 		resp.Body.Close()
 
 		// Login with wrong password
-		loginPayload := map[string]interface{}{
+		loginPayload := map[string]any{
 			"email":    "wrongpass@example.com",
 			"password": "wrongpassword",
 		}
@@ -108,7 +108,7 @@ var _ = Describe("Public Handlers API", func() {
 		defer resp.Body.Close()
 		Expect(resp.StatusCode).To(Equal(401))
 		b, _ := io.ReadAll(resp.Body)
-		var result map[string]interface{}
+		var result map[string]any
 		_ = json.Unmarshal(b, &result)
 		Expect(result["error"]).To(Equal("Invalid username or password"))
 	})
@@ -119,7 +119,7 @@ var _ = Describe("Public Handlers API", func() {
 		defer resp.Body.Close()
 		Expect(resp.StatusCode).To(Equal(200))
 		b, _ := io.ReadAll(resp.Body)
-		var result map[string]interface{}
+		var result map[string]any
 		_ = json.Unmarshal(b, &result)
 		Expect(result["message"]).To(Equal("Logged out successfully"))
 	})
