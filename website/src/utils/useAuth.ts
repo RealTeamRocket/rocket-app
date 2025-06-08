@@ -28,8 +28,6 @@ export function useAuth() {
       console.error("eyy yo somethign went wrong")
     }
     loggedIn.value = false
-    router.push('/')
-    window.location.reload()
   }
 
   async function checkAuth() {

@@ -34,6 +34,9 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { useAuth } from '@/utils/useAuth'
+import { useRouter } from 'vue-router'
+
+const router = useRouter()
 
 const { isLoggedIn, checkAuth, logout } = useAuth()
 
@@ -50,6 +53,8 @@ const closeDropdown = () => {
 const handleLogout = async () => {
   dropdownOpen.value = false
   await logout()
+  router.push('/')
+  window.location.reload()
 }
 
 onMounted(() => {
@@ -59,7 +64,8 @@ onMounted(() => {
 
 <style scoped>
 .rocket-navbar {
-  width: 100%;
+  min-width: 100vw;
+  width: max-content;
   background: linear-gradient(90deg, #1e3c72 0%, #2a5298 100%);
   box-shadow: 0 2px 8px rgba(30,60,114,0.1);
   padding: 0;
