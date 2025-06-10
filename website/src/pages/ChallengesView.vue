@@ -2,12 +2,26 @@
   <Navbar />
   <div class="challenges-view">
     <h1>Challenges</h1>
-    <p>This is the Challenges page. Here you will see all your active and completed challenges in the future.</p>
+    <ChallengeList :challenges="challenges" />
   </div>
 </template>
 
 <script setup lang="ts">
-import Navbar from '@/components/Navbar.vue'
+import { ref, onMounted } from 'vue';
+import Navbar from '@/components/Navbar.vue';
+import ChallengeList from '@/components/ChallengeList.vue';
+import backendApi from '@/api/backend-api';
+
+const challenges = ref([]);
+
+onMounted(async () => {
+  try {
+    const response = await backendApi.getChallenges();
+    challenges.value = response.data; // response.data enthält das Array der Challenges
+  } catch (e) {
+    console.error('Fehler beim Laden der Challenges:', e);
+  }
+});
 </script>
 
 <style scoped>
