@@ -10,16 +10,22 @@
       >
         <div class="run-info">
           <div class="run-date">
-            <span class="icon-calendar" title="Date"></span>
+            <span class="icon-calendar" title="Date">
+              <svg><use href="/src/assets/icons/calender.svg#icon" /></svg>
+            </span>
             <span class="run-date-value">{{ formatDate(run.created_at) }}</span>
           </div>
           <div class="run-detail-row">
-            <span class="icon-distance" title="Distance"></span>
+            <span class="icon-distance" title="Distance">
+              <svg><use href="/src/assets/icons/ruler.svg#icon" /></svg>
+            </span>
             <span class="run-detail-label">Distance:</span>
             <span class="run-detail-value">{{ run.distance?.toFixed(2) ?? '?' }} km</span>
           </div>
           <div class="run-detail-row">
-            <span class="icon-duration" title="Duration"></span>
+            <span class="icon-duration" title="Duration">
+              <svg><use href="/src/assets/icons/rocket.svg#icon" /></svg>
+            </span>
             <span class="run-detail-label">Duration:</span>
             <span class="run-detail-value">{{ run.duration ?? '?' }}</span>
           </div>
@@ -130,16 +136,21 @@ const formatDate = (dateStr: string) => {
   color: #222;
   font-weight: 600;
 }
-.icon-calendar::before {
-  content: "📅";
+.icon-calendar,
+.icon-distance,
+.icon-duration {
+  display: inline-flex;
+  align-items: center;
   margin-right: 0.2em;
+  width: 1.1em;
+  height: 1.1em;
+  vertical-align: middle;
 }
-.icon-distance::before {
-  content: "📏";
-  margin-right: 0.2em;
-}
-.icon-duration::before {
-  content: "⏱️";
-  margin-right: 0.2em;
+.icon-calendar svg,
+.icon-distance svg,
+.icon-duration svg {
+  width: 1em;
+  height: 1em;
+  display: block;
 }
 </style>

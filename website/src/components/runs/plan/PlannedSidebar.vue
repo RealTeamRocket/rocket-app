@@ -10,16 +10,16 @@
       >
         <div class="run-info">
           <div class="run-name">
-            <span class="icon-name" title="Name"></span>
+            <img src="/src/assets/icons/label.svg" class="icon-svg" alt="Name" title="Name" />
             {{ run.name }}
           </div>
           <div class="run-detail-row">
-            <span class="icon-distance" title="Distance"></span>
+            <img src="/src/assets/icons/ruler.svg" class="icon-svg" alt="Distance" title="Distance" />
             <span class="run-detail-label">Distance:</span>
             <span class="run-detail-value">{{ run.distance?.toFixed(2) ?? '?' }} km</span>
           </div>
           <div class="run-detail-row">
-            <span class="icon-calendar" title="Created"></span>
+            <img src="/src/assets/icons/calender.svg" class="icon-svg" alt="Created" title="Created" />
             <span class="run-detail-label">Created:</span>
             <span class="run-detail-value date">{{ formatDate(run.created_at) }}</span>
           </div>
@@ -126,17 +126,12 @@ const formatDate = (dateStr: string) => {
   color: #222;
   font-weight: 600;
 }
-.icon-calendar::before {
-  content: "📅";
+.icon-svg {
+  width: 1.15em;
+  height: 1.15em;
+  vertical-align: middle;
   margin-right: 0.2em;
-}
-.icon-distance::before {
-  content: "📏";
-  margin-right: 0.2em;
-}
-.icon-name::before {
-  content: "🏷️";
-  margin-right: 0.2em;
+  display: inline-block;
 }
 .run-detail-value.date {
   white-space: nowrap;

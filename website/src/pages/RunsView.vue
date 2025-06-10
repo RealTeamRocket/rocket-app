@@ -54,7 +54,9 @@
             title="Delete run"
             @click="openDeleteDialog('run', selectedRun)"
           >
-            <span class="icon-trash"></span>
+            <span class="icon-trash">
+              <img src="@/assets/icons/trash-can.svg" alt="Delete" style="width:1.25em;height:1.25em;vertical-align:middle;" />
+            </span>
           </button>
         </div>
         <div v-if="selectedRun">
@@ -88,7 +90,9 @@
             title="Delete planned run"
             @click="openDeleteDialog('planned', selectedPlannedRun)"
           >
-            <span class="icon-trash"></span>
+            <span class="icon-trash">
+              <img src="@/assets/icons/trash-can.svg" alt="Delete" style="width:1.25em;height:1.25em;vertical-align:middle;" />
+            </span>
           </button>
         </div>
         <div v-if="selectedPlannedRun">
@@ -388,9 +392,7 @@ const handleConfirmDelete = async () => {
   border-color: #c0392b;
   color: #c0392b;
 }
-.icon-trash::before {
-  content: "🗑️";
-  font-size: 1.25em;
+.icon-trash img {
   display: inline-block;
   vertical-align: middle;
 }
