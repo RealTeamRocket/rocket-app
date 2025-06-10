@@ -38,9 +38,21 @@
     />
     <main class="run-details">
       <template v-if="tab === 'past'">
-        <h2 v-if="selectedRun">Run Details</h2>
+        <div class="details-header-row" v-if="selectedRun">
+          <h2 style="margin: 0;">Run Details</h2>
+          <button
+            class="delete-run-btn"
+            title="Delete run"
+            @click="deleteRun(selectedRun)"
+          >
+            <span class="icon-trash"></span>
+          </button>
+        </div>
         <div v-if="selectedRun">
-          <strong>Date:</strong> {{ formatDate(selectedRun.created_at) }}<br>
+          <strong>Date:</strong>
+          <span style="white-space:nowrap; font-size:0.97em;">
+            {{ new Date(selectedRun.created_at).toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' }) }}
+          </span><br>
           <strong>Distance:</strong> {{ selectedRun.distance?.toFixed(2) ?? '?' }} km<br>
           <strong>Duration:</strong> {{ selectedRun.duration ?? '?' }}
         </div>
@@ -60,7 +72,16 @@
         </div>
       </template>
       <template v-else-if="tab === 'planned'">
-        <h2 v-if="selectedPlannedRun">Planned Run Details</h2>
+        <div class="details-header-row" v-if="selectedPlannedRun">
+          <h2 style="margin: 0;">Planned Run Details</h2>
+          <button
+            class="delete-run-btn"
+            title="Delete planned run"
+            @click="deletePlannedRun(selectedPlannedRun)"
+          >
+            <span class="icon-trash"></span>
+          </button>
+        </div>
         <div v-if="selectedPlannedRun">
           <strong>Name:</strong> {{ selectedPlannedRun.name }}<br>
           <strong>Distance:</strong> {{ selectedPlannedRun.distance?.toFixed(2) ?? '?' }} km<br>
@@ -104,31 +125,43 @@ import PlanRunMap from '@/components/runs/plan/PlanRunMap.vue'
 
 const tab = ref<'past' | 'plan' | 'planned'>('past')
 
-const runs = ref<any[]>([])
-const selectedRun = ref<any | null>(null)
-const plannedRuns = ref<any[]>([])
-const selectedPlannedRun = ref<any | null>(null)
+// --- Types ---
+export interface Run {
+  id: string
+  route: string
+  duration: string
+  distance: number
+  created_at: string
+}
+
+export interface PlannedRun {
+  id: string
+  route: string
+  name: string
+  created_at: string
+  distance: number
+}
+
+const runs = ref<Run[]>([])
+const selectedRun = ref<Run | null>(null)
+const plannedRuns = ref<PlannedRun[]>([])
+const selectedPlannedRun = ref<PlannedRun | null>(null)
 
 onMounted(async () => {
   const res = await backendApi.getPastRuns()
-  runs.value = Array.isArray(res.data) ? res.data : []
+  runs.value = Array.isArray(res.data) ? res.data as Run[] : []
   if (runs.value.length > 0) selectedRun.value = runs.value[0]
   const plannedRes = await backendApi.getPlannedRuns()
-  plannedRuns.value = Array.isArray(plannedRes.data) ? plannedRes.data : []
+  plannedRuns.value = Array.isArray(plannedRes.data) ? plannedRes.data as PlannedRun[] : []
   if (plannedRuns.value.length > 0) selectedPlannedRun.value = plannedRuns.value[0]
 })
 
-const selectRun = (run: any) => {
+const selectRun = (run: Run) => {
   selectedRun.value = run
 }
 
-const selectPlannedRun = (run: any) => {
+const selectPlannedRun = (run: PlannedRun) => {
   selectedPlannedRun.value = run
-}
-
-const formatDate = (dateStr: string) => {
-  if (!dateStr) return '?'
-  return new Date(dateStr).toLocaleString()
 }
 
 // Parse WKT LINESTRING to array of marker objects for start/end
@@ -143,6 +176,28 @@ const routeMarkers = (route: string) => {
 
 const feedback = ref<{ type: 'success' | 'error', message: string } | null>(null);
 
+const deleteRun = async (run: Run) => {
+  if (!run?.id) return;
+  if (!confirm('Are you sure you want to delete this run?')) return;
+  try {
+    await backendApi.deletePastRun(run.id);
+    // Remove from local list
+    runs.value = runs.value.filter((r) => r.id !== run.id);
+    // Select next run or null
+    if (runs.value.length > 0) {
+      selectedRun.value = runs.value[0];
+    } else {
+      selectedRun.value = null;
+    }
+    feedback.value = { type: 'success', message: 'Run deleted successfully.' };
+    setTimeout(() => { feedback.value = null }, 2000);
+  } catch (e) {
+    feedback.value = { type: 'error', message: 'Failed to delete run.' };
+    setTimeout(() => { feedback.value = null }, 2500);
+    console.error('Failed to delete run', e);
+  }
+};
+
 const handlePlanSave = async (payload: { name: string, points: [number, number][], distance: number }) => {
   // Convert points to WKT LINESTRING
   if (!payload.name.trim() || payload.points.length < 2) return;
@@ -150,7 +205,7 @@ const handlePlanSave = async (payload: { name: string, points: [number, number][
   try {
     await backendApi.savePlannedRun(wkt, payload.name.trim(), payload.distance);
     const res = await backendApi.getPlannedRuns();
-    plannedRuns.value = res.data;
+    plannedRuns.value = res.data as PlannedRun[];
     tab.value = 'planned';
     if (plannedRuns.value.length > 0) {
       selectedPlannedRun.value = plannedRuns.value[0];
@@ -163,6 +218,26 @@ const handlePlanSave = async (payload: { name: string, points: [number, number][
     console.error('Failed to save planned run', e);
   }
 }
+
+const deletePlannedRun = async (run: PlannedRun) => {
+  if (!run?.id) return;
+  if (!confirm('Are you sure you want to delete this planned run?')) return;
+  try {
+    await backendApi.deletePlannedRun(run.id);
+    plannedRuns.value = plannedRuns.value.filter((r) => r.id !== run.id);
+    if (plannedRuns.value.length > 0) {
+      selectedPlannedRun.value = plannedRuns.value[0];
+    } else {
+      selectedPlannedRun.value = null;
+    }
+    feedback.value = { type: 'success', message: 'Planned run deleted successfully.' };
+    setTimeout(() => { feedback.value = null }, 2000);
+  } catch (e) {
+    feedback.value = { type: 'error', message: 'Failed to delete planned run.' };
+    setTimeout(() => { feedback.value = null }, 2500);
+    console.error('Failed to delete planned run', e);
+  }
+};
 </script>
 
 <style scoped>
@@ -240,5 +315,37 @@ const handlePlanSave = async (payload: { name: string, points: [number, number][
   justify-content: flex-start;
   padding: 2rem;
   color: #888;
+}
+.details-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 0.7rem;
+}
+.delete-run-btn {
+  background: #fff;
+  border: 2px solid #e74c3c;
+  color: #e74c3c;
+  border-radius: 50%;
+  width: 2.2em;
+  height: 2.2em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.15s, border 0.15s;
+  margin-left: 1rem;
+}
+.delete-run-btn:hover, .delete-run-btn:focus {
+  background: #ffeaea;
+  border-color: #c0392b;
+  color: #c0392b;
+}
+.icon-trash::before {
+  content: "🗑️";
+  font-size: 1.25em;
+  display: inline-block;
+  vertical-align: middle;
 }
 </style>

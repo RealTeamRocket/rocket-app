@@ -86,3 +86,15 @@ func (s *service) GetAllPlannedRunsByUser(userID uuid.UUID) ([]types.PlannedRunD
     }
     return runs, nil
 }
+
+func (s *service) DeletePlannedRun(runID uuid.UUID) error {
+	query := `
+		DELETE FROM planned_runs
+		WHERE id = $1
+	`
+	_, err := s.db.Exec(query, runID)
+	if err != nil {
+		return err
+	}
+	return nil
+}

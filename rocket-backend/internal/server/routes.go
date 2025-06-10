@@ -59,6 +59,7 @@ func (s *Server) RegisterRoutes() http.Handler {
 			protected.DELETE("/runs/:id", s.DeleteRunHandler)
 			protected.POST("/runs/plan", s.PlanRunHandler)
 			protected.GET("/runs/plan", s.GetPlannedRunHandler)
+			protected.DELETE("/runs/plan/:id", s.DeletePlannedRunHandler)
 
 			protected.GET("/activites", s.GetActivityHandler)
 

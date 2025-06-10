@@ -136,3 +136,20 @@ func (s *Server) GetPlannedRunHandler(c *gin.Context) {
 
     c.JSON(http.StatusOK, runs)
 }
+
+func (s *Server) DeletePlannedRunHandler(c *gin.Context) {
+	runIDStr := c.Param("id")
+	runID, err := uuid.Parse(runIDStr)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid planned run ID format"})
+		return
+	}
+
+	err = s.db.DeletePlannedRun(runID)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete planned run"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Planned run deleted successfully"})
+}
