@@ -114,7 +114,7 @@ const saveRun = () => {
 }
 
 const canSave = ref(false)
-watch([runName, points], () => {
+watch([runName, () => points.value.length], () => {
   canSave.value = runName.value.trim().length > 0 && points.value.length > 1
 })
 

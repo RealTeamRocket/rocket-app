@@ -64,7 +64,10 @@
         <div v-if="selectedPlannedRun">
           <strong>Name:</strong> {{ selectedPlannedRun.name }}<br>
           <strong>Distance:</strong> {{ selectedPlannedRun.distance?.toFixed(2) ?? '?' }} km<br>
-          <strong>Created:</strong> {{ formatDate(selectedPlannedRun.created_at) }}
+          <strong>Created:</strong>
+          <span style="white-space:nowrap; font-size:0.97em;">
+            {{ new Date(selectedPlannedRun.created_at).toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' }) }}
+          </span>
         </div>
         <div class="map-container">
           <Map
@@ -110,7 +113,6 @@ onMounted(async () => {
   const res = await backendApi.getPastRuns()
   runs.value = Array.isArray(res.data) ? res.data : []
   if (runs.value.length > 0) selectedRun.value = runs.value[0]
-  // Fetch planned runs as well
   const plannedRes = await backendApi.getPlannedRuns()
   plannedRuns.value = Array.isArray(plannedRes.data) ? plannedRes.data : []
   if (plannedRuns.value.length > 0) selectedPlannedRun.value = plannedRuns.value[0]
@@ -147,10 +149,8 @@ const handlePlanSave = async (payload: { name: string, points: [number, number][
   const wkt = `LINESTRING(${payload.points.map(([lat, lng]) => `${lng} ${lat}`).join(', ')})`;
   try {
     await backendApi.savePlannedRun(wkt, payload.name.trim(), payload.distance);
-    // Optionally fetch the updated planned runs list from backend
     const res = await backendApi.getPlannedRuns();
     plannedRuns.value = res.data;
-    // Switch to planned tab and select the latest planned run
     tab.value = 'planned';
     if (plannedRuns.value.length > 0) {
       selectedPlannedRun.value = plannedRuns.value[0];
@@ -173,7 +173,6 @@ const handlePlanSave = async (payload: { name: string, points: [number, number][
   background: #f7fafd;
   border-bottom: 1px solid #e0eaff;
 }
-
 .feedback-message {
   position: fixed;
   top: 80px;
@@ -209,7 +208,6 @@ const handlePlanSave = async (payload: { name: string, points: [number, number][
   background: #e0eaff;
   color: #222;
 }
-
 .runs-view {
   display: flex;
   height: 100vh;
