@@ -50,12 +50,10 @@ completeChallenge(challengeId: string, rocketPoints: number): Promise<AxiosRespo
 getChallengeProgress(): Promise<AxiosResponse> {
   return protectedAxiosApi.get('/challenges/progress', { withCredentials: true });
 },
-createChallenge(title: string, description: string, points: number): Promise<any> {
-  // Dummy: Simuliere einen erfolgreichen API-Call mit kurzer Verzögerung
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve({ data: { id: Date.now().toString(), text: title, points } });
-    }, 500);
-  });
+getFriends(): Promise<AxiosResponse> {
+  return protectedAxiosApi.get('/friends', { withCredentials: true });
+},
+inviteFriendToChallenge(challengeId: string, friendId: string): Promise<AxiosResponse> {
+  return protectedAxiosApi.post('/challenges/invite', { challenge_id: challengeId, friend_id: friendId }, { withCredentials: true });
 },
 }
