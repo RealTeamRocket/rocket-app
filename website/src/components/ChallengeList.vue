@@ -47,7 +47,7 @@ h3 {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 1rem;  
+  gap: 1rem;
   margin-bottom: 1rem;
 }
 </style>
