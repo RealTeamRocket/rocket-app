@@ -28,4 +28,7 @@ onMounted(async () => {
 .challenges-view {
   padding: 2rem;
 }
+.challenges-view h1 {
+  text-align: center;
+}
 </style>

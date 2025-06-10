@@ -1,14 +1,23 @@
 <template>
   <div>
-    <h2>Active Challenges</h2>
-    <ul>
-      <li v-for="challenge in challenges" :key="challenge.id">
-        <strong>{{ challenge.text }}</strong> – {{ challenge.points }} Punkte
-      </li>
-    </ul>
+    <h3>Active Challenges</h3>
+    <div>
+      <ChallengeCard
+        v-for="challenge in challenges"
+        :key="challenge.id"
+        :challenge="challenge"
+      />
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
+import ChallengeCard from './ChallengeCard.vue';
 defineProps<{ challenges: Array<{ id: string, text: string, points: number }> }>();
 </script>
+
+<style scoped>
+h3 {
+  text-align: center;
+}
+</style>
