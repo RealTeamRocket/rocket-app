@@ -4,13 +4,17 @@
     <h1>Challenges</h1>
     <ChallengeList :challenges="challenges" @complete="handleCompleteChallenge" />
   </div>
+    <DailyChallengeProgress :completed="completedCount" :total="totalCount" />
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import Navbar from '@/components/Navbar.vue';
 import ChallengeList from '@/components/ChallengeList.vue';
+import DailyChallengeProgress from '@/components/DailyChallengeProgress.vue';
 import backendApi from '@/api/backend-api';
+
+const MAX_DAILY_CHALLENGES = 5;
 
 const challenges = ref([]);
 
@@ -33,6 +37,10 @@ const handleCompleteChallenge = async (payload: { id: string, points: number }) 
 };
 
 onMounted(fetchChallenges);
+
+const completedCount = computed(() => MAX_DAILY_CHALLENGES - challenges.value.length);
+const totalCount = computed(() => MAX_DAILY_CHALLENGES);
+
 </script>
 
 <style scoped>
