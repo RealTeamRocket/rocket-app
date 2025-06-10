@@ -7,7 +7,7 @@
 <script setup lang="ts">
 import { ref, watch, onMounted } from "vue";
 import { Chart } from "chart.js/auto";
-import { getElevations } from "../api/service-api";
+import { getElevations } from "../../api/service-api";
 
 const props = defineProps<{
   coordinates: [number, number][];

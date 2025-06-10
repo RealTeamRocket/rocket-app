@@ -13,6 +13,12 @@
     >
       Plan a Run
     </button>
+    <button
+      :class="{ active: tab === 'planned' }"
+      @click="tab = 'planned'"
+    >
+      Planned Runs
+    </button>
   </div>
   <div v-if="feedback" :class="['feedback-message', feedback.type]">
     {{ feedback.message }}
@@ -23,6 +29,12 @@
       :runs="runs ?? []"
       :selected-id="selectedRun?.id"
       @select="selectRun"
+    />
+    <PlannedSidebar
+      v-if="tab === 'planned'"
+      :runs="plannedRuns ?? []"
+      :selected-id="selectedPlannedRun?.id"
+      @select="selectPlannedRun"
     />
     <main class="run-details">
       <template v-if="tab === 'past'">
@@ -47,6 +59,28 @@
           />
         </div>
       </template>
+      <template v-else-if="tab === 'planned'">
+        <h2 v-if="selectedPlannedRun">Planned Run Details</h2>
+        <div v-if="selectedPlannedRun">
+          <strong>Name:</strong> {{ selectedPlannedRun.name }}<br>
+          <strong>Distance:</strong> {{ selectedPlannedRun.distance?.toFixed(2) ?? '?' }} km<br>
+          <strong>Created:</strong> {{ formatDate(selectedPlannedRun.created_at) }}
+        </div>
+        <div class="map-container">
+          <Map
+            v-if="selectedPlannedRun"
+            :route="selectedPlannedRun.route"
+            :markers="routeMarkers(selectedPlannedRun.route)"
+          />
+          <div v-else class="empty-map-msg">
+            <p>Select a planned run to see its route.</p>
+          </div>
+          <ElevationProfile
+            v-if="selectedPlannedRun"
+            :coordinates="parseRoute(selectedPlannedRun.route)"
+          />
+        </div>
+      </template>
       <template v-else>
         <PlanRunMap @save="handlePlanSave" />
       </template>
@@ -56,13 +90,14 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import RunSidebar from '@/components/RunSidebar.vue'
+import RunSidebar from '@/components/runs/RunSidebar.vue'
+import PlannedSidebar from '@/components/runs/plan/PlannedSidebar.vue'
 import backendApi from '@/api/backend-api'
 import Navbar from '@/components/Navbar.vue'
-import Map from '@/components/Map.vue'
-import ElevationProfile from '@/components/ElevationProfile.vue'
+import Map from '@/components/runs/Map.vue'
+import ElevationProfile from '@/components/runs/ElevationProfile.vue'
 import { parseRoute } from '@/utils/routes'
-import PlanRunMap from '@/components/plan/PlanRunMap.vue'
+import PlanRunMap from '@/components/runs/plan/PlanRunMap.vue'
 
 const tab = ref<'past' | 'plan' | 'planned'>('past')
 
@@ -75,10 +110,18 @@ onMounted(async () => {
   const res = await backendApi.getPastRuns()
   runs.value = Array.isArray(res.data) ? res.data : []
   if (runs.value.length > 0) selectedRun.value = runs.value[0]
+  // Fetch planned runs as well
+  const plannedRes = await backendApi.getPlannedRuns()
+  plannedRuns.value = Array.isArray(plannedRes.data) ? plannedRes.data : []
+  if (plannedRuns.value.length > 0) selectedPlannedRun.value = plannedRuns.value[0]
 })
 
 const selectRun = (run: any) => {
   selectedRun.value = run
+}
+
+const selectPlannedRun = (run: any) => {
+  selectedPlannedRun.value = run
 }
 
 const formatDate = (dateStr: string) => {

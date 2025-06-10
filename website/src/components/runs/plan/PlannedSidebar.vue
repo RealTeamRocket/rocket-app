@@ -1,6 +1,6 @@
 <template>
   <aside class="run-sidebar">
-    <h2>Your Runs</h2>
+    <h2>Planned Runs</h2>
     <ul>
       <li
         v-for="run in runs"
@@ -9,9 +9,9 @@
         @click="select(run)"
       >
         <div class="run-info">
-          <div class="run-date">
-            <span class="icon-calendar" title="Date"></span>
-            {{ formatDate(run.created_at) }}
+          <div class="run-name">
+            <span class="icon-name" title="Name"></span>
+            {{ run.name }}
           </div>
           <div class="run-detail-row">
             <span class="icon-distance" title="Distance"></span>
@@ -19,9 +19,9 @@
             <span class="run-detail-value">{{ run.distance?.toFixed(2) ?? '?' }} km</span>
           </div>
           <div class="run-detail-row">
-            <span class="icon-duration" title="Duration"></span>
-            <span class="run-detail-label">Duration:</span>
-            <span class="run-detail-value">{{ run.duration ?? '?' }}</span>
+            <span class="icon-calendar" title="Created"></span>
+            <span class="run-detail-label">Created:</span>
+            <span class="run-detail-value date">{{ formatDate(run.created_at) }}</span>
           </div>
         </div>
       </li>
@@ -47,7 +47,7 @@ const select = (run: any) => {
 
 const formatDate = (dateStr: string) => {
   if (!dateStr) return '?'
-  return new Date(dateStr).toLocaleString()
+  return new Date(dateStr).toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' })
 }
 </script>
 
@@ -93,7 +93,7 @@ const formatDate = (dateStr: string) => {
   margin-top: 0.2rem;
   color: #222;
 }
-.run-date {
+.run-name {
   font-size: 1.05rem;
   font-weight: 600;
   color: #4a90e2;
@@ -125,8 +125,12 @@ const formatDate = (dateStr: string) => {
   content: "📏";
   margin-right: 0.2em;
 }
-.icon-duration::before {
-  content: "⏱️";
+.icon-name::before {
+  content: "🏷️";
   margin-right: 0.2em;
+}
+.run-detail-value.date {
+  white-space: nowrap;
+  font-size: 0.97em;
 }
 </style>
