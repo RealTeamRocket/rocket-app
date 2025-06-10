@@ -32,16 +32,25 @@
 <script setup lang="ts">
 import { defineProps, defineEmits } from 'vue'
 
+// --- Types ---
+export interface PlannedRun {
+  id: string
+  route: string
+  name: string
+  created_at: string
+  distance: number
+}
+
 const props = defineProps<{
-  runs: any[],
+  runs: PlannedRun[],
   selectedId?: string
 }>()
 
 const emit = defineEmits<{
-  (e: 'select', run: any): void
+  (e: 'select', run: PlannedRun): void
 }>()
 
-const select = (run: any) => {
+const select = (run: PlannedRun) => {
   emit('select', run)
 }
 

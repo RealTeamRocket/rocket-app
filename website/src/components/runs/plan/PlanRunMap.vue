@@ -24,8 +24,14 @@
 import { ref, onMounted, watch } from 'vue'
 import leaflet from 'leaflet'
 
+interface PlanRunMapSavePayload {
+  name: string;
+  points: [number, number][];
+  distance: number;
+}
+
 const emit = defineEmits<{
-  (e: 'save', payload: { name: string, points: [number, number][], distance: number }): void
+  (e: 'save', payload: PlanRunMapSavePayload): void
 }>()
 
 const points = ref<[number, number][]>([])
