@@ -2,7 +2,6 @@
   <div class="challenge-list-container">
     <div class="challenge-list-header">
       <h3>Active Challenges</h3>
-      <button class="create-button" @click="$emit('addChallenge')">+</button>
     </div>
     <div>
       <ChallengeCard
@@ -28,20 +27,6 @@ defineProps<{ challenges: Array<{ id: string, text: string, points: number }> }>
 }
 h3 {
   text-align: center;
-}
-.create-button {
-  padding: 0.4rem 1rem;
-  border-radius: 0.5rem;
-  border: none;
-  background: #4f46e5;
-  color: #fff;
-  font-weight: 800;
-  cursor: pointer;
-  transition: background 0.2s;
-  margin-left: 1rem;
-}
-.create-button:hover {
-  background: #da13ab;
 }
 .challenge-list-header {
   display: flex;

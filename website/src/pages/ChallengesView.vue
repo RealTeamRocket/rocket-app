@@ -3,17 +3,9 @@
   <div class="challenges-view">
     <h1>Challenges</h1>
     <ChallengeList :challenges="challenges"
-      @complete="handleCompleteChallenge"
-      @addChallenge="showCreate" />
+      @complete="handleCompleteChallenge"/>
   </div>
   <DailyChallengeProgress :completed="completedCount" :total="totalCount" />
-
-  <ChallengeCreateModal
-    v-if="openDialog"
-    :show="openDialog"
-    @submit="submitChallengeModal"
-    @close="openDialog = false"
-  />
 </template>
 
 <script setup lang="ts">
@@ -49,24 +41,6 @@ const handleCompleteChallenge = async (payload: { id: string, points: number }) 
   } catch (e) {
     console.error('Failed to complete challenge', e);
   }
-};
-
-const showCreate = () => {
-  openDialog.value = true;
-};
-
-const submitChallenge = async (challenge: { title: string, description: string, points: number }) => {
-  try {
-    await backendApi.createChallenge(challenge.title, challenge.description, challenge.points);
-    await fetchChallenges();
-  } catch (e) {
-    console.error('Failed to create challenge', e);
-  }
-};
-
-const submitChallengeModal = async (challenge: { title: string, description: string, points: number }) => {
-  await submitChallenge(challenge);
-  openDialog.value = false;
 };
 
 onMounted(fetchChallenges);
