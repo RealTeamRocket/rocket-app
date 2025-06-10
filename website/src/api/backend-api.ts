@@ -47,4 +47,12 @@ export default {
 completeChallenge(challengeId: string, rocketPoints: number): Promise<AxiosResponse> {
   return protectedAxiosApi.post('/challenges/complete', { challenge_id: challengeId, rocket_points: rocketPoints }, { withCredentials: true });
 },
+createChallenge(title: string, description: string, points: number): Promise<any> {
+  // Dummy: Simuliere einen erfolgreichen API-Call mit kurzer Verzögerung
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve({ data: { id: Date.now().toString(), text: title, points } });
+    }, 500);
+  });
+},
 }

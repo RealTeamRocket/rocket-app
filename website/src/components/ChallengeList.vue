@@ -2,7 +2,7 @@
   <div class="challenge-list-container">
     <div class="challenge-list-header">
       <h3>Active Challenges</h3>
-      <button class="create-button" @click="$emit('create')">+</button>
+      <button class="create-button" @click="$emit('addChallenge')">+</button>
     </div>
     <div>
       <ChallengeCard

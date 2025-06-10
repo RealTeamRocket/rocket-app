@@ -2,9 +2,12 @@
   <Navbar />
   <div class="challenges-view">
     <h1>Challenges</h1>
-    <ChallengeList :challenges="challenges" @complete="handleCompleteChallenge" />
+    <ChallengeList :challenges="challenges" 
+    @complete="handleCompleteChallenge" 
+    @addChallenge="showCreate" />
   </div>
     <DailyChallengeProgress :completed="completedCount" :total="totalCount" />
+    <CreateChallengeDialog v-if="openDialog" @close="openDialog = false" @submit="submitChallenge" />
 </template>
 
 <script setup lang="ts">
@@ -12,10 +15,11 @@ import { ref, onMounted, computed } from 'vue';
 import Navbar from '@/components/Navbar.vue';
 import ChallengeList from '@/components/ChallengeList.vue';
 import DailyChallengeProgress from '@/components/DailyChallengeProgress.vue';
+import CreateChallengeDialog from '@/components/CreateChallengeDialog.vue';
 import backendApi from '@/api/backend-api';
 
 const MAX_DAILY_CHALLENGES = 5;
-
+const openDialog = ref(false);
 const challenges = ref<{ id: string; text: string; points: number }[]>([]);
 
 const fetchChallenges = async () => {
@@ -40,6 +44,14 @@ const handleCompleteChallenge = async (payload: { id: string, points: number }) 
   } catch (e) {
     console.error('Failed to complete challenge', e);
   }
+};
+
+const showCreate = () => {
+  openDialog.value = true;
+};
+
+const submitChallenge = async (challenge: { title: string, description: string, points: number }) => {
+  console.log('Submitting challenge:', challenge);
 };
 
 onMounted(fetchChallenges);
