@@ -1,6 +1,9 @@
 <template>
   <div class="challenge-list-container">
-    <h3>Active Challenges</h3>
+    <div class="challenge-list-header">
+      <h3>Active Challenges</h3>
+      <button class="create-button" @click="$emit('create')">+</button>
+    </div>
     <div>
       <ChallengeCard
         v-for="challenge in challenges"
@@ -25,5 +28,26 @@ defineProps<{ challenges: Array<{ id: string, text: string, points: number }> }>
 }
 h3 {
   text-align: center;
+}
+.create-button {
+  padding: 0.4rem 1rem;
+  border-radius: 0.5rem;
+  border: none;
+  background: #4f46e5;
+  color: #fff;
+  font-weight: 800;
+  cursor: pointer;
+  transition: background 0.2s;
+  margin-left: 1rem;
+}
+.create-button:hover {
+  background: #da13ab;
+}
+.challenge-list-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;  
+  margin-bottom: 1rem;
 }
 </style>
