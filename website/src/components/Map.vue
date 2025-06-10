@@ -17,7 +17,7 @@ let startMarker: leaflet.Marker | null = null;
 let endMarker: leaflet.Marker | null = null;
 let markerObjs: leaflet.Marker[] = [];
 
-function parseRoute(route: string | undefined): [number, number][] {
+const parseRoute = (route: string | undefined): [number, number][] => {
   if (!route) return [];
   const match = route.match(/\((.*)\)/);
   if (!match) return [];
@@ -27,14 +27,14 @@ function parseRoute(route: string | undefined): [number, number][] {
   });
 }
 
-function fitMapToRoute(points: [number, number][]) {
+const fitMapToRoute = (points: [number, number][]) => {
   if (map && points.length > 0) {
     const bounds = leaflet.latLngBounds(points);
     map.fitBounds(bounds, { padding: [30, 30] });
   }
 }
 
-function clearMap() {
+const clearMap = () => {
   if (polyline && map) {
     map.removeLayer(polyline);
     polyline = null;
@@ -51,7 +51,7 @@ function clearMap() {
   markerObjs = [];
 }
 
-function drawRoute() {
+const drawRoute = () => {
   if (!map) return;
   clearMap();
   const points = parseRoute(props.route);

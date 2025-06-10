@@ -41,11 +41,11 @@ const emit = defineEmits<{
   (e: 'select', run: any): void
 }>()
 
-function select(run: any) {
+const select = (run: any) => {
   emit('select', run)
 }
 
-function formatDate(dateStr: string) {
+const formatDate = (dateStr: string) => {
   if (!dateStr) return '?'
   return new Date(dateStr).toLocaleString()
 }

@@ -8,7 +8,6 @@
 import { ref, watch, onMounted } from "vue";
 import { Chart } from "chart.js/auto";
 import { getElevations } from "../api/service-api";
-import { parseRoute } from "../utils/routes";
 
 const props = defineProps<{
   coordinates: [number, number][];
@@ -17,11 +16,11 @@ const props = defineProps<{
 const canvas = ref<HTMLCanvasElement | null>(null);
 let chart: any = null;
 
-async function fetchElevations(coords: [number, number][]) {
+const fetchElevations = async (coords: [number, number][]) => {
   return await getElevations(coords);
 }
 
-async function drawChart() {
+const drawChart = async () => {
   if (!canvas.value || !props.coordinates.length) return;
   let coords = props.coordinates;
   coords = coords.map(([a, b]) => [a, b]); // shallow copy
