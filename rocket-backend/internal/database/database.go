@@ -69,6 +69,9 @@ type Service interface {
 	IsNewDayForUser(userID uuid.UUID) (bool, error)
 	CleanUpChallengesForUser(userID uuid.UUID) error
 	GetChallengeByID(challengeID uuid.UUID) (*types.Challenge, error)
+	InviteFriendToChallenge(challengeID uuid.UUID, friendID uuid.UUID) error
+	GetCompletedChallengesAmount(userID uuid.UUID) (int, error)
+	GetAllChallengesAmount(userID uuid.UUID) (int, error)
 
 	// friends
 	AddFriend(userID, friendID uuid.UUID) error

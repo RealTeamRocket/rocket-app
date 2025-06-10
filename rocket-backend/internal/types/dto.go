@@ -44,17 +44,17 @@ type UserWithImageDTO struct {
 }
 
 type RunDataDTO struct {
-    Route    string  `json:"route" binding:"required"`    // WKT LineString
-    Duration string  `json:"duration" binding:"required"`
-    Distance float64 `json:"distance"`
+	Route    string  `json:"route" binding:"required"` // WKT LineString
+	Duration string  `json:"duration" binding:"required"`
+	Distance float64 `json:"distance"`
 }
 
 type RunDTO struct {
-    ID       string  `json:"id"`
-    Route    string  `json:"route"`
-    Duration string  `json:"duration"`
-    Distance float64 `json:"distance"`
-    CreatedAt string `json:"created_at"`
+	ID        string  `json:"id"`
+	Route     string  `json:"route"`
+	Duration  string  `json:"duration"`
+	Distance  float64 `json:"distance"`
+	CreatedAt string  `json:"created_at"`
 }
 
 type ActivityWithUser struct {
@@ -64,10 +64,15 @@ type ActivityWithUser struct {
 }
 
 type ChatMessage struct {
-	ID        uuid.UUID `json:"id"`
-	Username  string    `json:"username"`
-	Message   string    `json:"message"`
-	Timestamp string    `json:"timestamp"`
-	Reactions int       `json:"reactions"`
-	HasReacted bool     `json:"hasReacted"`
+	ID         uuid.UUID `json:"id"`
+	Username   string    `json:"username"`
+	Message    string    `json:"message"`
+	Timestamp  string    `json:"timestamp"`
+	Reactions  int       `json:"reactions"`
+	HasReacted bool      `json:"hasReacted"`
+}
+
+type DailyChallengeProgress struct {
+	Completed int `json:"completed"`
+	Total     int `json:"total"`
 }

@@ -4,9 +4,9 @@ import (
 	"errors"
 	"net/http"
 
+	"rocket-backend/internal/challenges"
 	"rocket-backend/internal/custom_error"
 	"rocket-backend/internal/types"
-	"rocket-backend/internal/challenges"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
@@ -90,8 +90,72 @@ func (s *Server) CompleteChallengeHandler(c *gin.Context) {
 	}
 
 	message := "Completed a daily challenge: " + challenge.Text
-	err = s.db.SaveActivity(userUUID, message)
-
+	_ = s.db.SaveActivity(userUUID, message)
 
 	c.JSON(http.StatusOK, gin.H{"message": "Challenge completed successfully"})
+}
+
+func (s *Server) InviteFriendChallenge(c *gin.Context) {
+	var req struct {
+		ChallengeID uuid.UUID `json:"challenge_id" binding:"required"`
+		FriendID    uuid.UUID `json:"friend_id" binding:"required"`
+	}
+
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request body"})
+		return
+	}
+
+	err := s.db.InviteFriendToChallenge(req.ChallengeID, req.FriendID)
+	if err != nil {
+		if errors.Is(err, custom_error.ErrFailedToUpdate) {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to invite friend"})
+		} else {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal server error"})
+		}
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Friend invited successfully"})
+}
+
+func (s *Server) GetDailyChallengeProgress(c *gin.Context) {
+	userID, exists := c.Get("userID")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "User not authenticated"})
+		return
+	}
+
+	userUUID, err := uuid.Parse(userID.(string))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid user ID format"})
+		return
+	}
+
+	completed, err := s.db.GetCompletedChallengesAmount(userUUID)
+	if err != nil {
+		if errors.Is(err, custom_error.ErrFailedToRetrieveData) {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve challenge progress"})
+		} else {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal server error"})
+		}
+		return
+	}
+
+	total, err := s.db.GetAllChallengesAmount(userUUID)
+	if err != nil {
+		if errors.Is(err, custom_error.ErrFailedToRetrieveData) {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve total challenges"})
+		} else {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal server error"})
+		}
+		return
+	}
+
+	progress := types.DailyChallengeProgress{
+		Completed: completed,
+		Total:     total,
+	}
+
+	c.JSON(http.StatusOK, progress)
 }

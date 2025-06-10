@@ -46,6 +46,8 @@ func (s *Server) RegisterRoutes() http.Handler {
 
 			protected.GET("/challenges/new", s.GetDailyChallengesHandler)
 			protected.POST("/challenges/complete", s.CompleteChallengeHandler)
+			protected.GET("/challenges/progress", s.GetDailyChallengeProgress)
+			protected.POST("/challenges/invite", s.InviteFriendChallenge)
 
 			protected.GET("/ranking/users", s.GetUserRankingHandler)
 			protected.GET("/ranking/friends", s.GetFriendsRankedHandler)
