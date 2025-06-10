@@ -1,8 +1,11 @@
 package server
 
 import (
+	"database/sql"
+	"errors"
 	"fmt"
 	"net/http"
+	"strings"
 
 	"rocket-backend/internal/types"
 
@@ -105,7 +108,13 @@ func (s *Server) PlanRunHandler(c *gin.Context) {
 
     err = s.db.SavePlannedRun(userUUID, req.Route, req.Name, req.Distance)
     if err != nil {
-        if pqErr, ok := err.(*pq.Error); ok && pqErr.Code == "23505" {
+        var pqErr *pq.Error
+        if errors.As(err, &pqErr) && pqErr.Code == "23505" {
+            c.JSON(http.StatusBadRequest, gin.H{"error": "A planned run with this name already exists."})
+            return
+        }
+        // Fallback: check error message for duplicate key
+        if strings.Contains(err.Error(), "duplicate key") {
             c.JSON(http.StatusBadRequest, gin.H{"error": "A planned run with this name already exists."})
             return
         }
@@ -147,6 +156,10 @@ func (s *Server) DeletePlannedRunHandler(c *gin.Context) {
 
 	err = s.db.DeletePlannedRun(runID)
 	if err != nil {
+		if err == sql.ErrNoRows {
+			c.JSON(http.StatusNotFound, gin.H{"error": "Planned run not found"})
+			return
+		}
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete planned run"})
 		return
 	}
