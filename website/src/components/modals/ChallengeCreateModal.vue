@@ -116,7 +116,7 @@ function close() {
   z-index: 10;
 }
 .close-btn:hover {
-  color: #da13ab;
+  color: #da1313;
 }
 h2 {
   text-align: center;
@@ -162,7 +162,7 @@ textarea {
   margin-top: 1.5rem;
 }
 .submit-btn {
-  background: linear-gradient(90deg, #7c3aed 60%, #da13ab 100%);
+  background: linear-gradient(90deg, #7c3aed 60%);
   color: #fff;
   font-weight: 700;
   border: none;
@@ -174,7 +174,7 @@ textarea {
   transition: background 0.18s, box-shadow 0.18s;
 }
 .submit-btn:hover {
-  background: linear-gradient(90deg, #da13ab 60%, #7c3aed 100%);
+  background: linear-gradient(90deg, #37da13 60%);
   box-shadow: 0 4px 16px rgba(218, 19, 171, 0.13);
 }
 .cancel-btn {
@@ -190,6 +190,6 @@ textarea {
 }
 .cancel-btn:hover {
   background: #c7d2fe;
-  color: #da13ab;
+  color: #da1313;
 }
 </style>
