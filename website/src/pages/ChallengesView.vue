@@ -2,7 +2,7 @@
   <Navbar />
   <div class="challenges-view">
     <h1>Challenges</h1>
-    <ChallengeList :challenges="challenges" />
+    <ChallengeList :challenges="challenges" @complete="handleCompleteChallenge" />
   </div>
 </template>
 
@@ -14,14 +14,25 @@ import backendApi from '@/api/backend-api';
 
 const challenges = ref([]);
 
-onMounted(async () => {
+const fetchChallenges = async () => {
   try {
     const response = await backendApi.getChallenges();
-    challenges.value = response.data; // response.data enthält das Array der Challenges
+    challenges.value = response.data;
   } catch (e) {
-    console.error('Fehler beim Laden der Challenges:', e);
+    console.error('Failed to load challenges', e);
   }
-});
+};
+
+const handleCompleteChallenge = async (payload: { id: string, points: number }) => {
+  try {
+    await backendApi.completeChallenge(payload.id, payload.points);
+    await fetchChallenges();
+  } catch (e) {
+    console.error('Failed to complete challenge', e);
+  }
+};
+
+onMounted(fetchChallenges);
 </script>
 
 <style scoped>

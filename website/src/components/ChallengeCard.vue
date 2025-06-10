@@ -2,7 +2,7 @@
   <div class="challenge-card">
     <div class="challenge-card-title">{{ challenge.text }}</div>
     <div class="challenge-card-value">🚀Rocket-Points: {{ challenge.points }}</div>
-    <!--  Later Buttons -->
+    <button class="complete-button" @click="$emit('complete', { id: challenge.id, points: challenge.points })">Complete</button>
   </div>
 </template>
 

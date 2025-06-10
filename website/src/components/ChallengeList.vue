@@ -6,6 +6,7 @@
         v-for="challenge in challenges"
         :key="challenge.id"
         :challenge="challenge"
+        @complete="$emit('complete', $event)"
       />
     </div>
   </div>
