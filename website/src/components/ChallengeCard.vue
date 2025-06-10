@@ -9,7 +9,9 @@
         <button class="complete-button" @click="$emit('complete', { id: challenge.id, points: challenge.points })">
           Complete
         </button>
-        <!-- Hier können weitere Buttons folgen -->
+        <button class="complete-button" @click="$emit('invite', challenge.id)">
+            Invite friend
+        </button>
       </div>
     </div>
   </div>

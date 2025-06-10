@@ -1,7 +1,7 @@
 <template>
   <div class="progressbar-container">
     <div class="progressbar-label">
-      Daily Challenge Progress: {{ props.completed }}/{{ props.total }}
+      Daily Challenge Progress: {{ completed }}/{{ total }}
     </div>
     <div class="progressbar-bg">
       <div class="progressbar-fill" :style="{ width: percent + '%' }"></div>

@@ -13,12 +13,11 @@ import { ref, onMounted, computed } from 'vue';
 import Navbar from '@/components/Navbar.vue';
 import ChallengeList from '@/components/ChallengeList.vue';
 import DailyChallengeProgress from '@/components/DailyChallengeProgress.vue';
-import ChallengeCreateModal from '@/components/modals/ChallengeCreateModal.vue';
 import backendApi from '@/api/backend-api';
 
-const MAX_DAILY_CHALLENGES = 5;
-const openDialog = ref(false);
 const challenges = ref<{ id: string; text: string; points: number }[]>([]);
+const completedCount = ref(0);
+const totalCount = ref(0);
 
 const fetchChallenges = async () => {
   try {
@@ -33,20 +32,34 @@ const fetchChallenges = async () => {
   }
 };
 
+const fetchProgress = async () => {
+  try {
+    const response = await backendApi.getChallengeProgress();
+    completedCount.value = response.data.completed;
+    totalCount.value = response.data.total;
+  } catch (e: any) {
+    completedCount.value = 0;
+    totalCount.value = 0;
+    console.error('Failed to load challenge progress', e);
+  }
+};
+
 const handleCompleteChallenge = async (payload: { id: string, points: number }) => {
   try {
     await backendApi.completeChallenge(payload.id, payload.points);
     challenges.value = challenges.value.filter(c => c.id !== payload.id);
     await fetchChallenges();
+    await fetchProgress();
   } catch (e) {
     console.error('Failed to complete challenge', e);
   }
 };
 
-onMounted(fetchChallenges);
+onMounted(async () => {
+  await fetchChallenges();
+  await fetchProgress();
+});
 
-const completedCount = computed(() => MAX_DAILY_CHALLENGES - challenges.value.length);
-const totalCount = computed(() => MAX_DAILY_CHALLENGES);
 </script>
 
 <style scoped>
