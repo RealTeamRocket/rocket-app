@@ -23,6 +23,15 @@
   <div v-if="feedback" :class="['feedback-message', feedback.type]">
     {{ feedback.message }}
   </div>
+  <ConfirmDialog
+    :open="confirmDialog.open"
+    :title="confirmDialog.title"
+    :message="confirmDialog.message"
+    confirmText="Delete"
+    cancelText="Cancel"
+    @confirm="handleConfirmDelete"
+    @cancel="confirmDialog.open = false"
+  />
   <div class="runs-view">
     <RunSidebar
       v-if="tab === 'past'"
@@ -43,7 +52,7 @@
           <button
             class="delete-run-btn"
             title="Delete run"
-            @click="deleteRun(selectedRun)"
+            @click="openDeleteDialog('run', selectedRun)"
           >
             <span class="icon-trash"></span>
           </button>
@@ -77,7 +86,7 @@
           <button
             class="delete-run-btn"
             title="Delete planned run"
-            @click="deletePlannedRun(selectedPlannedRun)"
+            @click="openDeleteDialog('planned', selectedPlannedRun)"
           >
             <span class="icon-trash"></span>
           </button>
@@ -122,6 +131,7 @@ import Map from '@/components/runs/Map.vue'
 import ElevationProfile from '@/components/runs/ElevationProfile.vue'
 import { parseRoute } from '@/utils/routes'
 import PlanRunMap from '@/components/runs/plan/PlanRunMap.vue'
+import ConfirmDialog from '@/components/ConfirmDialog.vue'
 
 const tab = ref<'past' | 'plan' | 'planned'>('past')
 
@@ -146,6 +156,20 @@ const runs = ref<Run[]>([])
 const selectedRun = ref<Run | null>(null)
 const plannedRuns = ref<PlannedRun[]>([])
 const selectedPlannedRun = ref<PlannedRun | null>(null)
+
+const confirmDialog = ref<{
+  open: boolean,
+  type: 'run' | 'planned' | '',
+  run: Run | PlannedRun | null,
+  title?: string,
+  message?: string,
+}>({
+  open: false,
+  type: '',
+  run: null,
+  title: '',
+  message: '',
+});
 
 onMounted(async () => {
   const res = await backendApi.getPastRuns()
@@ -178,12 +202,9 @@ const feedback = ref<{ type: 'success' | 'error', message: string } | null>(null
 
 const deleteRun = async (run: Run) => {
   if (!run?.id) return;
-  if (!confirm('Are you sure you want to delete this run?')) return;
   try {
     await backendApi.deletePastRun(run.id);
-    // Remove from local list
     runs.value = runs.value.filter((r) => r.id !== run.id);
-    // Select next run or null
     if (runs.value.length > 0) {
       selectedRun.value = runs.value[0];
     } else {
@@ -221,7 +242,6 @@ const handlePlanSave = async (payload: { name: string, points: [number, number][
 
 const deletePlannedRun = async (run: PlannedRun) => {
   if (!run?.id) return;
-  if (!confirm('Are you sure you want to delete this planned run?')) return;
   try {
     await backendApi.deletePlannedRun(run.id);
     plannedRuns.value = plannedRuns.value.filter((r) => r.id !== run.id);
@@ -238,7 +258,33 @@ const deletePlannedRun = async (run: PlannedRun) => {
     console.error('Failed to delete planned run', e);
   }
 };
+const openDeleteDialog = (type: 'run' | 'planned', run: Run | PlannedRun | null) => {
+  if (!run) return;
+  confirmDialog.value = {
+    open: true,
+    type,
+    run,
+    title: 'Are you sure?',
+    message: type === 'run'
+      ? 'Do you really want to delete this run? This action cannot be undone.'
+      : 'Do you really want to delete this planned run? This action cannot be undone.',
+  };
+};
+
+const handleConfirmDelete = async () => {
+  if (!confirmDialog.value.run) {
+    confirmDialog.value.open = false;
+    return;
+  }
+  if (confirmDialog.value.type === 'run') {
+    await deleteRun(confirmDialog.value.run as Run);
+  } else if (confirmDialog.value.type === 'planned') {
+    await deletePlannedRun(confirmDialog.value.run as PlannedRun);
+  }
+  confirmDialog.value.open = false;
+};
 </script>
+
 
 <style scoped>
 .tab-switcher {
