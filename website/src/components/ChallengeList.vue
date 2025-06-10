@@ -9,6 +9,7 @@
         :key="challenge.id"
         :challenge="challenge"
         @complete="$emit('complete', $event)"
+        @invite="$emit('invite', $event)"
       />
     </div>
   </div>

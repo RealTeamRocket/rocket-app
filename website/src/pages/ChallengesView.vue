@@ -3,7 +3,13 @@
   <div class="challenges-view">
     <h1>Challenges</h1>
     <ChallengeList :challenges="challenges"
-      @complete="handleCompleteChallenge"/>
+      @complete="handleCompleteChallenge"
+      @invite="handleInvite"/>
+    <FriendInvitePopup
+      v-if="showInvitePopup"
+      :challenge-id="inviteChallengeId"
+      @close="showInvitePopup = false"
+      @invited="handleInvited"/>
   </div>
   <DailyChallengeProgress :completed="completedCount" :total="totalCount" />
 </template>
@@ -13,11 +19,14 @@ import { ref, onMounted, computed } from 'vue';
 import Navbar from '@/components/Navbar.vue';
 import ChallengeList from '@/components/ChallengeList.vue';
 import DailyChallengeProgress from '@/components/DailyChallengeProgress.vue';
+import FriendInvitePopup from '@/components/FriendInvitePopup.vue';
 import backendApi from '@/api/backend-api';
 
 const challenges = ref<{ id: string; text: string; points: number }[]>([]);
 const completedCount = ref(0);
 const totalCount = ref(0);
+const showInvitePopup = ref(false);
+const inviteChallengeId = ref<string | null>(null);
 
 const fetchChallenges = async () => {
   try {
@@ -53,6 +62,15 @@ const handleCompleteChallenge = async (payload: { id: string, points: number }) 
   } catch (e) {
     console.error('Failed to complete challenge', e);
   }
+};
+
+const handleInvite = (challengeId: string) => {
+  inviteChallengeId.value = challengeId;
+  showInvitePopup.value = true;
+};
+
+const handleInvited = (friend: any) => {
+  // Optionally show a toast or notification
 };
 
 onMounted(async () => {
