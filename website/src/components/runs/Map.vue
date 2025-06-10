@@ -13,9 +13,9 @@ const props = defineProps<{
 
 let map: leaflet.Map | null = null;
 let polyline: leaflet.Polyline | null = null;
-let startMarker: leaflet.Marker | null = null;
-let endMarker: leaflet.Marker | null = null;
-let markerObjs: leaflet.Marker[] = [];
+let startMarker: leaflet.CircleMarker | null = null;
+let endMarker: leaflet.CircleMarker | null = null;
+let markerObjs: leaflet.CircleMarker[] = [];
 
 const parseRoute = (route: string | undefined): [number, number][] => {
   if (!route) return [];
@@ -69,7 +69,7 @@ const drawRoute = () => {
           fillOpacity: 1,
           weight: 2,
         })
-          .addTo(map)
+          .addTo(map!)
           .bindPopup(m.label || (idx === 0 ? "Start" : "End"));
         markerObjs.push(marker);
       });
@@ -80,14 +80,14 @@ const drawRoute = () => {
         fillColor: "#1abc1a",
         fillOpacity: 1,
         weight: 2,
-      }).addTo(map).bindPopup("Start");
+      }).addTo(map!).bindPopup("Start");
       endMarker = leaflet.circleMarker(points[points.length - 1], {
         radius: 8,
         color: "#1a4abc",
         fillColor: "#1a4abc",
         fillOpacity: 1,
         weight: 2,
-      }).addTo(map).bindPopup("End");
+      }).addTo(map!).bindPopup("End");
     }
   }
 }
@@ -100,7 +100,7 @@ onMounted(() => {
       attribution:
         '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
     })
-    .addTo(map);
+    .addTo(map!);
   drawRoute();
 });
 

@@ -40,7 +40,7 @@ const totalDistance = ref(0)
 
 let map: leaflet.Map | null = null
 let polyline: leaflet.Polyline | null = null
-let markerObjs: leaflet.Marker[] = []
+let markerObjs: leaflet.CircleMarker[] = [];
 
 const haversineDistance = (a: [number, number], b: [number, number]) => {
   // [lat, lng] in degrees
@@ -73,7 +73,7 @@ const updatePolyline = () => {
         fillOpacity: 1,
         weight: 2,
       })
-        .addTo(map)
+        .addTo(map!)
         .bindPopup(idx === 0 ? 'Start' : idx === points.value.length - 1 ? 'End' : `Point ${idx + 1}`)
       markerObjs.push(marker)
     })
@@ -83,7 +83,7 @@ const updatePolyline = () => {
         color: '#4a90e2',
         weight: 5,
         opacity: 0.9,
-      }).addTo(map)
+      }).addTo(map!)
     }
     // Fit map to route
     if (points.value.length > 1) {
@@ -129,7 +129,7 @@ onMounted(() => {
   leaflet.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
     maxZoom: 19,
     attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
-  }).addTo(map)
+  }).addTo(map!)
   map.on('click', onMapClick)
 })
 
