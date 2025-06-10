@@ -13,6 +13,8 @@ const props = defineProps<{
 
 let map: leaflet.Map | null = null;
 let polyline: leaflet.Polyline | null = null;
+let startMarker: leaflet.Marker | null = null;
+let endMarker: leaflet.Marker | null = null;
 let markerObjs: leaflet.Marker[] = [];
 
 function parseRoute(route: string | undefined): [number, number][] {
@@ -37,6 +39,14 @@ function clearMap() {
     map.removeLayer(polyline);
     polyline = null;
   }
+  if (startMarker && map) {
+    map.removeLayer(startMarker);
+    startMarker = null;
+  }
+  if (endMarker && map) {
+    map.removeLayer(endMarker);
+    endMarker = null;
+  }
   markerObjs.forEach(m => map && map.removeLayer(m));
   markerObjs = [];
 }
@@ -46,20 +56,38 @@ function drawRoute() {
   clearMap();
   const points = parseRoute(props.route);
   if (points.length > 0) {
-    polyline = leaflet.polyline(points, { color: "blue", weight: 5 }).addTo(map);
+    polyline = leaflet.polyline(points, { color: "red", weight: 5 }).addTo(map);
     fitMapToRoute(points);
-    // Add start/end markers if available
     if (props.markers && props.markers.length) {
       props.markers.forEach((m, idx) => {
-        const marker = leaflet.marker([m.latitude, m.longitude])
+        // Use colored circle markers for start/end
+        const color = idx === 0 ? "#1abc1a" : "#1a4abc";
+        const marker = leaflet.circleMarker([m.latitude, m.longitude], {
+          radius: 8,
+          color,
+          fillColor: color,
+          fillOpacity: 1,
+          weight: 2,
+        })
           .addTo(map)
           .bindPopup(m.label || (idx === 0 ? "Start" : "End"));
         markerObjs.push(marker);
       });
     } else {
-      // Default: add start/end markers
-      leaflet.marker(points[0]).addTo(map).bindPopup("Start");
-      leaflet.marker(points[points.length - 1]).addTo(map).bindPopup("End");
+      startMarker = leaflet.circleMarker(points[0], {
+        radius: 8,
+        color: "#1abc1a",
+        fillColor: "#1abc1a",
+        fillOpacity: 1,
+        weight: 2,
+      }).addTo(map).bindPopup("Start");
+      endMarker = leaflet.circleMarker(points[points.length - 1], {
+        radius: 8,
+        color: "#1a4abc",
+        fillColor: "#1a4abc",
+        fillOpacity: 1,
+        weight: 2,
+      }).addTo(map).bindPopup("End");
     }
   }
 }

@@ -47,7 +47,6 @@ export class ChatWebSocket {
 
   sendReaction(messageId: string) {
     if (this.ws && this.ws.readyState === WebSocket.OPEN) {
-      console.log('WebSocket: sending reaction for messageId', messageId)
       this.ws.send(JSON.stringify({ type: "reaction", messageId }))
     }
   }

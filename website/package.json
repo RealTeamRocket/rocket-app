@@ -16,7 +16,6 @@
   },
   "dependencies": {
     "@rushstack/eslint-patch": "^1.11.0",
-    "@vueuse/core": "^10.11.1",
     "axios": "^1.8.4",
     "bootstrap": "^5.3.6",
     "chart.js": "^4.4.9",

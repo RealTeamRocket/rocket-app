@@ -22,6 +22,10 @@
         <div v-else class="empty-map-msg">
           <p>Select a run to see its route.</p>
         </div>
+        <ElevationProfile
+          v-if="selectedRun"
+          :coordinates="parseRoute(selectedRun.route)"
+        />
       </div>
     </main>
   </div>
@@ -33,6 +37,8 @@ import RunSidebar from '@/components/RunSidebar.vue'
 import backendApi from '@/api/backend-api'
 import Navbar from '@/components/Navbar.vue'
 import Map from '@/components/Map.vue'
+import ElevationProfile from '@/components/ElevationProfile.vue'
+import { parseRoute } from '@/utils/routes'
 
 const runs = ref<any[]>([])
 const selectedRun = ref<any | null>(null)
@@ -57,20 +63,9 @@ function routeMarkers(route: string) {
   const points = parseRoute(route)
   if (points.length === 0) return []
   return [
-    { latitude: points[0][1], longitude: points[0][0], label: 'Start' },
-    { latitude: points[points.length - 1][1], longitude: points[points.length - 1][0], label: 'End' }
+    { latitude: points[0][0], longitude: points[0][1], label: 'Start' },
+    { latitude: points[points.length - 1][0], longitude: points[points.length - 1][1], label: 'End' }
   ]
-}
-
-// Parse WKT LINESTRING to array of [lng, lat]
-function parseRoute(route: string): [number, number][] {
-  if (!route) return []
-  const match = route.match(/\((.*)\)/)
-  if (!match) return []
-  return match[1].split(',').map(pair => {
-    const [lng, lat] = pair.trim().split(' ').map(Number)
-    return [lng, lat]
-  })
 }
 </script>
 
