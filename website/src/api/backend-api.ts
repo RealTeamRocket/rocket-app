@@ -40,5 +40,8 @@ export default {
   },
   getChatHistory(): Promise<AxiosResponse> {
     return protectedAxiosApi.get('/chat/history', { withCredentials: true });
-  }
+  },
+  getChallenges(): Promise<AxiosResponse> {
+  return protectedAxiosApi.get('/challenges/new', { withCredentials: true });
+},
 }
