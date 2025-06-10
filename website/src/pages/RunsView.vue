@@ -98,7 +98,7 @@
         <div v-if="selectedPlannedRun">
           <strong>Name:</strong> {{ selectedPlannedRun.name }}<br>
           <strong>Distance:</strong> {{ selectedPlannedRun.distance?.toFixed(2) ?? '?' }} km<br>
-          <strong>Created:</strong>
+          <strong>Created: </strong>
           <span style="white-space:nowrap; font-size:0.97em;">
             {{ new Date(selectedPlannedRun.created_at).toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' }) }}
           </span>
