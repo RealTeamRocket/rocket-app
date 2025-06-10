@@ -25,7 +25,7 @@ import { ref, onMounted, watch } from 'vue'
 import leaflet from 'leaflet'
 
 const emit = defineEmits<{
-  (e: 'save', payload: { name: string, points: [number, number][] }): void
+  (e: 'save', payload: { name: string, points: [number, number][], distance: number }): void
 }>()
 
 const points = ref<[number, number][]>([])
@@ -107,10 +107,10 @@ const clearRoute = () => {
 
 const saveRun = () => {
   if (!canSave.value) return
-  emit('save', { name: runName.value.trim(), points: points.value })
-  // Optionally clear after save
-  // clearRoute()
-  // runName.value = ''
+  emit('save', { name: runName.value.trim(), points: points.value, distance: totalDistance.value })
+
+  clearRoute()
+  runName.value = ''
 }
 
 const canSave = ref(false)

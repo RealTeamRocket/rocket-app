@@ -43,5 +43,15 @@ export default {
   },
   getPastRuns(): Promise<AxiosResponse> {
     return protectedAxiosApi.get('/runs', { withCredentials: true });
+  },
+  savePlannedRun(route: string, name: string, distance: number): Promise<AxiosResponse> {
+    return protectedAxiosApi.post(
+      '/runs/plan',
+      { route, name, distance },
+      { withCredentials: true }
+    );
+  },
+  getPlannedRuns(): Promise<AxiosResponse> {
+    return protectedAxiosApi.get('/runs/plan', { withCredentials: true });
   }
 }

@@ -14,10 +14,13 @@
       Plan a Run
     </button>
   </div>
+  <div v-if="feedback" :class="['feedback-message', feedback.type]">
+    {{ feedback.message }}
+  </div>
   <div class="runs-view">
     <RunSidebar
       v-if="tab === 'past'"
-      :runs="runs"
+      :runs="runs ?? []"
       :selected-id="selectedRun?.id"
       @select="selectRun"
     />
@@ -60,7 +63,6 @@ import Map from '@/components/Map.vue'
 import ElevationProfile from '@/components/ElevationProfile.vue'
 import { parseRoute } from '@/utils/routes'
 import PlanRunMap from '@/components/plan/PlanRunMap.vue'
-import PlannedSidebar from '@/components/plan/PlannedSidebar.vue'
 
 const tab = ref<'past' | 'plan' | 'planned'>('past')
 
@@ -71,7 +73,7 @@ const selectedPlannedRun = ref<any | null>(null)
 
 onMounted(async () => {
   const res = await backendApi.getPastRuns()
-  runs.value = res.data
+  runs.value = Array.isArray(res.data) ? res.data : []
   if (runs.value.length > 0) selectedRun.value = runs.value[0]
 })
 
@@ -94,11 +96,29 @@ const routeMarkers = (route: string) => {
   ]
 }
 
-const handlePlanSave = (payload: { name: string, points: [number, number][] }) => {
- // Here you can send the planned run to the backend or store locally
- // Example: convert points to WKT LINESTRING and send to backend
- // For now, just log it
- console.log('Planned run saved:', payload)
+const feedback = ref<{ type: 'success' | 'error', message: string } | null>(null);
+
+const handlePlanSave = async (payload: { name: string, points: [number, number][], distance: number }) => {
+  // Convert points to WKT LINESTRING
+  if (!payload.name.trim() || payload.points.length < 2) return;
+  const wkt = `LINESTRING(${payload.points.map(([lat, lng]) => `${lng} ${lat}`).join(', ')})`;
+  try {
+    await backendApi.savePlannedRun(wkt, payload.name.trim(), payload.distance);
+    // Optionally fetch the updated planned runs list from backend
+    const res = await backendApi.getPlannedRuns();
+    plannedRuns.value = res.data;
+    // Switch to planned tab and select the latest planned run
+    tab.value = 'planned';
+    if (plannedRuns.value.length > 0) {
+      selectedPlannedRun.value = plannedRuns.value[0];
+    }
+    feedback.value = { type: 'success', message: 'Planned run saved successfully!' };
+    setTimeout(() => { feedback.value = null }, 2500);
+  } catch (e) {
+    feedback.value = { type: 'error', message: 'Failed to save planned run.' };
+    setTimeout(() => { feedback.value = null }, 3000);
+    console.error('Failed to save planned run', e);
+  }
 }
 </script>
 
@@ -109,6 +129,26 @@ const handlePlanSave = (payload: { name: string, points: [number, number][] }) =
   padding: 1.5rem 2rem 0.5rem 2rem;
   background: #f7fafd;
   border-bottom: 1px solid #e0eaff;
+}
+
+.feedback-message {
+  position: fixed;
+  top: 80px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1000;
+  padding: 1rem 2rem;
+  border-radius: 8px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  background: #e0ffe0;
+  color: #217a21;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  transition: opacity 0.2s;
+}
+.feedback-message.error {
+  background: #ffe0e0;
+  color: #a12121;
 }
 .tab-switcher button {
   background: none;
