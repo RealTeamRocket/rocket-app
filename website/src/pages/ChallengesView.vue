@@ -16,20 +16,26 @@ import backendApi from '@/api/backend-api';
 
 const MAX_DAILY_CHALLENGES = 5;
 
-const challenges = ref([]);
+const challenges = ref<{ id: string; text: string; points: number }[]>([]);
 
 const fetchChallenges = async () => {
   try {
     const response = await backendApi.getChallenges();
     challenges.value = response.data;
-  } catch (e) {
-    console.error('Failed to load challenges', e);
+  }  catch (e: any) {
+    // 404 means no challenges available
+    if (e.response && e.response.status === 404) {
+      challenges.value = [];
+    } else {
+      console.error('Failed to load challenges', e);
+    }
   }
 };
 
 const handleCompleteChallenge = async (payload: { id: string, points: number }) => {
   try {
     await backendApi.completeChallenge(payload.id, payload.points);
+    challenges.value = challenges.value.filter(c => c.id !== payload.id);
     await fetchChallenges();
   } catch (e) {
     console.error('Failed to complete challenge', e);
