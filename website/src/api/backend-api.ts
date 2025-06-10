@@ -44,4 +44,11 @@ export default {
   getChallenges(): Promise<AxiosResponse> {
   return protectedAxiosApi.get('/challenges/new', { withCredentials: true });
 },
+completeChallenge(challengeId: string): Promise<AxiosResponse> {
+  return protectedAxiosApi.post(
+    '/challenges/complete',
+    { challenge_id: challengeId },
+    { withCredentials: true }
+  );
+},
 }
