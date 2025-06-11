@@ -5,11 +5,8 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
-	"net/http"
 	"os"
 	"path/filepath"
-	"rocket-backend/internal/database"
-	"rocket-backend/internal/server"
 	"rocket-backend/pkg/logger"
 	"runtime"
 	"testing"
@@ -46,30 +43,14 @@ type TestDatabase struct {
 }
 
 var testDB *TestDatabase
-var testServer *http.Server
-var baseURL string
-var port = 8090
 
 var _ = BeforeSuite(func() {
 	testDB = SetupTestDatabase()
 	testDbInstance = testDB.DbInstance
 
-	// Start API server for all tests in this package
-	connStr := fmt.Sprintf("postgres://%s:%s@%s/%s?sslmode=disable", DbUser, DbPass, testDB.DbAddress, DbName)
-	dbService := database.NewWithConfig(connStr)
-	testServer = &http.Server{
-		Addr:    fmt.Sprintf(":%d", port),
-		Handler: server.NewServerWithDB(dbService, port, "testsecret").RegisterRoutes(),
-	}
-	go testServer.ListenAndServe()
-	time.Sleep(1 * time.Second)
-	baseURL = fmt.Sprintf("http://localhost:%d/api/v1", port)
 })
 
 var _ = AfterSuite(func() {
-	if testServer != nil {
-		testServer.Close()
-	}
 	testDB.TearDown()
 })
 

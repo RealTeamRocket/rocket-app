@@ -128,7 +128,6 @@ function sendMessage() {
 
 function handleReact(msg: LocalMessage) {
   if (msg.hasReacted || msg.mine || !msg.id || !ws.value) return
-  console.log('Sending reaction for message id:', msg.id)
   ws.value.sendReaction(msg.id)
   // Optimistic UI update (optional)
   msg.hasReacted = true

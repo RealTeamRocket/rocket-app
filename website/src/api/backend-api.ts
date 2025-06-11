@@ -41,20 +41,39 @@ export default {
   getChatHistory(): Promise<AxiosResponse> {
     return protectedAxiosApi.get('/chat/history', { withCredentials: true });
   },
-  getChallenges(): Promise<AxiosResponse> {
-  return protectedAxiosApi.get('/challenges/new', { withCredentials: true });
+  getPastRuns(): Promise<AxiosResponse> {
+    return protectedAxiosApi.get('/runs', { withCredentials: true });
   },
-  completeChallenge(challengeId: string, rocketPoints: number): Promise<AxiosResponse> {
-    return protectedAxiosApi.post('/challenges/complete', { challenge_id: challengeId, rocket_points: rocketPoints }, { withCredentials: true });
+  deletePastRun(id: string): Promise<AxiosResponse> {
+    return protectedAxiosApi.delete(`/runs/${id}`, { withCredentials: true });
   },
-  getChallengeProgress(): Promise<AxiosResponse> {
-    return protectedAxiosApi.get('/challenges/progress', { withCredentials: true });
+  savePlannedRun(route: string, name: string, distance: number): Promise<AxiosResponse> {
+    return protectedAxiosApi.post(
+      '/runs/plan',
+      { route, name, distance },
+      { withCredentials: true }
+    );
   },
-  getFriends(): Promise<AxiosResponse> {
-    return protectedAxiosApi.get('/friends', { withCredentials: true });
+  getPlannedRuns(): Promise<AxiosResponse> {
+    return protectedAxiosApi.get('/runs/plan', { withCredentials: true });
   },
-  inviteFriendToChallenge(challengeId: string, friendId: string): Promise<AxiosResponse> {
-    console.log("Inviting friend to challenge", challengeId, friendId);
-    return protectedAxiosApi.post('/challenges/invite', { challenge_id: challengeId, friend_id: friendId }, { withCredentials: true });
+  deletePlannedRun(id: string): Promise<AxiosResponse> {
+    return protectedAxiosApi.delete(`/runs/plan/${id}`, { withCredentials: true });
   },
+    getChallenges(): Promise<AxiosResponse> {
+        return protectedAxiosApi.get('/challenges/new', { withCredentials: true });
+    },
+    completeChallenge(challengeId: string, rocketPoints: number): Promise<AxiosResponse> {
+        return protectedAxiosApi.post('/challenges/complete', { challenge_id: challengeId, rocket_points: rocketPoints }, { withCredentials: true });
+    },
+    getChallengeProgress(): Promise<AxiosResponse> {
+        return protectedAxiosApi.get('/challenges/progress', { withCredentials: true });
+    },
+    getFriends(): Promise<AxiosResponse> {
+        return protectedAxiosApi.get('/friends', { withCredentials: true });
+    },
+    inviteFriendToChallenge(challengeId: string, friendId: string): Promise<AxiosResponse> {
+        console.log("Inviting friend to challenge", challengeId, friendId);
+        return protectedAxiosApi.post('/challenges/invite', { challenge_id: challengeId, friend_id: friendId }, { withCredentials: true });
+    },
 }

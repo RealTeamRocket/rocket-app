@@ -2,7 +2,10 @@
   <nav class="rocket-navbar">
     <div class="navbar-content">
       <div class="navbar-left">
-        <router-link to="/" class="navbar-brand">🚀 Rocket App</router-link>
+        <router-link to="/" class="navbar-brand">
+          <img src="/src/assets/icons/rocket.svg" alt="Rocket" style="width:1.3em;height:1.3em;vertical-align:middle;margin-right:0.35em;" />
+          <span>Rocket App</span>
+        </router-link>
         <router-link to="/chat" class="nav-link">Chat</router-link>
         <router-link to="/highscore" class="nav-link">Highscore</router-link>
         <router-link to="/friendlist" class="nav-link">Friendlist</router-link>
@@ -16,7 +19,9 @@
         </template>
         <template v-else>
           <div class="user-info dropdown" @click="toggleDropdown" @blur="closeDropdown" tabindex="0">
-            <span class="user-icon">👤</span>
+            <span class="user-icon">
+              <img src="/src/assets/icons/user.svg" alt="User" style="width:1.3em;height:1.3em;vertical-align:middle;" />
+            </span>
             <span class="user-name">User</span>
             <span class="dropdown-caret">&#9662;</span>
             <div v-if="dropdownOpen" class="dropdown-menu show">

@@ -72,6 +72,14 @@ type ChatMessage struct {
 	HasReacted bool      `json:"hasReacted"`
 }
 
+type PlannedRunDTO struct {
+	ID        string `json:"id"`
+	Route     string `json:"route"`
+	Name      string `json:"name"`
+	CreatedAt string `json:"created_at"`
+	Distance float64 `json:"distance"`
+}
+
 type DailyChallengeProgress struct {
 	Completed int `json:"completed"`
 	Total     int `json:"total"`

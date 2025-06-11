@@ -12,9 +12,6 @@ import (
 	"github.com/google/uuid"
 )
 
-// Assumes Server struct is defined in the server package and imported appropriately
-// If not, adjust the import or struct definition as needed
-
 func (s *Server) GetDailyChallengesHandler(c *gin.Context) {
 	userID, exists := c.Get("userID")
 	if !exists {
