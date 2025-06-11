@@ -1,10 +1,10 @@
 <template>
   <div class="profile-tab" v-if="user">
     <div class="profile-header">
-      <span v-if="userImage" class="user-avatar-img">
+      <span v-if="userImage" class="user-avatar-img" @click="showImageModal = true" style="cursor:pointer;">
         <img :src="userImage" alt="User" />
       </span>
-      <span v-else class="user-avatar-initials" :style="{ backgroundColor: '#e53935', color: '#fff' }">
+      <span v-else class="user-avatar-initials" :style="{ backgroundColor: userInitials, color: '#fff' }">
         {{ userInitials }}
       </span>
       <div class="profile-info">
@@ -21,6 +21,13 @@
     </div>
     <div class="profile-chart">
       <StepChart :data="chartData" :labels="chartLabels" />
+    </div>
+    <!-- Image Popup Modal -->
+    <div v-if="showImageModal" class="image-modal-overlay" @click.self="showImageModal = false">
+      <div class="image-modal-content">
+        <img :src="userImage" alt="Profile Full" />
+        <button class="close-btn" @click="showImageModal = false">&times;</button>
+      </div>
     </div>
   </div>
   <div v-else class="profile-loading">
@@ -48,12 +55,19 @@ const props = defineProps<{
 
 const user = computed(() => props.user)
 
-const userImage = computed(() => {
+const userImage = computed<string | undefined>(() => {
   if (user.value && user.value.image_data) {
     // Assume image is jpeg, you can adjust if you store mime_type
     return `data:image/jpeg;base64,${user.value.image_data}`
   }
-  return null
+  return undefined
+})
+
+const userInitials = computed(() => {
+  if (user.value && user.value.username) {
+    return getInitials(user.value.username)
+  }
+  return ''
 })
 
 const userColor = computed(() => {
@@ -63,12 +77,8 @@ const userColor = computed(() => {
   return '#2a5298'
 })
 
-const userInitials = computed(() => {
-  if (user.value && user.value.username) {
-    return getInitials(user.value.username)
-  }
-  return ''
-})
+// Modal state for image popup
+const showImageModal = ref(false)
 
 // Stats and chart data
 const stats = ref({
@@ -211,5 +221,59 @@ onMounted(() => {
 .profile-loading {
   text-align: center;
   padding: 2rem;
+}
+
+/* Modal Styles */
+.image-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(30, 60, 114, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+.image-modal-content {
+  position: relative;
+  background: #fff;
+  border-radius: 1.2rem;
+  box-shadow: 0 4px 24px rgba(30,60,114,0.18);
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  max-width: 90vw;
+  max-height: 90vh;
+}
+.image-modal-content img {
+  max-width: 70vw;
+  max-height: 70vh;
+  border-radius: 1rem;
+  box-shadow: 0 2px 8px rgba(30,60,114,0.10);
+}
+.close-btn {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  background: #e53935;
+  color: #fff;
+  border: none;
+  border-radius: 50%;
+  width: 2.2rem;
+  height: 2.2rem;
+  font-size: 1.5rem;
+  font-weight: bold;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 1px 4px rgba(30,60,114,0.10);
+  transition: background 0.18s;
+}
+.close-btn:hover {
+  background: #b71c1c;
 }
 </style>
