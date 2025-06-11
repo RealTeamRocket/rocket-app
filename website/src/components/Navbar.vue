@@ -28,7 +28,16 @@
             <span class="user-name">{{ user?.username || 'User' }}</span>
             <span class="dropdown-caret">&#9662;</span>
             <div v-if="dropdownOpen" class="dropdown-menu show">
-              <router-link to="/profile" class="dropdown-item">Profile</router-link>
+              <router-link
+                v-if="user?.username"
+                :to="`/profile/${user.username}`"
+                class="dropdown-item"
+              >Profile</router-link>
+              <router-link
+                v-else
+                to="/profile"
+                class="dropdown-item"
+              >Profile</router-link>
               <router-link to="/settings" class="dropdown-item">Settings</router-link>
               <button class="dropdown-item" @click.stop="handleLogout">Logout</button>
             </div>

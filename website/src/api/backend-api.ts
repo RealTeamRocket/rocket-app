@@ -35,13 +35,13 @@ export default {
   getActivityFeed(): Promise<AxiosResponse> {
     return protectedAxiosApi.get('/activites', { withCredentials: true });
   },
-  getUser(): Promise<AxiosResponse> {
-    return protectedAxiosApi.get('/user', { withCredentials: true });
-  },
   getUserImage(id?: string): Promise<AxiosResponse> {
     const config = { withCredentials: true };
     const data = id ? { user_id: id } : {};
     return protectedAxiosApi.post('/user/image', data, config);
+  },
+  getUser(username: string): Promise<AxiosResponse> {
+    return protectedAxiosApi.get(`/user/${username}`, { withCredentials: true });
   },
   getChatHistory(): Promise<AxiosResponse> {
     return protectedAxiosApi.get('/chat/history', { withCredentials: true });
