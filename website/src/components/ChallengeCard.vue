@@ -53,7 +53,7 @@ defineProps<{ challenge: { id: string, text: string, points: number } }>();
 }
 .challenge-card-actions {
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   gap: 0.5rem;
 }
 .complete-button {
