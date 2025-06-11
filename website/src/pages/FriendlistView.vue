@@ -42,8 +42,9 @@ const filteredFriends = computed(() =>
 );
 
 const unfollowFriend = async (id: string) => {
-  // Call your backend API to unfollow
-  // await backendApi.deleteFriend(id);
+  const friend = friends.value.find(f => f.id === id);
+  if (!friend) return;
+  await backendApi.deleteFriend(friend.username);
   friends.value = friends.value.filter(f => f.id !== id);
 };
 </script>
