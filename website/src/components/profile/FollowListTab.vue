@@ -13,13 +13,15 @@
         <span v-if="u.image_data" class="user-avatar-img">
           <img :src="getUserImage(u.image_data)" alt="User" />
         </span>
-        <span v-else class="user-avatar-initials" :style="{ backgroundColor: getColor(u.username) }">
+        <span v-else class="user-avatar-initials" :style="{ backgroundColor: getColor(u.username), color: '#fff' }">
           {{ getInitials(u.username) }}
         </span>
         <div class="user-info">
           <span class="username">{{ u.username }}</span>
           <span class="rocket-points">
-            <span class="points-icon">🚀</span>
+            <span class="points-icon">
+              <img src="/src/assets/icons/rocket.svg" alt="Rocket" style="width:1.1em;height:1.1em;vertical-align:middle;" />
+            </span>
             {{ u.rocket_points ?? 0 }}
           </span>
         </div>
@@ -33,25 +35,7 @@
 
 <script setup lang="ts">
 import { useRouter, useRoute } from 'vue-router'
-
-// Utility functions for color/initials
-function getColor(username: string) {
-  // Simple hash for color, can be replaced with your own logic
-  const colors = ['#2a5298', '#e53935', '#ffb347', '#43a047', '#8e24aa', '#00838f'];
-  let hash = 0;
-  for (let i = 0; i < username.length; i++) {
-    hash = username.charCodeAt(i) + ((hash << 5) - hash);
-  }
-  return colors[Math.abs(hash) % colors.length];
-}
-function getInitials(username: string) {
-  return username
-    .split(' ')
-    .map((n) => n[0])
-    .join('')
-    .toUpperCase()
-    .slice(0, 2);
-}
+import { getColor, getInitials } from '@/utils/userUtils'
 
 const props = defineProps<{
   users: Array<{
@@ -65,7 +49,8 @@ const props = defineProps<{
 
 const router = useRouter()
 const route = useRoute()
-function goToProfile(username: string) {
+
+const goToProfile = (username: string) => {
   if (route.params.username === username) {
     // If already on this profile, force reload with dummy query param
     router.replace({ path: `/profile/${username}`, query: { t: Date.now() } })
@@ -74,7 +59,7 @@ function goToProfile(username: string) {
   }
 }
 
-function getUserImage(image_data: string | null | undefined) {
+const getUserImage = (image_data: string | null | undefined) => {
   return image_data ? `data:image/jpeg;base64,${image_data}` : undefined
 }
 </script>

@@ -4,7 +4,7 @@
       <span v-if="userImage" class="user-avatar-img" @click="showImageModal = true" style="cursor:pointer;">
         <img :src="userImage" alt="User" />
       </span>
-      <span v-else class="user-avatar-initials" :style="{ backgroundColor: userInitials, color: '#fff' }">
+      <span v-else class="user-avatar-initials" :style="{ backgroundColor: userColor, color: '#fff' }">
         {{ userInitials }}
       </span>
       <div class="profile-info">
@@ -57,7 +57,6 @@ const user = computed(() => props.user)
 
 const userImage = computed<string | undefined>(() => {
   if (user.value && user.value.image_data) {
-    // Assume image is jpeg, you can adjust if you store mime_type
     return `data:image/jpeg;base64,${user.value.image_data}`
   }
   return undefined
@@ -77,10 +76,8 @@ const userColor = computed(() => {
   return '#2a5298'
 })
 
-// Modal state for image popup
 const showImageModal = ref(false)
 
-// Stats and chart data
 const stats = ref({
   totalSteps: 0,
   avgSteps: 0,

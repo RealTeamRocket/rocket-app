@@ -2,7 +2,6 @@
   <div class="login-bg d-flex align-items-center justify-content-center min-vh-100">
     <div class="login-card shadow p-4 rounded bg-white" style="min-width: 350px; max-width: 400px; width: 100%;">
       <div class="mb-3">
-        <img src="https://rocket.emoji.gg/🚀" alt="Rocket Logo" style="width: 48px; height: 48px;" class="mb-2" />
         <h2 class="mb-1">Rocket App</h2>
         <p class="text-muted mb-3">Sign in to your account</p>
       </div>
@@ -44,7 +43,7 @@ const error = ref('')
 
 const { login } = useAuth()
 
-async function handleLogin() {
+const handleLogin = async () => {
   error.value = ''
   try {
     await login(email.value, password.value)
