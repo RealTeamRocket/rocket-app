@@ -240,7 +240,7 @@ func (s *service) InviteFriendToChallenge(challengeID uuid.UUID, friendID uuid.U
 	query := `
 		INSERT INTO user_challenges (user_id, challenge_id, date)
 		VALUES ($1, $2, $3)
-		ON CONFLICT (user_id, challenge_id) DO NOTHING
+		ON CONFLICT (user_id, challenge_id, date) DO NOTHING
 	`
 
 	_, err := s.db.Exec(query, friendID, challengeID, time.Now())
