@@ -36,7 +36,6 @@
 </template>
 
 <script setup lang="ts">
-import { defineProps, defineEmits } from 'vue'
 
 // Types for run and planned run
 export interface Run {

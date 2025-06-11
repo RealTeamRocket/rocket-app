@@ -20,7 +20,7 @@ import TabBar from '@/components/profile/TabBar.vue'
 import ProfileTab from '@/components/profile/ProfileTab.vue'
 import FollowListTab from '@/components/profile/FollowListTab.vue'
 import { ref, onMounted, watch } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import { useRouter } from 'vue-router'
 import api from '@/api/backend-api'
 
 interface User {
@@ -32,9 +32,9 @@ interface User {
    image_data: string | null
 }
 
-const route = useRoute()
+const props = defineProps<{ username: string }>()
 const router = useRouter()
-const username = route.params.username as string
+const username = props.username
 
 const user = ref<User | null>(null)
 const followedUsers = ref([])
@@ -49,15 +49,18 @@ const loadProfile = async (username: string) => {
     return
   }
   try {
-    const response = await api.getUser(username)
-    user.value = response.data
-    // TODO: Replace with real API calls for followed/following users
-    followedUsers.value = [] // await api.getFollowedUsers(username)
-    followingUsers.value = [] // await api.getFollowingUsers(username)
-    if (!user.value || !user.value.username) {
+    const { data: userData } = await api.getUser(username)
+    if (!userData || !userData.username) {
       router.replace('/404')
+      return
     }
-  } catch (error) {
+    user.value = userData
+
+    // Replace with real API calls when available
+    followedUsers.value = [] // await api.getFollowedUsers(username)
+    const { data: followingData } = await api.getFollowing()
+    followingUsers.value = followingData
+  } catch {
     router.replace('/404')
   }
 }
@@ -67,9 +70,9 @@ onMounted(() => {
 })
 
 watch(
-  () => route.params.username,
+  () => props.username,
   (newUsername) => {
-    loadProfile(newUsername as string)
+    loadProfile(newUsername)
   }
 )
 </script>

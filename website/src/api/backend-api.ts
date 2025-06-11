@@ -65,4 +65,7 @@ export default {
   deletePlannedRun(id: string): Promise<AxiosResponse> {
     return protectedAxiosApi.delete(`/runs/plan/${id}`, { withCredentials: true });
   },
+  getFollowing(): Promise<AxiosResponse> {
+    return protectedAxiosApi.get('/friends', { withCredentials: true });
+  }
 }

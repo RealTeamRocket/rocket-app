@@ -111,7 +111,6 @@ onMounted(async () => {
   try {
     const response = await api.getUserImage()
     user.value = response.data
-    console.log('User data:', user.value)
   } catch (e) {
     user.value = null
   }

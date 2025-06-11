@@ -83,10 +83,6 @@ func (s *service) GetFriends(userID uuid.UUID) ([]types.User, error) {
 		return friends[i].Username < friends[j].Username
 	})
 
-	if len(friends) == 0 {
-		return nil, custom_error.ErrUserNotFound
-	}
-
 	return friends, nil
 }
 
