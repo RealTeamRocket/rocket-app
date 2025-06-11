@@ -36,7 +36,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, onMounted } from 'vue'
+import { computed, ref, onMounted, watch } from 'vue'
 import StatsCards from '@/components/StatsCards.vue'
 import StepChart from '@/components/StepChart.vue'
 import { getColor, getInitials } from '@/utils/userUtils'
@@ -119,6 +119,15 @@ const fetchStats = async () => {
 onMounted(() => {
   if (user.value) fetchStats()
 })
+
+watch(
+  () => user.value,
+  (newUser, oldUser) => {
+    if (newUser && (!oldUser || newUser.id !== oldUser.id)) {
+      fetchStats()
+    }
+  }
+)
 </script>
 
 <style scoped>

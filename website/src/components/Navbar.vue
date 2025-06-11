@@ -18,7 +18,12 @@
           <router-link to="/register" class="nav-auth-btn nav-auth-register">Register</router-link>
         </template>
         <template v-else>
-          <div class="user-info dropdown" @click="toggleDropdown" @blur="closeDropdown" tabindex="0">
+          <div
+            class="user-info dropdown"
+            @click="toggleDropdown"
+            tabindex="0"
+            ref="dropdownRef"
+          >
             <span v-if="userImage" class="user-avatar-img">
               <img :src="userImage" alt="User" style="width:1.7em;height:1.7em;vertical-align:middle;border-radius:50%;" />
             </span>
@@ -49,7 +54,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted, onBeforeUnmount, computed } from 'vue'
 import { useAuth } from '@/utils/useAuth'
 import { useRouter } from 'vue-router'
 import api from '@/api/backend-api'
@@ -67,6 +72,7 @@ const router = useRouter()
 const { isLoggedIn, checkAuth, logout } = useAuth()
 
 const dropdownOpen = ref(false)
+const dropdownRef = ref<HTMLElement | null>(null)
 
 const user = ref<User | null>(null)
 
@@ -91,13 +97,17 @@ const userInitials = computed(() => {
   return ''
 })
 
-const toggleDropdown = () => {
+const toggleDropdown = (event: MouseEvent) => {
   dropdownOpen.value = !dropdownOpen.value
 }
-const closeDropdown = () => {
-  setTimeout(() => {
+
+const handleClickOutside = (event: MouseEvent) => {
+  if (
+    dropdownRef.value &&
+    !dropdownRef.value.contains(event.target as Node)
+  ) {
     dropdownOpen.value = false
-  }, 100)
+  }
 }
 const handleLogout = async () => {
   dropdownOpen.value = false
@@ -107,6 +117,7 @@ const handleLogout = async () => {
 }
 
 onMounted(async () => {
+  document.addEventListener('click', handleClickOutside)
   checkAuth()
   try {
     const response = await api.getUserImage()
@@ -114,6 +125,10 @@ onMounted(async () => {
   } catch (e) {
     user.value = null
   }
+})
+
+onBeforeUnmount(() => {
+  document.removeEventListener('click', handleClickOutside)
 })
 </script>
 

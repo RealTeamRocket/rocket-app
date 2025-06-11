@@ -43,6 +43,9 @@ export default {
   getUser(username: string): Promise<AxiosResponse> {
     return protectedAxiosApi.get(`/user/${username}`, { withCredentials: true });
   },
+  getMyself(): Promise<AxiosResponse> {
+    return protectedAxiosApi.get('/user', { withCredentials: true });
+  },
   getChatHistory(): Promise<AxiosResponse> {
     return protectedAxiosApi.get('/chat/history', { withCredentials: true });
   },
@@ -65,7 +68,10 @@ export default {
   deletePlannedRun(id: string): Promise<AxiosResponse> {
     return protectedAxiosApi.delete(`/runs/plan/${id}`, { withCredentials: true });
   },
-  getFollowing(): Promise<AxiosResponse> {
-    return protectedAxiosApi.get('/friends', { withCredentials: true });
-  }
+  getFollowing(id: string): Promise<AxiosResponse> {
+    return protectedAxiosApi.get(`/following/${id}`, { withCredentials: true });
+  },
+  getFollowers(id: string): Promise<AxiosResponse> {
+    return protectedAxiosApi.get(`/followers/${id}`, { withCredentials: true });
+  },
 }

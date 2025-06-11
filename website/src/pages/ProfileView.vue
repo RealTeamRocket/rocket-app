@@ -5,8 +5,8 @@
     <div v-if="activeTab === 'Profile'">
       <ProfileTab :user="user" />
     </div>
-    <div v-else-if="activeTab === 'Followed'">
-      <FollowListTab :users="followedUsers" title="Followed" />
+    <div v-else-if="activeTab === 'Followers'">
+      <FollowListTab :users="followedUsers" title="Followers" />
     </div>
     <div v-else-if="activeTab === 'Following'">
       <FollowListTab :users="followingUsers" title="Following" />
@@ -40,7 +40,7 @@ const user = ref<User | null>(null)
 const followedUsers = ref([])
 const followingUsers = ref([])
 
-const tabs = ['Profile', 'Followed', 'Following']
+const tabs = ['Profile', 'Followers', 'Following']
 const activeTab = ref('Profile')
 
 const loadProfile = async (username: string) => {
@@ -56,10 +56,15 @@ const loadProfile = async (username: string) => {
     }
     user.value = userData
 
-    // Replace with real API calls when available
-    followedUsers.value = [] // await api.getFollowedUsers(username)
-    const { data: followingData } = await api.getFollowing()
-    followingUsers.value = followingData
+    if (!user.value) {
+      router.replace('/404')
+      return
+    }
+    const { data: followingData } = await api.getFollowing(user.value.id)
+    followingUsers.value = followingData || []
+
+    const { data: followersData } = await api.getFollowers(user.value.id)
+    followedUsers.value = followersData || []
   } catch {
     router.replace('/404')
   }
