@@ -2,7 +2,7 @@
   <Navbar />
   <div class="friendlist-page">
     <FriendSearchBar v-model:search="search" />
-    <div v-if="search">
+    <div v-if="search" class="search-results-section">
       <h3 class="result-headline">Search Results</h3>
       <div class="friend-grid">
         <FriendCard
@@ -115,5 +115,8 @@ const addFriend = async (user: any) => {
 .result-headline {
   text-align: center;
   margin-bottom: 1.5rem;
+}
+.search-results-section {
+  margin-bottom: 6rem; 
 }
 </style>
