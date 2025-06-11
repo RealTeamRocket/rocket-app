@@ -7,7 +7,7 @@
       @invite="handleInvite"/>
     <FriendInvitePopup
       v-if="showInvitePopup"
-      :challenge-id="inviteChallengeId"
+      :challenge-id="inviteChallengeId!"
       @close="showInvitePopup = false"/>
   </div>
   <DailyChallengeProgress :completed="completedCount" :total="totalCount" />
