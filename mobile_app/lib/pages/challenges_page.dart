@@ -18,11 +18,14 @@ class ChallengePage extends StatefulWidget {
 class _ChallengePageState extends State<ChallengePage>
     with SingleTickerProviderStateMixin {
   List<Challenge> _challenges = [];
+  int _completedChallenges = 0;
+  int _totalChallenges = 1;
 
   @override
   void initState() {
     super.initState();
     _loadChallenges();
+    _loadChallengeProgress();
   }
 
   Future<void> _loadChallenges() async {
@@ -42,16 +45,26 @@ class _ChallengePageState extends State<ChallengePage>
     }
   }
 
+  Future<void> _loadChallengeProgress() async {
+    try {
+      final jwt = await FlutterSecureStorage().read(key: 'jwt_token');
+      if (jwt == null) return;
+      final progress = await ChallengesApi.fetchChallengeProgress(jwt);
+      setState(() {
+        _completedChallenges = progress.completed;
+        _totalChallenges = progress.total == 0 ? 1 : progress.total;
+      });
+    } catch (e) {
+      debugPrint('Error loading challenge progress: $e');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    const int totalChallenges = 5;
-    double progressValue =
-        totalChallenges == 0
-            ? 0
-            : ((totalChallenges - _challenges.length) / totalChallenges).clamp(
-              0.0,
-              1.0,
-            );
+    double progressValue = (_completedChallenges / _totalChallenges).clamp(
+      0.0,
+      1.0,
+    );
 
     return Container(
       color: ColorConstants.primaryColor,
@@ -132,7 +145,7 @@ class _ChallengePageState extends State<ChallengePage>
 
     try {
       await ChallengesApi.markAsDone(jwt, challenge.id, challenge.points);
-      // await _loadChallenges(); // only needed if we want to use only backend to sync/show challenges
+      await _loadChallengeProgress();
       if (!mounted) return;
     } catch (e) {
       debugPrint('Failure at completing challenge: $e');

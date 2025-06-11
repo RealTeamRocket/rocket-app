@@ -235,3 +235,51 @@ func (s *service) GetChallengeByID(challengeID uuid.UUID) (*types.Challenge, err
 
 	return &challenge, nil
 }
+
+func (s *service) InviteFriendToChallenge(challengeID uuid.UUID, friendID uuid.UUID) error {
+	query := `
+		INSERT INTO user_challenges (user_id, challenge_id, date)
+		VALUES ($1, $2, $3)
+		ON CONFLICT (user_id, challenge_id, date) DO NOTHING
+	`
+
+	_, err := s.db.Exec(query, friendID, challengeID, time.Now())
+	if err != nil {
+		logger.Error("Failed to invite friend to challenge", err)
+		return fmt.Errorf("%w: %v", custom_error.ErrFailedToUpdate, err)
+	}
+
+	return nil
+}
+
+func (s *service) GetAllChallengesAmount(userID uuid.UUID) (int, error) {
+	query := `
+		SELECT COUNT(*)
+		FROM user_challenges
+		WHERE user_id = $1 AND date = CURRENT_DATE
+	`
+	var count int
+	err := s.db.QueryRow(query, userID).Scan(&count)
+	if err != nil {
+		logger.Error("Failed to get all challenges amount for user", err)
+		return 0, fmt.Errorf("%w: %v", custom_error.ErrDatabaseQuery, err)
+	}
+
+	return count, nil
+}
+
+func (s *service) GetCompletedChallengesAmount(userID uuid.UUID) (int, error) {
+	query := `
+		SELECT COUNT(*)
+		FROM user_challenges
+		WHERE user_id = $1 AND date = CURRENT_DATE AND is_completed = TRUE
+	`
+	var count int
+	err := s.db.QueryRow(query, userID).Scan(&count)
+	if err != nil {
+		logger.Error("Failed to get completed challenges amount for user", err)
+		return 0, fmt.Errorf("%w: %v", custom_error.ErrDatabaseQuery, err)
+	}
+
+	return count, nil
+}
