@@ -10,6 +10,15 @@
         @unfollow="unfollowFriend"
       />
     </div>
+    <div v-if="search">
+      <h3 class="result-headline">Search Results</h3>
+      <FriendCard
+        v-for="user in filteredUserResults"
+        :key="user.id"
+        :friend="user"
+        @add-friend="addFriend"
+      />
+    </div>
   </div>
 </template>
 
@@ -22,6 +31,7 @@ import backendApi from '@/api/backend-api';
 
 const search = ref('');
 const friends = ref<any[]>([]);
+const allUsers = ref<any[]>([]);
 
 const fetchFriends = async () => {
   const res = await backendApi.getFriends();
@@ -33,11 +43,33 @@ const fetchFriends = async () => {
     image: f.ImageData ? `data:image/png;base64,${f.ImageData}` : undefined,
   }));
 };
-onMounted(fetchFriends);
+
+const fetchAllUsers = async () => {
+  const res = await backendApi.getAllUsers();
+  allUsers.value = res.data.map((u: any) => ({
+    id: u.ID || u.id,
+    username: u.Username || u.username,
+    email: u.Email || u.email,
+    rocketPoints: u.RocketPoints || u.rocketPoints,
+    image: u.ImageData ? `data:image/png;base64,${u.ImageData}` : undefined,
+  }));
+};
+
+onMounted(() => {
+  fetchFriends();
+  fetchAllUsers();
+});
 
 const filteredFriends = computed(() =>
   friends.value.filter(f =>
     f.username.toLowerCase().includes(search.value.toLowerCase())
+  )
+);
+
+const filteredUserResults = computed(() =>
+  allUsers.value.filter(u =>
+    u.username.toLowerCase().includes(search.value.toLowerCase()) &&
+    !friends.value.some(f => f.id === u.id)
   )
 );
 
@@ -46,6 +78,15 @@ const unfollowFriend = async (id: string) => {
   if (!friend) return;
   await backendApi.deleteFriend(friend.username);
   friends.value = friends.value.filter(f => f.id !== id);
+};
+
+const addFriend = async (user: any) => {
+  try {
+    await backendApi.addFriend(user.username);
+    await fetchFriends();
+  } catch (e) {
+    console.error('Failed to add friend:', e);
+  }
 };
 </script>
 
