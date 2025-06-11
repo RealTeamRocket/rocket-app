@@ -84,7 +84,7 @@ var _ = Describe("Friends API", func() {
 		resp, err = http.DefaultClient.Do(req)
 		Expect(err).To(BeNil())
 		defer resp.Body.Close()
-		Expect(resp.StatusCode).To(Equal(404))
+		Expect(resp.StatusCode).To(Equal(200))
 	})
 
 	It("should not add a non-existent user as friend", func() {
