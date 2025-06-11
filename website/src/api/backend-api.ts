@@ -81,7 +81,6 @@ export default {
         return protectedAxiosApi.get('/friends', { withCredentials: true });
     },
     inviteFriendToChallenge(challengeId: string, friendId: string): Promise<AxiosResponse> {
-        console.log("Inviting friend to challenge", challengeId, friendId);
         return protectedAxiosApi.post('/challenges/invite', { challenge_id: challengeId, friend_id: friendId }, { withCredentials: true });
     },
   getFollowing(id: string): Promise<AxiosResponse> {
