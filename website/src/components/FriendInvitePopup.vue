@@ -13,8 +13,7 @@
             class="friend-item"
             @click="invite(friend)"
           >
-            <img :src="friend.profilePictureUrl" alt="Profile" class="friend-avatar" />
-            <span>{{ friend.name }}</span>
+            {{ friend.username }}
           </div>
         </div>
       </div>
@@ -30,7 +29,7 @@ import backendApi from '@/api/backend-api';
 const props = defineProps<{ challengeId: string }>();
 const emit = defineEmits(['close', 'invited']);
 
-const friends = ref<{ id: string; name: string; profilePictureUrl: string }[]>([]);
+const friends = ref<{ id: string; username: string; image_name: string }[]>([]);
 const loading = ref(true);
 
 const successMessage = ref('');
@@ -39,13 +38,14 @@ const fetchFriends = async () => {
   loading.value = true;
   try {
     const res = await backendApi.getFriends();
+    console.log('API friends:', res.data);
     friends.value = res.data.map((f: any) => ({
-    id: f.ID,
-    name: f.Username,
-    profilePictureUrl: f.ImageData
-    ? `data:image/png;base64,${f.ImageData}`
-    : '/default-avatar.png',
-  }));
+      id: f.id,
+      username: f.username,
+      image_name: f.image_name
+        ? `data:image/png;base64,${f.image_name}`
+        : '/default-avatar.png',
+    }));
   } catch (e) {
     friends.value = [];
   }

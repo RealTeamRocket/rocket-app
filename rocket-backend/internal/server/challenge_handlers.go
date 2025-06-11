@@ -97,8 +97,8 @@ func (s *Server) CompleteChallengeHandler(c *gin.Context) {
 
 func (s *Server) InviteFriendChallenge(c *gin.Context) {
 	var req struct {
-		ChallengeID uuid.UUID `json:"challenge_id" binding:"required"`
-		FriendID    uuid.UUID `json:"friend_id" binding:"required"`
+		ChallengeID string `json:"challenge_id" binding:"required"`
+		FriendID    string `json:"friend_id" binding:"required"`
 	}
 
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -106,7 +106,19 @@ func (s *Server) InviteFriendChallenge(c *gin.Context) {
 		return
 	}
 
-	err := s.db.InviteFriendToChallenge(req.ChallengeID, req.FriendID)
+	friendUUID, err := uuid.Parse(req.FriendID)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid friend ID format"})
+		return
+	}
+
+	challengeUUID, err := uuid.Parse(req.ChallengeID)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid challenge ID format"})
+		return
+	}
+
+	err = s.db.InviteFriendToChallenge(challengeUUID, friendUUID)
 	if err != nil {
 		if errors.Is(err, custom_error.ErrFailedToUpdate) {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to invite friend"})
