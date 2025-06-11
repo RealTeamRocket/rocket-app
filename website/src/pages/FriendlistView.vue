@@ -4,13 +4,15 @@
     <FriendSearchBar v-model:search="search" />
     <div v-if="search">
       <h3 class="result-headline">Search Results</h3>
-      <FriendCard
-        v-for="user in filteredUserResults"
-        :key="user.id"
-        :friend="user"
-        :isFriend="false"
-        @add-friend="addFriend"
-      />
+      <div class="friend-grid">
+        <FriendCard
+          v-for="user in filteredUserResults"
+          :key="user.id"
+          :friend="user"
+          :isFriend="false"
+          @add-friend="addFriend"
+        />
+      </div>
     </div>
     <div class="friend-grid">
       <FriendCard
@@ -109,5 +111,9 @@ const addFriend = async (user: any) => {
   .friend-grid {
     grid-template-columns: 1fr;
   }
+}
+.result-headline {
+  text-align: center;
+  margin-bottom: 1.5rem;
 }
 </style>
