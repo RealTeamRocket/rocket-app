@@ -103,7 +103,7 @@ onMounted(fetchFriends);
   border-radius: 0.5rem; 
   transition: background 0.2s;
   border: 1px solid #e5e7eb;       
-    width: 100%;           /* Add this */
+  width: 100%;          
   box-sizing: border-box;    
 }
 .friend-item:hover { background: #f3f4f6; }
