@@ -5,8 +5,8 @@
     <div class="friend-info">
       <div class="friend-name">{{ friend.username }}</div>
       <div class="friend-email">{{ friend.email }}</div>
-      <div class="friend-points">🚀 {{ friend.rocketPoints }}</div>
-      <div class="friend-steps">Steps walked today: 1000</div>
+      <div class="friend-points">🚀 {{ friend.rocketPoints ?? 0 }}</div>
+      <div class="friend-steps">👣 1000</div>
     </div>
     <button v-if="isFriend" class="unfollow-btn" @click="$emit('unfollow', friend.id)"> Unfollow </button>
     <button v-else class="follow-btn" @click="$emit('add-friend', friend)"> Follow </button>

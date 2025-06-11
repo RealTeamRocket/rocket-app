@@ -43,7 +43,7 @@ const fetchFriends = async () => {
     id: f.ID || f.id,
     username: f.Username || f.username,
     email: f.Email || f.email,
-    rocketPoints: f.RocketPoints || f.rocketPoints,
+    rocketPoints: f.rocket_points,
     image: f.ImageData ? `data:image/png;base64,${f.ImageData}` : undefined,
   }));
 };
@@ -54,7 +54,7 @@ const fetchAllUsers = async () => {
     id: u.ID || u.id,
     username: u.Username || u.username,
     email: u.Email || u.email,
-    rocketPoints: u.RocketPoints || u.rocketPoints,
+    rocketPoints: u.rocket_points,
     image: u.ImageData ? `data:image/png;base64,${u.ImageData}` : undefined,
   }));
 };
