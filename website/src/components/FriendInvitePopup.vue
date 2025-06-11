@@ -83,21 +83,28 @@ onMounted(fetchFriends);
   min-width: 300px;
   display: flex;
   flex-direction: column;
-  align-items: center; 
+  max-height: 80vh;     
+  overflow-y: auto;   
 }
 .friend-list {
   display: flex; 
-  flex-wrap: wrap; gap: 1rem; 
+  flex-direction: column;
+  flex-wrap: wrap; gap: 0.5rem; 
   margin: 1rem 0;
+  width: 100%;
 }
 .friend-item {
   display: flex; 
   align-items: center; 
+  justify-content: center;
   gap: 0.5rem; 
   cursor: pointer; 
   padding: 0.5rem;
   border-radius: 0.5rem; 
   transition: background 0.2s;
+  border: 1px solid #e5e7eb;       
+    width: 100%;           /* Add this */
+  box-sizing: border-box;    
 }
 .friend-item:hover { background: #f3f4f6; }
 .friend-avatar { 
