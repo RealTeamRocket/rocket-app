@@ -79,3 +79,8 @@ type PlannedRunDTO struct {
 	CreatedAt string `json:"created_at"`
 	Distance float64 `json:"distance"`
 }
+
+type DailyChallengeProgress struct {
+	Completed int `json:"completed"`
+	Total     int `json:"total"`
+}
