@@ -19,10 +19,13 @@
         </template>
         <template v-else>
           <div class="user-info dropdown" @click="toggleDropdown" @blur="closeDropdown" tabindex="0">
-            <span class="user-icon">
-              <img src="/src/assets/icons/user.svg" alt="User" style="width:1.3em;height:1.3em;vertical-align:middle;" />
+            <span v-if="userImage" class="user-avatar-img">
+              <img :src="userImage" alt="User" style="width:1.7em;height:1.7em;vertical-align:middle;border-radius:50%;" />
             </span>
-            <span class="user-name">User</span>
+            <span v-else class="user-avatar-initials" :style="{ backgroundColor: userColor }">
+              {{ userInitials }}
+            </span>
+            <span class="user-name">{{ user?.username || 'User' }}</span>
             <span class="dropdown-caret">&#9662;</span>
             <div v-if="dropdownOpen" class="dropdown-menu show">
               <router-link to="/profile" class="dropdown-item">Profile</router-link>
@@ -37,15 +40,47 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { useAuth } from '@/utils/useAuth'
 import { useRouter } from 'vue-router'
+import api from '@/api/backend-api'
+import { getColor, getInitials } from '@/utils/userUtils'
+
+interface User {
+  username: string
+  name: string
+  mime_type: string
+  data: string | null
+}
 
 const router = useRouter()
 
 const { isLoggedIn, checkAuth, logout } = useAuth()
 
 const dropdownOpen = ref(false)
+
+const user = ref<User | null>(null)
+
+const userImage = computed(() => {
+  if (user.value && user.value.data && user.value.mime_type) {
+    return `data:${user.value.mime_type};base64,${user.value.data}`
+  }
+  return null
+})
+
+const userColor = computed(() => {
+  if (user.value && user.value.username) {
+    return getColor(user.value.username)
+  }
+  return '#2a5298'
+})
+
+const userInitials = computed(() => {
+  if (user.value && user.value.username) {
+    return getInitials(user.value.username)
+  }
+  return ''
+})
 
 const toggleDropdown = () => {
   dropdownOpen.value = !dropdownOpen.value
@@ -62,8 +97,15 @@ const handleLogout = async () => {
   window.location.reload()
 }
 
-onMounted(() => {
+onMounted(async () => {
   checkAuth()
+  try {
+    const response = await api.getUserImage()
+    user.value = response.data
+    console.log('User data:', user.value)
+  } catch (e) {
+    user.value = null
+  }
 })
 </script>
 
@@ -169,6 +211,29 @@ onMounted(() => {
 .dropdown-item:hover {
   background: #e0e7ff;
   color: #2a5298;
+}
+
+.user-avatar-img img {
+  display: inline-block;
+  border-radius: 50%;
+  object-fit: cover;
+  background: #fff;
+}
+
+.user-avatar-initials {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.7em;
+  height: 1.7em;
+  border-radius: 50%;
+  color: #fff;
+  font-weight: 700;
+  font-size: 1.1em;
+  margin-right: 0.2em;
+  background: #2a5298;
+  vertical-align: middle;
+  user-select: none;
 }
 
 .user-icon {

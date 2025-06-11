@@ -19,7 +19,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import api from '@/api/backend-api'
-import { getColor } from '@/utils/colorUtils'
+import { getColor, getInitials } from '@/utils/userUtils'
 
 interface Activity {
   name: string
@@ -28,13 +28,6 @@ interface Activity {
   description: string
   time: string
   isUser?: boolean
-}
-
-function getInitials(name: string) {
-  if (name === 'You') return 'YO'
-  const parts = name.split(' ')
-  if (parts.length === 1) return name.substring(0, 2).toUpperCase()
-  return (parts[0][0] + (parts[1]?.[0] || '')).toUpperCase()
 }
 
 function formatRelativeTime(iso: string): string {

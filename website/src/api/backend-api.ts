@@ -38,6 +38,11 @@ export default {
   getUser(): Promise<AxiosResponse> {
     return protectedAxiosApi.get('/user', { withCredentials: true });
   },
+  getUserImage(id?: string): Promise<AxiosResponse> {
+    const config = { withCredentials: true };
+    const data = id ? { user_id: id } : {};
+    return protectedAxiosApi.post('/user/image', data, config);
+  },
   getChatHistory(): Promise<AxiosResponse> {
     return protectedAxiosApi.get('/chat/history', { withCredentials: true });
   },
