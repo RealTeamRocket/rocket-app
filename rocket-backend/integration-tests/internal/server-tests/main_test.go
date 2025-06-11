@@ -62,8 +62,23 @@ var _ = BeforeSuite(func() {
 		Handler: server.NewServerWithDB(dbService, port, "testsecret").RegisterRoutes(),
 	}
 	go testServer.ListenAndServe()
-	time.Sleep(1 * time.Second)
+
+	// Wait for the server to be ready
+	ready := false
+	for range 30 {
+		resp, err := http.Get(fmt.Sprintf("http://localhost:%d/api/v1/health", port))
+		if err == nil && resp.StatusCode == 200 {
+			ready = true
+			resp.Body.Close()
+			break
+		}
+		time.Sleep(100 * time.Millisecond)
+	}
+	if !ready {
+		panic("server did not start in time")
+	}
 	baseURL = fmt.Sprintf("http://localhost:%d/api/v1", port)
+
 })
 
 var _ = AfterSuite(func() {

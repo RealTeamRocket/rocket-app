@@ -6,19 +6,16 @@ import vueDevTools from 'vite-plugin-vue-devtools'
 
 // https://vite.dev/config/
 export default defineConfig({
-  plugins: [
-    vue(),
-    vueDevTools(),
-  ],
+  plugins: [vue(), vueDevTools()],
   resolve: {
     alias: {
-      'vue': 'vue/dist/vue.esm-bundler.js',
+      vue: 'vue/dist/vue.esm-bundler.js',
       '@': fileURLToPath(new URL('./src', import.meta.url))
-    },
+    }
   },
   build: {
     commonjsOptions: {
-      include: [/node_modules/],
+      include: [/node_modules/]
     }
   },
   base: './',
@@ -28,7 +25,13 @@ export default defineConfig({
         target: 'http://localhost:8080',
         ws: true,
         changeOrigin: true,
-        rewrite: path => path,
+        rewrite: (path) => path
+      },
+      '/elevation-api': {
+        target: 'https://api.opentopodata.org',
+        changeOrigin: true,
+        secure: true,
+        rewrite: (path) => path.replace(/^\/elevation-api/, '')
       }
     }
   }

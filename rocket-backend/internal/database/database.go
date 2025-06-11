@@ -80,6 +80,9 @@ type Service interface {
 	SaveRun(userID uuid.UUID, route string, duration string, distance float64) error
 	GetAllRunsByUser(userID uuid.UUID) ([]types.RunDTO, error)
 	DeleteRun(runID uuid.UUID) error
+	SavePlannedRun(userID uuid.UUID, route string, name string, distance float64) error
+	GetAllPlannedRunsByUser(userID uuid.UUID) ([]types.PlannedRunDTO, error)
+	DeletePlannedRun(runID uuid.UUID) error
 
 	// activities
 	SaveActivity(userID uuid.UUID, message string) error

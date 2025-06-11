@@ -40,5 +40,24 @@ export default {
   },
   getChatHistory(): Promise<AxiosResponse> {
     return protectedAxiosApi.get('/chat/history', { withCredentials: true });
-  }
+  },
+  getPastRuns(): Promise<AxiosResponse> {
+    return protectedAxiosApi.get('/runs', { withCredentials: true });
+  },
+  deletePastRun(id: string): Promise<AxiosResponse> {
+    return protectedAxiosApi.delete(`/runs/${id}`, { withCredentials: true });
+  },
+  savePlannedRun(route: string, name: string, distance: number): Promise<AxiosResponse> {
+    return protectedAxiosApi.post(
+      '/runs/plan',
+      { route, name, distance },
+      { withCredentials: true }
+    );
+  },
+  getPlannedRuns(): Promise<AxiosResponse> {
+    return protectedAxiosApi.get('/runs/plan', { withCredentials: true });
+  },
+  deletePlannedRun(id: string): Promise<AxiosResponse> {
+    return protectedAxiosApi.delete(`/runs/plan/${id}`, { withCredentials: true });
+  },
 }

@@ -15,7 +15,8 @@
         class="reaction-badge"
         :class="[{ reacted: hasReacted }, mine ? 'left' : 'right']"
       >
-        🚀 <span>{{ reactions }}</span>
+        <img src="/src/assets/icons/rocket.svg" alt="Rocket" style="width:1em;height:1em;vertical-align:middle;" />
+        <span>{{ reactions }}</span>
       </div>
       <div class="d-flex align-items-end">
         <span
