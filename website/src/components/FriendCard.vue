@@ -8,14 +8,17 @@
       <div class="friend-points">🚀 {{ friend.rocketPoints }}</div>
       <div class="friend-steps">Steps walked today: 1000</div>
     </div>
-    <button class="unfollow-btn" @click="$emit('unfollow', friend.id)">Unfollow</button>
+    <button v-if="isFriend" class="unfollow-btn" @click="$emit('unfollow', friend.id)"> Unfollow </button>
+    <button v-else class="follow-btn" @click="$emit('add-friend', friend)"> Follow </button>
   </div>
 </template>
 
 <script setup lang="ts">
 const props = defineProps<{
-  friend: { id: string, username: string, email: string, rocketPoints: number, image?: string }
+  friend: { id: string, username: string, email: string, rocketPoints: number, image?: string },
+  isFriend?: boolean
 }>();
+
 const initials = props.friend.username
   ? props.friend.username.split(' ').map(n => n[0]).join('').toUpperCase()
   : '';
@@ -84,5 +87,22 @@ const initials = props.friend.username
 .unfollow-btn:hover {
   background: #ef4444;
   color: #fff;
+}
+.follow-btn {
+  background: #22c55e;
+  border: 1px solid #22c55e;
+  color: #fff;
+  border-radius: 0.5rem;
+  padding: 0.4rem 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+  position: absolute;
+  bottom: 1rem;
+  right: 1rem;
+}
+.follow-btn:hover {
+  background: #16a34a;
+  border-color: #16a34a;
 }
 </style>

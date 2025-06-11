@@ -2,21 +2,23 @@
   <Navbar />
   <div class="friendlist-page">
     <FriendSearchBar v-model:search="search" />
-    <div class="friend-grid">
-      <FriendCard
-        v-for="friend in filteredFriends"
-        :key="friend.id"
-        :friend="friend"
-        @unfollow="unfollowFriend"
-      />
-    </div>
     <div v-if="search">
       <h3 class="result-headline">Search Results</h3>
       <FriendCard
         v-for="user in filteredUserResults"
         :key="user.id"
         :friend="user"
+        :isFriend="false"
         @add-friend="addFriend"
+      />
+    </div>
+    <div class="friend-grid">
+      <FriendCard
+        v-for="friend in filteredFriends"
+        :key="friend.id"
+        :friend="friend"
+        :isFriend="true"
+        @unfollow="unfollowFriend"
       />
     </div>
   </div>
