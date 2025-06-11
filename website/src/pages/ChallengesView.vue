@@ -8,8 +8,7 @@
     <FriendInvitePopup
       v-if="showInvitePopup"
       :challenge-id="inviteChallengeId"
-      @close="showInvitePopup = false"
-      @invited="handleInvited"/>
+      @close="showInvitePopup = false"/>
   </div>
   <DailyChallengeProgress :completed="completedCount" :total="totalCount" />
 </template>
@@ -67,10 +66,6 @@ const handleCompleteChallenge = async (payload: { id: string, points: number }) 
 const handleInvite = (challengeId: string) => {
   inviteChallengeId.value = challengeId;
   showInvitePopup.value = true;
-};
-
-const handleInvited = (friend: any) => {
-  // Optionally show a toast or notification
 };
 
 onMounted(async () => {
