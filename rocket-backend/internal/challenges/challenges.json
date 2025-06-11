@@ -73,5 +73,255 @@
     "id": "550e8400-e29b-41d4-a716-44665544000e",
     "text": "Do a 10-minute dance workout",
     "points": 25
+  },
+  {
+    "id": "550e8400-e29b-41d4-a716-44665544000f",
+    "text": "Do 20 burpees",
+    "points": 30
+  },
+  {
+    "id": "550e8400-e29b-41d4-a716-446655440010",
+    "text": "Perform a 15-minute HIIT session",
+    "points": 15
+  },
+  {
+    "id": "550e8400-e29b-41d4-a716-446655440011",
+    "text": "Do 3 sets of 12 lunges on each leg",
+    "points": 25
+  },
+  {
+    "id": "550e8400-e29b-41d4-a716-446655440012",
+    "text": "Hold a yoga tree pose for 1 minute on each side",
+    "points": 15
+  },
+  {
+    "id": "550e8400-e29b-41d4-a716-446655440013",
+    "text": "Complete 20 mountain climbers",
+    "points": 25
+  },
+  {
+    "id": "550e8400-e29b-41d4-a716-446655440014",
+    "text": "Perform a 5-minute core workout",
+    "points": 15
+  },
+  {
+    "id": "550e8400-e29b-41d4-a716-446655440015",
+    "text": "Try a new healthy smoothie recipe",
+    "points": 25
+  },
+  {
+    "id": "550e8400-e29b-41d4-a716-446655440016",
+    "text": "Practice deep breathing for 5 minutes",
+    "points": 15
+  },
+  {
+    "id": "550e8400-e29b-41d4-a716-446655440017",
+    "text": "Take a 15-minute mobility workout",
+    "points": 25
+  },
+  {
+    "id": "550e8400-e29b-41d4-a716-446655440018",
+    "text": "Do 3 sets of 10 tricep dips",
+    "points": 25
+  },
+  {
+    "id": "550e8400-e29b-41d4-a716-446655440019",
+    "text": "Jump rope for 10 minutes",
+    "points": 20
+  },
+  {
+    "id": "550e8400-e29b-41d4-a716-44665544001a",
+    "text": "Take the stairs instead of the elevator all day",
+    "points": 30
+  },
+  {
+    "id": "550e8400-e29b-41d4-a716-44665544001b",
+    "text": "Have a meat-free dinner",
+    "points": 30
+  },
+  {
+    "id": "550e8400-e29b-41d4-a716-44665544001c",
+    "text": "Get at least 8 hours of sleep",
+    "points": 30
+  },
+  {
+    "id": "550e8400-e29b-41d4-a716-44665544001d",
+    "text": "Practice balance exercises for 10 minutes",
+    "points": 15
+  },
+  {
+    "id": "550e8400-e29b-41d4-a716-44665544001e",
+    "text": "Do 50 jumping jacks",
+    "points": 30
+  },
+  {
+    "id": "550e8400-e29b-41d4-a716-44665544001f",
+    "text": "Perform a 20-minute pilates session",
+    "points": 30
+  },
+  {
+    "id": "550e8400-e29b-41d4-a716-446655440020",
+    "text": "Cycle to work or school (round trip)",
+    "points": 35
+  },
+  {
+    "id": "550e8400-e29b-41d4-a716-446655440021",
+    "text": "Do 3 sets of 15 calf raises",
+    "points": 25
+  },
+  {
+    "id": "550e8400-e29b-41d4-a716-446655440022",
+    "text": "Carry your groceries on foot",
+    "points": 25
+  },
+  {
+    "id": "550e8400-e29b-41d4-a716-446655440023",
+    "text": "Take a cold shower post-workout",
+    "points": 20
+  },
+  {
+    "id": "550e8400-e29b-41d4-a716-446655440024",
+    "text": "Avoid screen time 1 hour before bed",
+    "points": 30
+  },
+  {
+    "id": "550e8400-e29b-41d4-a716-446655440025",
+    "text": "Meditate for 15 minutes in the morning",
+    "points": 25
+  },
+  {
+    "id": "550e8400-e29b-41d4-a716-446655440026",
+    "text": "Do a dynamic warm-up for 10 minutes",
+    "points": 15
+  },
+  {
+    "id": "550e8400-e29b-41d4-a716-446655440027",
+    "text": "Do 3 sets of 12 bicep curls",
+    "points": 25
+  },
+  {
+    "id": "550e8400-e29b-41d4-a716-446655440028",
+    "text": "Run up and down the stairs 10 times",
+    "points": 25
+  },
+  {
+    "id": "550e8400-e29b-41d4-a716-446655440029",
+    "text": "Perform 5 sets of 30-second box jumps",
+    "points": 35
+  },
+  {
+    "id": "550e8400-e29b-41d4-a716-44665544002a",
+    "text": "Hold a wall plank for 2 minutes",
+    "points": 20
+  },
+  {
+    "id": "550e8400-e29b-41d4-a716-44665544002b",
+    "text": "Do a foam rolling session for 10 minutes",
+    "points": 15
+  },
+  {
+    "id": "550e8400-e29b-41d4-a716-44665544002c",
+    "text": "Perform 20 Russian twists",
+    "points": 25
+  },
+  {
+    "id": "550e8400-e29b-41d4-a716-44665544002d",
+    "text": "Do 15 glute bridges",
+    "points": 25
+  },
+  {
+    "id": "550e8400-e29b-41d4-a716-44665544002e",
+    "text": "Drink a green juice",
+    "points": 20
+  },
+  {
+    "id": "550e8400-e29b-41d4-a716-44665544002f",
+    "text": "Attend a 20-minute Zumba class",
+    "points": 30
+  },
+  {
+    "id": "550e8400-e29b-41d4-a716-446655440030",
+    "text": "Stretch for 5 minutes before bed",
+    "points": 20
+  },
+  {
+    "id": "550e8400-e29b-41d4-a716-446655440031",
+    "text": "Do 3 sets of 12 leg raises",
+    "points": 25
+  },
+  {
+    "id": "550e8400-e29b-41d4-a716-446655440032",
+    "text": "Practice 10 minutes of Tai Chi",
+    "points": 15
+  },
+  {
+    "id": "550e8400-e29b-41d4-a716-446655440033",
+    "text": "Hold a wall-assisted handstand for 30 seconds",
+    "points": 20
+  },
+  {
+    "id": "550e8400-e29b-41d4-a716-446655440034",
+    "text": "Row for 15 minutes",
+    "points": 25
+  },
+  {
+    "id": "550e8400-e29b-41d4-a716-446655440035",
+    "text": "Do 3 sets of 10 lat pulldowns",
+    "points": 25
+  },
+  {
+    "id": "550e8400-e29b-41d4-a716-446655440036",
+    "text": "Perform a 1-minute squat hold",
+    "points": 20
+  },
+  {
+    "id": "550e8400-e29b-41d4-a716-446655440037",
+    "text": "Take a 5-minute mindfulness break every 2 hours",
+    "points": 20
+  },
+  {
+    "id": "550e8400-e29b-41d4-a716-446655440038",
+    "text": "Eat 5 servings of fruits and vegetables",
+    "points": 35
+  },
+  {
+    "id": "550e8400-e29b-41d4-a716-446655440039",
+    "text": "Do 25 knee push-ups",
+    "points": 25
+  },
+  {
+    "id": "550e8400-e29b-41d4-a716-44665544003a",
+    "text": "Practice jump squats for 5 minutes",
+    "points": 20
+  },
+  {
+    "id": "550e8400-e29b-41d4-a716-44665544003b",
+    "text": "Go for a 30-minute hike",
+    "points": 35
+  },
+  {
+    "id": "550e8400-e29b-41d4-a716-44665544003c",
+    "text": "Perform a 10-minute partner workout",
+    "points": 25
+  },
+  {
+    "id": "550e8400-e29b-41d4-a716-44665544003d",
+    "text": "Try a new sport or activity for 30 minutes",
+    "points": 35
+  },
+  {
+    "id": "550e8400-e29b-41d4-a716-44665544003e",
+    "text": "Complete a circuit of 5 exercises: 1 minute each",
+    "points": 25
+  },
+  {
+    "id": "550e8400-e29b-41d4-a716-44665544003f",
+    "text": "Dance to your favorite song in full",
+    "points": 20
+  },
+  {
+    "id": "550e8400-e29b-41d4-a716-446655440040",
+    "text": "Do a sunrise yoga session outdoors",
+    "points": 20
   }
 ]
