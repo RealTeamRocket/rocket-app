@@ -38,7 +38,6 @@ const fetchFriends = async () => {
   loading.value = true;
   try {
     const res = await backendApi.getFriends();
-    console.log('API friends:', res.data);
     friends.value = res.data.map((f: any) => ({
       id: f.id,
       username: f.username,
@@ -71,45 +70,45 @@ onMounted(fetchFriends);
 
 <style scoped>
 .popup-backdrop {
-  position: fixed; 
+  position: fixed;
   top: 0; left: 0; right: 0; bottom: 0;
   background: rgba(0,0,0,0.3); display: flex; align-items: center; justify-content: center;
   z-index: 1000;
 }
 .popup-content {
-  background: #fff; 
-  padding: 2rem; 
-  border-radius: 1rem; 
+  background: #fff;
+  padding: 2rem;
+  border-radius: 1rem;
   min-width: 300px;
   display: flex;
   flex-direction: column;
-  max-height: 80vh;     
-  overflow-y: auto;   
+  max-height: 80vh;
+  overflow-y: auto;
 }
 .friend-list {
-  display: flex; 
+  display: flex;
   flex-direction: column;
-  flex-wrap: wrap; gap: 0.5rem; 
+  flex-wrap: wrap; gap: 0.5rem;
   margin: 1rem 0;
   width: 100%;
 }
 .friend-item {
-  display: flex; 
-  align-items: center; 
+  display: flex;
+  align-items: center;
   justify-content: center;
-  gap: 0.5rem; 
-  cursor: pointer; 
+  gap: 0.5rem;
+  cursor: pointer;
   padding: 0.5rem;
-  border-radius: 0.5rem; 
+  border-radius: 0.5rem;
   transition: background 0.2s;
-  border: 1px solid #e5e7eb;       
-  width: 100%;          
-  box-sizing: border-box;    
+  border: 1px solid #e5e7eb;
+  width: 100%;
+  box-sizing: border-box;
 }
 .friend-item:hover { background: #f3f4f6; }
-.friend-avatar { 
-  width: 40px; 
-  height: 40px; 
+.friend-avatar {
+  width: 40px;
+  height: 40px;
   border-radius: 50%; object-fit: cover; }
 .cancel-button {
   padding: 0.5rem 1rem;
@@ -121,7 +120,7 @@ onMounted(fetchFriends);
   cursor: pointer;
   transition: background 0.2s;
   margin-top: 1rem;
-  
+
 }
 .cancel-button:hover {
   background: #ef4444;

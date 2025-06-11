@@ -39,6 +39,7 @@ func (s *Server) RegisterRoutes() http.Handler {
 			protected.POST("/settings/image", s.UpdateImageHandler)
 
 			protected.GET("/user", s.GetUserHandler)
+			protected.GET("/user/:name", s.GetUserByNameHandler)
 			protected.POST("/user/statistics", s.GetUserStatisticsHandler)
 			protected.POST("/user/image", s.GetUserImageHandler)
 			protected.GET("/user/rocketpoints", s.GetRocketPointsHandler)
@@ -55,6 +56,8 @@ func (s *Server) RegisterRoutes() http.Handler {
 			protected.GET("/friends", s.GetAllFriendsHandler)
 			protected.POST("/friends/add", s.AddFriendHandler)
 			protected.DELETE("/friends/:name", s.DeleteFriendHandler)
+			protected.GET("/followers/:id", s.GetFollowersHandler)
+			protected.GET("/following/:id", s.GetFollowingHandler)
 
 			protected.POST("/runs", s.UploadRunHandler)
 			protected.GET("/runs", s.GetAllRunsHandler)

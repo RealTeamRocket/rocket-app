@@ -84,7 +84,7 @@ var _ = Describe("Friends API", func() {
 		resp, err = http.DefaultClient.Do(req)
 		Expect(err).To(BeNil())
 		defer resp.Body.Close()
-		Expect(resp.StatusCode).To(Equal(404))
+		Expect(resp.StatusCode).To(Equal(200))
 	})
 
 	It("should not add a non-existent user as friend", func() {
@@ -106,5 +106,69 @@ var _ = Describe("Friends API", func() {
 		Expect(err).To(BeNil())
 		defer resp.Body.Close()
 		Expect(resp.StatusCode).To(Equal(500)) // Internal error or 404 depending on backend logic
+	})
+
+	It("should return correct followers and following lists", func() {
+		// Register and login users
+		tokenA := registerAndLoginFriend("followerA@example.com", "password123", "followerA")
+		_ = registerAndLoginFriend("followedB@example.com", "password123", "followedB")
+
+		// Add followedB as friend to followerA
+		payload := map[string]any{"friend_name": "followedB"}
+		body, _ := json.Marshal(payload)
+		req, _ := http.NewRequest("POST", baseURL+"/protected/friends/add", bytes.NewReader(body))
+		req.Header.Set("Authorization", "Bearer "+tokenA)
+		req.Header.Set("Content-Type", "application/json")
+		resp, err := http.DefaultClient.Do(req)
+		Expect(err).To(BeNil())
+		defer resp.Body.Close()
+		Expect(resp.StatusCode).To(Equal(200))
+
+		// Get user IDs for both users (simulate what backend expects)
+		// We'll use the /protected/user endpoint to get the ID for followerA
+		req, _ = http.NewRequest("GET", baseURL+"/protected/user", nil)
+		req.Header.Set("Authorization", "Bearer "+tokenA)
+		resp, err = http.DefaultClient.Do(req)
+		Expect(err).To(BeNil())
+		defer resp.Body.Close()
+		Expect(resp.StatusCode).To(Equal(200))
+		var userAInfo map[string]any
+		_ = json.NewDecoder(resp.Body).Decode(&userAInfo)
+		userAID := userAInfo["id"].(string)
+
+		// Now get userB's ID
+		req, _ = http.NewRequest("GET", baseURL+"/protected/user/"+ "followedB", nil)
+		req.Header.Set("Authorization", "Bearer "+tokenA)
+		resp, err = http.DefaultClient.Do(req)
+		Expect(err).To(BeNil())
+		defer resp.Body.Close()
+		Expect(resp.StatusCode).To(Equal(200))
+		var userBInfo map[string]any
+		_ = json.NewDecoder(resp.Body).Decode(&userBInfo)
+		userBID := userBInfo["id"].(string)
+
+		// Check following for followerA (should include followedB)
+		req, _ = http.NewRequest("GET", baseURL+"/protected/following/"+userAID, nil)
+		req.Header.Set("Authorization", "Bearer "+tokenA)
+		resp, err = http.DefaultClient.Do(req)
+		Expect(err).To(BeNil())
+		defer resp.Body.Close()
+		Expect(resp.StatusCode).To(Equal(200))
+		var following []map[string]any
+		_ = json.NewDecoder(resp.Body).Decode(&following)
+		Expect(len(following)).To(Equal(1))
+		Expect(following[0]["username"]).To(Equal("followedB"))
+
+		// Check followers for followedB (should include followerA)
+		req, _ = http.NewRequest("GET", baseURL+"/protected/followers/"+userBID, nil)
+		req.Header.Set("Authorization", "Bearer "+tokenA)
+		resp, err = http.DefaultClient.Do(req)
+		Expect(err).To(BeNil())
+		defer resp.Body.Close()
+		Expect(resp.StatusCode).To(Equal(200))
+		var followers []map[string]any
+		_ = json.NewDecoder(resp.Body).Decode(&followers)
+		Expect(len(followers)).To(Equal(1))
+		Expect(followers[0]["username"]).To(Equal("followerA"))
 	})
 })

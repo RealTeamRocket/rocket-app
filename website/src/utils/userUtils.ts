@@ -8,3 +8,9 @@ export function getColor(name: string) {
   for (let i = 0; i < name.length; i++) hash = name.charCodeAt(i) + ((hash << 5) - hash)
   return chatColors[Math.abs(hash) % chatColors.length]
 }
+
+export function getInitials(name: string) {
+  const parts = name.split(' ')
+  if (parts.length === 1) return name.substring(0, 2).toUpperCase()
+  return (parts[0][0] + (parts[1]?.[0] || '')).toUpperCase()
+}

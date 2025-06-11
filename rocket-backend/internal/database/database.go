@@ -78,6 +78,7 @@ type Service interface {
 	GetFriends(userID uuid.UUID) ([]types.User, error)
 	GetFriendsRankedByPoints(userID uuid.UUID) ([]types.User, error)
 	DeleteFriend(userID, friendID uuid.UUID) error
+	GetFollowers(userID uuid.UUID) ([]types.User, error)
 
 	// runs
 	SaveRun(userID uuid.UUID, route string, duration string, distance float64) error

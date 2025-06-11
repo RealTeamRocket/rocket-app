@@ -9,6 +9,7 @@ import ChallengesView from '@/pages/ChallengesView.vue'
 import RunsView from '@/pages/RunsView.vue'
 import ProfileView from '@/pages/ProfileView.vue'
 import SettingsView from '@/pages/SettingsView.vue'
+import NotFoundView from '@/pages/NotFound.vue'
 import { useAuth } from '@/utils/useAuth'
 
 const routes = [
@@ -21,8 +22,8 @@ const routes = [
   { path: '/challenges', component: ChallengesView },
   { path: '/runs', component: RunsView },
   { path: '/settings', component: SettingsView },
-  { path: '/profile', component: ProfileView },
-  { path: '/:pathMatch(.*)*', redirect: '/' }
+  { path: '/profile/:username', component: ProfileView, props: true },
+  { path: '/:pathMatch(.*)*', component: NotFoundView } // Catch-all for 404
 ]
 
 const router = createRouter({

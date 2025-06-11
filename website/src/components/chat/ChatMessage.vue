@@ -32,7 +32,7 @@
 </template>
 
 <script setup lang="ts">
-import { getColor } from '@/utils/colorUtils'
+import { getColor } from '@/utils/userUtils'
 
 const props = defineProps<{
   username: string
