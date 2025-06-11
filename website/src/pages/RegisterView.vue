@@ -2,7 +2,6 @@
   <div class="register-bg d-flex align-items-center justify-content-center min-vh-100">
     <div class="register-card shadow p-4 rounded bg-white" style="min-width: 350px; max-width: 400px; width: 100%;">
       <div class="mb-3">
-        <img src="https://rocket.emoji.gg/🚀" alt="Rocket Logo" style="width: 48px; height: 48px;" class="mb-2" />
         <h2 class="mb-1">Create Account</h2>
         <p class="text-muted mb-3">Sign up for Rocket App</p>
       </div>
@@ -60,7 +59,7 @@ const repeatPassword = ref('')
 const error = ref('')
 const router = useRouter()
 
-async function handleRegister() {
+const handleRegister = async () => {
   error.value = ''
   if (password.value !== repeatPassword.value) {
     error.value = "Passwords do not match."

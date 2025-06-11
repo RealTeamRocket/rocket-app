@@ -104,4 +104,43 @@ var _ = Describe("Friends Table Integration", func() {
 		Expect(err).ToNot(BeNil())
 		Expect(err.Error()).To(ContainSubstring("violates foreign key constraint"))
 	})
+
+	It("should retrieve followers correctly", func() {
+		_, err := testDbInstance.Exec(`
+			INSERT INTO friends (user_id, friend_id)
+			VALUES ($1, $2)
+		`, userID, friendID)
+		Expect(err).To(BeNil())
+
+		// Query followers of friendID (should include userID)
+		rows, err := testDbInstance.Query(`
+			SELECT user_id FROM friends WHERE friend_id = $1
+		`, friendID)
+		Expect(err).To(BeNil())
+		defer rows.Close()
+
+		var found bool
+		for rows.Next() {
+			var follower uuid.UUID
+			err := rows.Scan(&follower)
+			Expect(err).To(BeNil())
+			if follower == userID {
+				found = true
+			}
+		}
+		Expect(found).To(BeTrue())
+
+		// Query followers of userID (should be empty)
+		rows, err = testDbInstance.Query(`
+			SELECT user_id FROM friends WHERE friend_id = $1
+		`, userID)
+		Expect(err).To(BeNil())
+		defer rows.Close()
+
+		count := 0
+		for rows.Next() {
+			count++
+		}
+		Expect(count).To(Equal(0))
+	})
 })

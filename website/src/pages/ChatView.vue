@@ -18,7 +18,7 @@ const user = ref({
 })
 
 onMounted(async () => {
-  const response = await api.getUser()
+  const response = await api.getMyself()
   if (response.status === 200) {
     user.value = response.data
   } else {

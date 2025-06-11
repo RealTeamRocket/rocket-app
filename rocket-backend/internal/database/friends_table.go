@@ -83,10 +83,6 @@ func (s *service) GetFriends(userID uuid.UUID) ([]types.User, error) {
 		return friends[i].Username < friends[j].Username
 	})
 
-	if len(friends) == 0 {
-		return nil, custom_error.ErrUserNotFound
-	}
-
 	return friends, nil
 }
 
@@ -117,4 +113,36 @@ func (s *service) GetFriendsRankedByPoints(userID uuid.UUID) ([]types.User, erro
 	}
 
 	return friends, nil
+}
+
+func (s *service) GetFollowers(userID uuid.UUID) ([]types.User, error) {
+	query := `
+		SELECT u.id, u.username, u.email, u.rocketpoints
+		FROM friends f
+		JOIN users u ON f.user_id = u.id
+		WHERE f.friend_id = $1
+	`
+	rows, err := s.db.Query(query, userID)
+	if err != nil {
+		logger.Error("Failed to get followers", err)
+		return nil, fmt.Errorf("%w: failed to retrieve followers", custom_error.ErrFailedToRetrieveData)
+	}
+	defer rows.Close()
+
+	var followers []types.User
+	for rows.Next() {
+		var follower types.User
+		if err := rows.Scan(&follower.ID, &follower.Username, &follower.Email, &follower.RocketPoints); err != nil {
+			logger.Error("Failed to scan follower row", err)
+			return nil, fmt.Errorf("%w: failed to scan follower row", custom_error.ErrFailedToRetrieveData)
+		}
+		followers = append(followers, follower)
+	}
+
+	// Sort followers alphanumerically by username
+	sort.Slice(followers, func(i, j int) bool {
+		return followers[i].Username < followers[j].Username
+	})
+
+	return followers, nil
 }

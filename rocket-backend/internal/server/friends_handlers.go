@@ -141,3 +141,94 @@ func (s *Server) GetAllFriendsHandler(c *gin.Context) {
 
 	c.JSON(http.StatusOK, friendsWithImages)
 }
+
+func (s *Server) GetFollowingHandler(c *gin.Context) {
+	paramID := c.Param("id")
+	if paramID == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "User ID is required"})
+		return
+	}
+
+	userUUID, err := uuid.Parse(paramID)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid user ID format"})
+		return
+	}
+
+	// Get the list of users this user is following
+	following, err := s.db.GetFriends(userUUID)
+	if err != nil {
+		if errors.Is(err, custom_error.ErrUserNotFound) {
+			c.JSON(http.StatusNotFound, gin.H{"error": custom_error.ErrUserNotFound.Error()})
+		} else {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": custom_error.ErrFailedToRetrieveData.Error()})
+		}
+		return
+	}
+
+	var followingWithImages []types.UserWithImageDTO
+	for _, fr := range following {
+		var f types.UserWithImageDTO
+		f.ID = fr.ID
+		f.Username = fr.Username
+		f.Email = fr.Email
+		f.RocketPoints = fr.RocketPoints
+
+		userImage, imgErr := s.db.GetUserImage(fr.ID)
+		if imgErr != nil {
+			f.ImageName = ""
+			f.ImageData = ""
+		} else if userImage != nil {
+			f.ImageName = userImage.Name
+			f.ImageData = base64.StdEncoding.EncodeToString(userImage.Data)
+		}
+		followingWithImages = append(followingWithImages, f)
+	}
+
+	c.JSON(http.StatusOK, followingWithImages)
+}
+
+func (s *Server) GetFollowersHandler(c *gin.Context) {
+	paramID := c.Param("id")
+	if paramID == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "User ID is required"})
+		return
+	}
+
+	userUUID, err := uuid.Parse(paramID)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid user ID format"})
+		return
+	}
+
+	followers, err := s.db.GetFollowers(userUUID)
+	if err != nil {
+		if errors.Is(err, custom_error.ErrUserNotFound) {
+			c.JSON(http.StatusNotFound, gin.H{"error": custom_error.ErrUserNotFound.Error()})
+		} else {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": custom_error.ErrFailedToRetrieveData.Error()})
+		}
+		return
+	}
+
+	var followersWithImages []types.UserWithImageDTO
+	for _, fr := range followers {
+		var f types.UserWithImageDTO
+		f.ID = fr.ID
+		f.Username = fr.Username
+		f.Email = fr.Email
+		f.RocketPoints = fr.RocketPoints
+
+		userImage, imgErr := s.db.GetUserImage(fr.ID)
+		if imgErr != nil {
+			f.ImageName = ""
+			f.ImageData = ""
+		} else if userImage != nil {
+			f.ImageName = userImage.Name
+			f.ImageData = base64.StdEncoding.EncodeToString(userImage.Data)
+		}
+		followersWithImages = append(followersWithImages, f)
+	}
+
+	c.JSON(http.StatusOK, followersWithImages)
+}

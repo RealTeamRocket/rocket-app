@@ -212,3 +212,52 @@ func (s *Server) GetUserHandler(c *gin.Context) {
 
 	c.JSON(http.StatusOK, user)
 }
+
+func (s *Server) GetUserByNameHandler(c *gin.Context) {
+	username := c.Param("name")
+	if username == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Username is required"})
+		return
+	}
+
+	userID, err := s.db.GetUserIDByName(username)
+	if err != nil {
+		if errors.Is(err, custom_error.ErrUserNotFound) {
+			c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
+		} else {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve user"})
+		}
+		return
+	}
+
+	user, err := s.db.GetUserByID(userID)
+	if err != nil {
+		if errors.Is(err, custom_error.ErrUserNotFound) {
+			c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
+		} else {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve user"})
+		}
+		return
+	}
+
+	userImage, err := s.db.GetUserImage(userID)
+	var imageName, imageData string
+	if err != nil || userImage == nil {
+		imageName = ""
+		imageData = ""
+	} else {
+		imageName = userImage.Name
+		imageData = base64.StdEncoding.EncodeToString(userImage.Data)
+	}
+
+	userWithImage := types.UserWithImageDTO{
+		ID:           user.ID,
+		Username:     user.Username,
+		Email:        user.Email,
+		RocketPoints: user.RocketPoints,
+		ImageName:    imageName,
+		ImageData:    imageData,
+	}
+
+	c.JSON(http.StatusOK, userWithImage)
+}
