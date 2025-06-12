@@ -166,11 +166,13 @@ func (s *Server) GetAllUsersHandler(c *gin.Context) {
 	var usersWithImages []types.UserWithImageDTO
 
 	for _, user := range users {
+		var steps, err = s.db.GetDailySteps(user.ID)
 		var userWithImage types.UserWithImageDTO
 		userWithImage.ID = user.ID
 		userWithImage.Username = user.Username
 		userWithImage.Email = user.Email
 		userWithImage.RocketPoints = user.RocketPoints
+		userWithImage.Steps = steps
 		userImage, err := s.db.GetUserImage(user.ID)
 
 		if err != nil {
