@@ -40,22 +40,24 @@ const allUsers = ref<any[]>([]);
 const fetchFriends = async () => {
   const res = await backendApi.getFriends();
   friends.value = res.data.map((f: any) => ({
-    id: f.ID || f.id,
-    username: f.Username || f.username,
-    email: f.Email || f.email,
+    id: f.id,
+    username: f.username,
+    email: f.email,
     rocketPoints: f.rocket_points,
-    image: f.ImageData ? `data:image/png;base64,${f.ImageData}` : undefined,
+    steps: f.steps,
+    image: f.image_data ? `data:image/png;base64,${f.image_data}` : undefined,
   }));
 };
 
 const fetchAllUsers = async () => {
   const res = await backendApi.getAllUsers();
   allUsers.value = res.data.map((u: any) => ({
-    id: u.ID || u.id,
-    username: u.Username || u.username,
-    email: u.Email || u.email,
+    id: u.id,
+    username: u.username,
+    email: u.email,
     rocketPoints: u.rocket_points,
-    image: u.ImageData ? `data:image/png;base64,${u.ImageData}` : undefined,
+    steps: u.steps,
+    image: u.image_data ? `data:image/png;base64,${u.image_data}` : undefined,
   }));
 };
 
