@@ -89,4 +89,11 @@ export default {
   getFollowers(id: string): Promise<AxiosResponse> {
     return protectedAxiosApi.get(`/followers/${id}`, { withCredentials: true });
   },
+  getRankedUsers(): Promise<AxiosResponse> {
+    return protectedAxiosApi.get('/ranking/users', { withCredentials: true });
+  },
+  getRankedFriends(): Promise<AxiosResponse> {
+    return protectedAxiosApi.get('/ranking/friends', { withCredentials: true });
+  }
+
 }
