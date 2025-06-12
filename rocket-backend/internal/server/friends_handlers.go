@@ -122,10 +122,12 @@ func (s *Server) GetAllFriendsHandler(c *gin.Context) {
 	var friendsWithImages []types.UserWithImageDTO
 	for _, fr := range friends {
 		var f types.UserWithImageDTO
+		var steps, _ = s.db.GetDailySteps(fr.ID)
 		f.ID = fr.ID
 		f.Username = fr.Username
 		f.Email = fr.Email
 		f.RocketPoints = fr.RocketPoints
+		f.Steps = steps
 
 		userImage, imgErr := s.db.GetUserImage(fr.ID)
 		if imgErr != nil {
