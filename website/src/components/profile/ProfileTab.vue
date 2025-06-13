@@ -38,8 +38,8 @@
 
 <script setup lang="ts">
 import { computed, ref, onMounted, watch } from 'vue'
-import StatsCards from '@/components/StatsCards.vue'
-import StepChart from '@/components/StepChart.vue'
+import StatsCards from '@/components/dashboard/StatsCards.vue'
+import StepChart from '@/components/dashboard/StepChart.vue'
 import { getColor, getInitials } from '@/utils/userUtils'
 import api from '@/api/backend-api'
 import ImageModal from '@/components/modals/ImageModal.vue'
