@@ -1,29 +1,21 @@
 <template>
   <Navbar />
   <div class="dashboard-container">
-    <div class="dashboard-header">
+    <div v-if="isLoggedIn" class="dashboard-header">
       <h1>Welcome back, Astronaut!</h1>
       <p>Here’s your step dashboard. Ready to break your record?</p>
     </div>
-    <div class="dashboard-main">
+    <div v-if="isLoggedIn" class="dashboard-main">
       <div class="dashboard-left">
-        <template v-if="isLoggedIn">
-          <StatsCards :stats="stats" />
-          <StepChart :data="chartData" :labels="chartLabels"/>
-        </template>
-        <template v-else>
-          <div class="skeleton-card" />
-          <div class="skeleton-chart" />
-        </template>
+        <StatsCards :stats="stats" />
+        <StepChart :data="chartData" :labels="chartLabels" />
       </div>
       <div class="dashboard-right">
-        <template v-if="isLoggedIn">
-          <ActivityPanel />
-        </template>
-        <template v-else>
-          <div class="skeleton-panel" />
-        </template>
+        <ActivityPanel />
       </div>
+    </div>
+    <div v-else>
+      <HomeGuest />
     </div>
   </div>
 </template>
@@ -31,9 +23,10 @@
 <script setup lang="ts">
 import { ref, onMounted, watch } from 'vue'
 import Navbar from '@/components/Navbar.vue'
-import StatsCards from '@/components/StatsCards.vue'
-import StepChart from '@/components/StepChart.vue'
-import ActivityPanel from '@/components/ActivityPanel.vue'
+import StatsCards from '@/components/dashboard/StatsCards.vue'
+import StepChart from '@/components/dashboard/StepChart.vue'
+import HomeGuest from '@/components/dashboard/HomeGuest.vue'
+import ActivityPanel from '@/components/dashboard/ActivityPanel.vue'
 import { useAuth } from '@/utils/useAuth'
 import api from '@/api/backend-api'
 

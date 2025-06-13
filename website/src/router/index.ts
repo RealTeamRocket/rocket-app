@@ -10,6 +10,7 @@ import RunsView from '@/pages/RunsView.vue'
 import ProfileView from '@/pages/ProfileView.vue'
 import SettingsView from '@/pages/SettingsView.vue'
 import NotFoundView from '@/pages/NotFound.vue'
+import DownloadView from '@/pages/DownloadView.vue'
 import { useAuth } from '@/utils/useAuth'
 
 const routes = [
@@ -21,6 +22,7 @@ const routes = [
   { path: '/friendlist', component: FriendlistView },
   { path: '/challenges', component: ChallengesView },
   { path: '/runs', component: RunsView },
+  { path: '/download', component: DownloadView },
   { path: '/settings', component: SettingsView },
   { path: '/profile/:username', component: ProfileView, props: true },
   { path: '/:pathMatch(.*)*', component: NotFoundView } // Catch-all for 404
@@ -33,7 +35,7 @@ const router = createRouter({
 
 router.beforeEach(async (to, from, next) => {
   const { isLoggedIn, checkAuth } = useAuth()
-  const publicPages = ['/', '/login', '/register']
+  const publicPages = ['/', '/login', '/register', '/download']
   const authRequired = !publicPages.includes(to.path)
 
   // Always check auth before proceeding
