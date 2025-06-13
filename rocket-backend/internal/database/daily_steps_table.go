@@ -11,7 +11,7 @@ import (
 
 func (s *service) saveStepMilestoneActivities(userID uuid.UUID, oldSteps, newSteps int) {
 	milestone := 2000
-	for threshold := ((oldSteps/milestone)+1)*milestone; threshold <= newSteps; threshold += milestone {
+	for threshold := ((oldSteps / milestone) + 1) * milestone; threshold <= newSteps; threshold += milestone {
 		message := fmt.Sprintf("🎉 Has reached %d steps today! 🚀", threshold)
 		_ = s.SaveActivity(userID, message)
 	}
@@ -117,4 +117,21 @@ func (s *service) GetUserStatistics(userID uuid.UUID) ([]types.StepStatistic, er
 	}
 
 	return statistics, nil
+}
+
+func (s *service) GetDailySteps(userID uuid.UUID) (int, error) {
+	currentDate := time.Now().Format("2006-01-02")
+	var steps int
+	query := `SELECT steps_taken FROM daily_steps WHERE user_id = $1 AND date = $2`
+	err := s.db.QueryRow(query, userID, currentDate).Scan(&steps)
+
+	if err != nil {
+		if err.Error() == "sql: no rows in result set" {
+			return 0, nil
+		}
+		logger.Error("Error retrieving daily steps: %v\n", err)
+		return 0, fmt.Errorf("failed to retrieve daily steps: %w", err)
+	}
+
+	return steps, nil
 }

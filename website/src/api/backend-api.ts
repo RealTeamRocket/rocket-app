@@ -56,11 +56,7 @@ export default {
     return protectedAxiosApi.delete(`/runs/${id}`, { withCredentials: true });
   },
   savePlannedRun(route: string, name: string, distance: number): Promise<AxiosResponse> {
-    return protectedAxiosApi.post(
-      '/runs/plan',
-      { route, name, distance },
-      { withCredentials: true }
-    );
+    return protectedAxiosApi.post('/runs/plan', { route, name, distance }, { withCredentials: true });
   },
   getPlannedRuns(): Promise<AxiosResponse> {
     return protectedAxiosApi.get('/runs/plan', { withCredentials: true });
@@ -89,4 +85,13 @@ export default {
   getFollowers(id: string): Promise<AxiosResponse> {
     return protectedAxiosApi.get(`/followers/${id}`, { withCredentials: true });
   },
+    addFriend(friendName: string): Promise<AxiosResponse> {
+        return protectedAxiosApi.post('/friends/add', { friend_name: friendName }, { withCredentials: true });
+    },
+    deleteFriend(friendName: string): Promise<AxiosResponse> {
+        return protectedAxiosApi.delete(`/friends/${encodeURIComponent(friendName)}`, { withCredentials: true });
+    },
+    getAllUsers(): Promise<AxiosResponse> {
+        return protectedAxiosApi.get('/users', { withCredentials: true });
+    },
 }
