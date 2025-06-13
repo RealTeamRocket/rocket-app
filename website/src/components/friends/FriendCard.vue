@@ -1,6 +1,13 @@
 <template>
   <div class="friend-card">
-    <img v-if="friend.image" :src="friend.image" class="friend-avatar" />
+    <img
+      v-if="friend.image"
+      :src="friend.image"
+      class="friend-avatar"
+      @click="showImageModal = true"
+      style="cursor:pointer"
+      :alt="`${friend.username}'s avatar`"
+    />
     <div
       v-else
       class="friend-avatar-placeholder"
@@ -24,12 +31,21 @@
     </div>
     <button v-if="isFriend" class="unfollow-btn" @click="$emit('unfollow', friend.id)"> Unfollow </button>
     <button v-else class="follow-btn" @click="$emit('add-friend', friend)"> Follow </button>
+    <ImageModal
+      v-if="friend.image"
+      :show="showImageModal"
+      :src="friend.image"
+      :alt="`${friend.username}'s avatar`"
+      @close="showImageModal = false"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
+import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { getColor, getInitials } from '@/utils/userUtils'
+import ImageModal from '@/components/modals/ImageModal.vue'
 
 const props = defineProps<{
   friend: { id: string, username: string, email: string, rocketPoints: number, image?: string, steps?: number },
@@ -44,6 +60,8 @@ const avatarColor = getColor(props.friend.username)
 function goToProfile() {
   router.push(`/profile/${encodeURIComponent(props.friend.username)}`)
 }
+
+const showImageModal = ref(false)
 </script>
 
 <style scoped>

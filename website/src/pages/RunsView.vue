@@ -135,7 +135,7 @@ import Map from '@/components/runs/Map.vue'
 import ElevationProfile from '@/components/runs/ElevationProfile.vue'
 import { parseRoute } from '@/utils/routes'
 import PlanRunMap from '@/components/runs/plan/PlanRunMap.vue'
-import ConfirmDialog from '@/components/ConfirmDialog.vue'
+import ConfirmDialog from '@/components/modals/ConfirmDialog.vue'
 
 const tab = ref<'past' | 'plan' | 'planned'>('past')
 
