@@ -34,8 +34,8 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
 import Navbar from '@/components/Navbar.vue';
-import FriendSearchBar from '@/components/FriendSearchBar.vue';
-import FriendCard from '@/components/FriendCard.vue';
+import FriendSearchBar from '@/components/friends/FriendSearchBar.vue';
+import FriendCard from '@/components/friends/FriendCard.vue';
 import backendApi from '@/api/backend-api';
 
 interface User {
@@ -66,7 +66,7 @@ const fetchFriends = async () => {
     console.error('Failed to fetch friends:', e);
     friends.value = [];
   }
-  
+
 };
 
 const fetchAllUsers = async () => {
@@ -84,7 +84,7 @@ const fetchAllUsers = async () => {
     console.error('Failed to fetch all users:', e);
     allUsers.value = [];
   }
-  
+
 };
 
 const loading = ref(true);
@@ -133,8 +133,8 @@ const addFriend = async (user: User) => {
 }
 .friend-grid {
   display: grid;
-  grid-template-columns: repeat(2, 700px); 
-  justify-content: center;                
+  grid-template-columns: repeat(2, 700px);
+  justify-content: center;
   gap: 1.5rem;
   width: 100%;
 }
@@ -148,7 +148,7 @@ const addFriend = async (user: User) => {
   margin-bottom: 1.5rem;
 }
 .search-results-section {
-  margin-bottom: 6rem; 
+  margin-bottom: 6rem;
 }
 .loading-indicator {
   text-align: center;

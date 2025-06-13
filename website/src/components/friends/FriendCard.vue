@@ -1,9 +1,21 @@
 <template>
   <div class="friend-card">
     <img v-if="friend.image" :src="friend.image" class="friend-avatar" />
-    <div v-else class="friend-avatar-placeholder">{{ initials }}</div>
+    <div
+      v-else
+      class="friend-avatar-placeholder"
+      :style="{ background: avatarColor }"
+    >
+      {{ initials }}
+    </div>
     <div class="friend-info">
-      <div class="friend-name">{{ friend.username }}</div>
+      <div
+        class="friend-name clickable"
+        @click="goToProfile"
+        :title="`Go to ${friend.username}'s profile`"
+      >
+        {{ friend.username }}
+      </div>
       <div class="friend-email">{{ friend.email }}</div>
       <div v-if="isFriend">
         <div class="friend-points">🚀 {{ friend.rocketPoints ?? 0 }}</div>
@@ -16,14 +28,22 @@
 </template>
 
 <script setup lang="ts">
+import { useRouter } from 'vue-router'
+import { getColor, getInitials } from '@/utils/userUtils'
+
 const props = defineProps<{
   friend: { id: string, username: string, email: string, rocketPoints: number, image?: string, steps?: number },
   isFriend?: boolean
-}>();
+}>()
 
-const initials = props.friend.username
-  ? props.friend.username.split(' ').map(n => n[0]).join('').toUpperCase()
-  : '';
+const router = useRouter()
+
+const initials = getInitials(props.friend.username)
+const avatarColor = getColor(props.friend.username)
+
+function goToProfile() {
+  router.push(`/profile/${encodeURIComponent(props.friend.username)}`)
+}
 </script>
 
 <style scoped>
@@ -45,12 +65,12 @@ const initials = props.friend.username
   height: 60px;
   border-radius: 50%;
   object-fit: cover;
-  background: #c7d2fe;
   display: flex;
   align-items: center;
   justify-content: center;
+  font-weight: 700;
   font-size: 2rem;
-  color: #374151;
+  color: #fff;
   margin-right: 1rem;
 }
 .friend-info {
@@ -60,6 +80,11 @@ const initials = props.friend.username
   font-size: 2.0rem;
   font-weight: 600;
   color: #2a5298;
+  cursor: pointer;
+  transition: text-decoration 0.2s;
+}
+.friend-name.clickable:hover {
+  text-decoration: underline;
 }
 .friend-email {
   font-size: 0.95rem;
