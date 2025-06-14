@@ -94,6 +94,13 @@ export default {
   },
   getRankedFriends(): Promise<AxiosResponse> {
     return protectedAxiosApi.get('/ranking/friends', { withCredentials: true });
+  },
+  addFriend(friendName: string): Promise<AxiosResponse> {
+    return protectedAxiosApi.post(
+        '/friends/add',
+        { friend_name: friendName },
+        { withCredentials: true }
+    );
   }
 
 }

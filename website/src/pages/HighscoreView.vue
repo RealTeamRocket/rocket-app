@@ -20,17 +20,68 @@
       <div class="podium">
         <div class="podium-row podium-row-top">
           <div class="podium-place first">
-            <span v-if="selectedList[0]">{{ selectedList[0].username }}</span>
+            <template v-if="selectedList[0]">
+              <div class="podium-user">
+                <img
+                    class="podium-img"
+                    v-if="selectedList[0]?.imageUrl"
+                    :src="selectedList[0].imageUrl"
+                    alt="User Icon"
+                />
+                <img
+                    class="podium-img"
+                    v-else
+                    src="/src/assets/icons/rocket.svg"
+                    alt="Default User Icon"
+                />
+                <div class="podium-username">{{ selectedList[0].username }}</div>
+                <div class="podium-points">{{ selectedList[0].rocket_points }} RP</div>
+              </div>
+            </template>
             <span v-else>—</span>
           </div>
         </div>
         <div class="podium-row podium-row-bottom">
           <div class="podium-place second">
-            <span v-if="selectedList[1]">{{ selectedList[1].username }}</span>
+            <template v-if="selectedList[1]">
+              <div class="podium-user">
+                <img
+                    class="podium-img"
+                    v-if="selectedList[1]?.imageUrl"
+                    :src="selectedList[1].imageUrl"
+                    alt="User Icon"
+                />
+                <img
+                    class="podium-img"
+                    v-else
+                    src="/src/assets/icons/rocket.svg"
+                    alt="Default User Icon"
+                />
+                <div class="podium-username">{{ selectedList[1].username }}</div>
+                <div class="podium-point">{{ selectedList[1].rocket_points }} RP</div>
+              </div>
+            </template>
             <span v-else>—</span>
           </div>
           <div class="podium-place third">
-            <span v-if="selectedList[2]">{{ selectedList[2].username }}</span>
+            <template v-if="selectedList[2]">
+              <div class="podium-user">
+                <img
+                    class="podium-img"
+                    v-if="selectedList[2]?.imageUrl"
+                    :src="selectedList[2].imageUrl"
+                    alt="User Icon"
+                />
+                <img
+                    class="podium-img"
+                    v-else
+                    src="/src/assets/icons/rocket.svg"
+                    alt="Default User Icon"
+                />
+                <div class="podium-username">{{ selectedList[2].username }}</div>
+                <div class="podium-point">{{ selectedList[2].rocket_points }} RP</div>
+              </div>
+            </template>
             <span v-else>—</span>
           </div>
         </div>
@@ -41,12 +92,34 @@
             v-for="(user, idx) in selectedList.slice(3, 28)"
             :key="user.id || idx"
         >
-          <img
-              class="user-avatar"
-              src="/src/assets/icons/rocket.svg"
-              alt="User Icon"
-          />
-          {{ user.username }}
+          <div class="rest-img">
+            <img
+                v-if="user.imageUrl"
+                :src="user.imageUrl"
+                alt="User Icon"
+                class="user-avatar"
+            />
+            <img
+                v-else
+                src="/src/assets/icons/user.svg"
+                alt="Default User Icon"
+                class="user-avatar"
+                style="color: lightgray"/>
+          </div>
+          <div class="rest-username">
+            {{ user.username }}
+          </div>
+          <div class="rest-rocketpoints">
+            {{ user.rocket_points }}  <img src="/src/assets/icons/rocket.svg" alt="Rocket"
+                 style="width:1.3em;height:1.3em;vertical-align:middle;margin-right:0.35em;"/>
+          </div>
+          <div class="rest-action">
+            <template v-if="user.isFriend">
+              <img src="/src/assets/icons/user.svg" alt="Friend Icon" class="friend-icon" />
+            </template>
+            <template v-else><button class="add-btn" @click="addFriend(user.username)">Add</button>
+            </template>
+          </div>
         </div>
       </div>
   </div>
@@ -58,47 +131,69 @@ import Navbar from '@/components/Navbar.vue'
 import {ref, onMounted, computed} from 'vue'
 import api from '@/api/backend-api'
 
-const isGlobal = ref(true)
-const rankedUsers = ref([])
-const rankedFriends = ref([])
-
-const loadRanking = async () => {
-  try {
-    const {data: userData} = await api.getRankedUsers()
-    rankedUsers.value = userData || []
-
-    const {data: friendData} = await api.getRankedFriends()
-    rankedFriends.value = friendData || []
-  } catch {
-    console.error("Error fetching ranking")
-  }
+interface RankedUser {
+  id: number | string
+  username: string
+  rocket_points: number
+  isFriend?: boolean
+  imageUrl?: string
 }
-const selectedList = computed(() => isGlobal.value ? rankedUsers.value : rankedFriends.value)
 
-onMounted(async () => {
-  await loadRanking()
-  fillWithDummyUsers()
-})
+const currentUsername = ref('')
+const isGlobal = ref(true)
+const rankedUsers = ref<RankedUser[]>([])
+const rankedFriends = ref<RankedUser[]>([])
 
-function fillWithDummyUsers() {
-  if (selectedList.value.length <= 1) {
-    const dummy = Array.from({ length: 25 }, (_, i) => ({
-      id: `dummy-${i + 1}`,
-      username: `User${i + 1}`
-    }))
-    if (isGlobal.value) {
-      rankedUsers.value = dummy
-    } else {
-      rankedFriends.value = dummy
+async function loadUserImages(list: RankedUser[]) {
+  for (const user of list) {
+    try {
+      const res = await api.getUserImage(user.id)
+      // Annahme: Das Bild kommt als Blob zurück
+      const blob = res.data
+      user.imageUrl = URL.createObjectURL(blob)
+    } catch {
+      user.imageUrl = '' // Kein Bild vorhanden
     }
   }
 }
 
-console.log(selectedList)
+const loadRanking = async () => {
+  try {
+    const {data: userData} = await api.getRankedUsers()
+    const {data: friendData} = await api.getRankedFriends()
+    const friendUsernames = new Set(friendData.map((f: RankedUser) => f.username))
+    rankedUsers.value = (userData || []).map((user: RankedUser) => ({
+      ...user,
+      isFriend: friendUsernames.has(user.username)
+    }))
+    rankedFriends.value = (friendData || []).map((user: RankedUser) => ({
+      ...user,
+      isFriend: true
+    }))
+    // Bilder laden
+    await loadUserImages(rankedUsers.value)
+    await loadUserImages(rankedFriends.value)
+  } catch {
+    console.error("Error fetching ranking")
+  }
+}
 
+const selectedList = computed(() => isGlobal.value ? rankedUsers.value : rankedFriends.value)
 
+onMounted(async () => {
+  await loadRanking()
+})
 
-
+function addFriend(friendName: string) {
+  api.addFriend(friendName)
+      .then(() => {
+        alert('Freund hinzugefügt!')
+        loadRanking()
+      })
+      .catch((err) => {
+        alert('Fehler beim Hinzufügen: ' + (err.response?.data?.message || err.message))
+      })
+}
 
 
 
@@ -109,7 +204,14 @@ console.log(selectedList)
 .highscore-page {
   padding: 2rem;
 }
-
+.rest-rocketpoints{
+  margin-left: 4rem;
+  font-weight: bold;
+}
+.rest-username{
+  margin-left: 2rem;
+  font-weight: bold;
+}
 .header {
   flex-direction: column;
   display: flex;
@@ -166,7 +268,26 @@ console.log(selectedList)
   justify-content: center;
   padding: 2rem 0;
 }
+.podium-user {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  height: 100%;
+  padding-bottom: 2em;
+  box-sizing: border-box;
+}
 
+.podium-username {
+  font-size: 1.3em;
+  font-weight: bold;
+  color: #333;
+}
+.podium-points {
+  font-size: 1em;
+  color: #2a5298;
+  margin-top: 0.2em;
+}
 .podium-row {
   display: flex;
   width: 100%;
@@ -193,51 +314,98 @@ console.log(selectedList)
 .first {
   width: 400px;
   height: 400px;
-  background: gold;
+  background: linear-gradient(135deg, #fffbe6 0%, #ffe066 60%, #ffd700 100%);
   color: #333;
   font-size: 1.4em;
-  border: 2px solid #007bff;
+  border: 3px solid #2196f3;
+  border-radius: 30%;
+}
+.second {
+  width: 400px;
+  height: 400px;
+  background: linear-gradient(135deg, #f8f8f8 0%, #e5e4e2 60%, #bfc1c2 100%);
+  color: #333;
+  margin: 0 2rem;
+  border: 3px solid #2196f3;
   border-radius: 30%;
 }
 
-.second, .third {
+.third {
   width: 400px;
   height: 400px;
-  background: #e0e0e0;
+  background: linear-gradient(135deg, #fbeee6 0%, #c97e4e 60%, #ad6c2d 100%);
   color: #333;
   margin: 0 2rem;
-  border: 2px solid #007bff;
+  border: 3px solid #2196f3;
   border-radius: 30%;
 }
-.podium-place:hover {
-  opacity: 0.7;
+.friend-icon {
+  width: 48px;
+  height: 48px;
+  filter: invert(41%) sepia(98%) saturate(1200%) hue-rotate(74deg) brightness(110%) contrast(120%);
 }
 .rest {
   width: 100%;
   max-width: 34%;
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;
+  margin-top: 2rem;
 }
 
-.rest-user:hover{
-  opacity: 0.7;
-}
 .rest-user {
-  background: #fff;
-  border: 1px solid #007bff;
-  border-radius: 24px;
-  margin-bottom: 0.7rem;
-  padding: 1em 1.5em;
-  box-shadow: 0 1px 6px rgba(30,60,114,0.09);
-  font-size: 1.1em;
   display: flex;
   align-items: center;
   width: 100%;
-  min-width: 0;
-  max-width: 100%;
-  height: 100px;
-  box-sizing: border-box;
+  background: linear-gradient(#f6fcff 0%, #eafeea 60%, #e6f7fa 100%);
+  border-radius: 24px;
+  border: 2px solid #e3f0fb;
+  box-shadow: 0 1px 6px rgba(30,60,114,0.06);
+  margin-bottom: 1.5rem;
+  height: 72px;
+  overflow: hidden;
+  gap: 12%;
+}
+
+.rest-img,
+.rest-username,
+.rest-rocketpoints,
+.rest-action {
+  display: flex;
+  align-items: center;
+  height: 100%;
+  padding: 0.7em 1.2em;
+}
+.add-btn {
+  background: linear-gradient(90deg, #2196f3 0%, #00bcd4 100%);
+  color: #fff;
+  border: none;
+  border-radius: 24px;
+  padding: 0.5em 1.5em;
+  font-weight: bold;
+  font-size: 1em;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(33, 150, 243, 0.18);
+  transition: background 0.2s, transform 0.1s;
+}
+.add-btn:hover {
+  background: linear-gradient(90deg, #1976d2 0%, #0097a7 100%);
+  transform: translateY(-2px) scale(1.04);
+}
+.rest-username,
+.rest-rocketpoints,
+.rest-action {
+  min-width: 100px;
+}
+
+.rest-action {
+  width: 56px;
+  text-align: center;
+  justify-content: center;
+  padding-left: 0; /* Kein extra Padding mehr */
+}
+
+.action-icon {
+  width: 36px;
+  height: 36px;
+  cursor: pointer;
 }
 
 .user-avatar {
@@ -249,14 +417,14 @@ console.log(selectedList)
   background: #f5f5f5;
 }
 
-
-
-
-
-
-
-
-
+.podium-img{
+  width: 120px;
+  height: 120px;
+  margin-bottom: 5rem;
+  border-radius: 50%;
+  border: 2px solid #000000;
+  background: lightgray;
+}
 
 .rocket-fly {
   position: fixed;
