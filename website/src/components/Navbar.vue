@@ -11,6 +11,7 @@
         <router-link to="/friendlist" class="nav-link">Friendlist</router-link>
         <router-link to="/challenges" class="nav-link">Challenges</router-link>
         <router-link to="/runs" class="nav-link">Runs</router-link>
+        <router-link to="/download" class="nav-link">Download</router-link>
       </div>
       <div class="navbar-right">
         <template v-if="!isLoggedIn">

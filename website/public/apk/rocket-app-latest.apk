@@ -1,0 +1,11 @@
+this is a dummy apk file for testing purposes
+
+if you want to use the real apk file, you need to create it first
+by running this command:
+
+```bash
+flutter build apk --release
+```
+
+the resulting apk file will be located in the `build/app/outputs/flutter-apk/` directory
+rename the file to `rocket-app-latest.apk` and place it in this directory instead of this dummy file

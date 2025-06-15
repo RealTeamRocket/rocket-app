@@ -125,7 +125,7 @@ watch([runName, () => points.value.length], () => {
 })
 
 onMounted(() => {
-  map = leaflet.map('plan-map').setView([47.41322, -1.219482], 13)
+  map = leaflet.map('plan-map').setView([48.7758, 9.1829], 13)
   leaflet.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
     maxZoom: 19,
     attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',

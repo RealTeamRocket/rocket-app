@@ -46,6 +46,7 @@ type Service interface {
 	// daily_steps
 	UpdateDailySteps(userID uuid.UUID, steps int) error
 	GetUserStatistics(userID uuid.UUID) ([]types.StepStatistic, error)
+	GetDailySteps(userID uuid.UUID) (int, error)
 
 	// settings
 	GetSettingsByUserID(userID uuid.UUID) (*types.Settings, error)

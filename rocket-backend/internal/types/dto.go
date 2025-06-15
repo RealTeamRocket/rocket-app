@@ -41,6 +41,7 @@ type UserWithImageDTO struct {
 	RocketPoints int       `json:"rocket_points"`
 	ImageName    string    `json:"image_name"`
 	ImageData    string    `json:"image_data"`
+	Steps        int       `json:"steps"`
 }
 
 type RunDataDTO struct {
@@ -73,11 +74,11 @@ type ChatMessage struct {
 }
 
 type PlannedRunDTO struct {
-	ID        string `json:"id"`
-	Route     string `json:"route"`
-	Name      string `json:"name"`
-	CreatedAt string `json:"created_at"`
-	Distance float64 `json:"distance"`
+	ID        string  `json:"id"`
+	Route     string  `json:"route"`
+	Name      string  `json:"name"`
+	CreatedAt string  `json:"created_at"`
+	Distance  float64 `json:"distance"`
 }
 
 type DailyChallengeProgress struct {

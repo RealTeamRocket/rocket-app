@@ -14,11 +14,11 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, computed } from 'vue';
+import { ref, onMounted } from 'vue';
 import Navbar from '@/components/Navbar.vue';
-import ChallengeList from '@/components/ChallengeList.vue';
-import DailyChallengeProgress from '@/components/DailyChallengeProgress.vue';
-import FriendInvitePopup from '@/components/FriendInvitePopup.vue';
+import ChallengeList from '@/components/challenges/ChallengeList.vue';
+import DailyChallengeProgress from '@/components/challenges/DailyChallengeProgress.vue';
+import FriendInvitePopup from '@/components/challenges/FriendInvitePopup.vue';
 import backendApi from '@/api/backend-api';
 
 const challenges = ref<{ id: string; text: string; points: number }[]>([]);
