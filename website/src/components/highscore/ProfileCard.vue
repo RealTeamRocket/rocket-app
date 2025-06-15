@@ -5,6 +5,7 @@ defineProps<{
   user: RankedUser
   onClose: () => void
   onAddFriend: (username: string) => void
+  currentUsername: string
 }>()
 </script>
 
@@ -21,6 +22,9 @@ defineProps<{
         <div class="profile-actions">
           <template v-if="user.isFriend">
             <img src="/src/assets/icons/user.svg" alt="Friend Icon" class="friend-icon" />
+          </template>
+          <template v-else-if="user.username === currentUsername">
+            <span></span>
           </template>
           <template v-else>
             <button class="add-btn" @click.stop="onAddFriend(user.username)">Add</button>

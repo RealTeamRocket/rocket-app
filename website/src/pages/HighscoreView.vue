@@ -14,25 +14,27 @@
           :users="selectedList.slice(3, 28)"
           :openProfile="openProfile"
           :addFriend="addFriend"
+          :currentUsername="currentUsername"
       />
       <ProfileCard
           v-if="showProfileDialog && selectedProfile"
           :user="selectedProfile"
           :onClose="closeProfile"
           :onAddFriend="addFriend"
+          :currentUsername="currentUsername"
       />
     </div>
   </div>
 </template>
 <script setup lang="ts">
-import Podium from '@/components/Podium.vue'
-import ToggleSwitch from '@/components/ToggleSwitch.vue'
+import Podium from '@/components/highscore/Podium.vue'
+import ToggleSwitch from '@/components/highscore/ToggleSwitch.vue'
 import Navbar from '@/components/Navbar.vue'
 import {ref, onMounted, computed} from 'vue'
 import api from '@/api/backend-api'
-import List from "@/components/List.vue";
-import ProfileCard from '@/components/ProfileCard.vue'
-import Rocket from '@/components/Rocket.vue'
+import List from "@/components/highscore/List.vue";
+import ProfileCard from '@/components/highscore/ProfileCard.vue'
+import Rocket from '@/components/highscore/Rocket.vue'
 
 interface RankedUser {
   id: number | string
@@ -84,6 +86,8 @@ const loadRanking = async () => {
 const selectedList = computed(() => isGlobal.value ? rankedUsers.value : rankedFriends.value)
 
 onMounted(async () => {
+  const res = await api.getMyself()
+  currentUsername.value = res.data.username
   await loadRanking()
 })
 

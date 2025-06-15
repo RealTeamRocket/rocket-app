@@ -25,6 +25,9 @@
   border-radius: 24px;
   background: #f5f5f5;
   padding: 0.5rem 1rem;
+  position: sticky;
+  top: 1rem;
+  z-index: 10;
 }
 
 .switchBtn button:hover {
