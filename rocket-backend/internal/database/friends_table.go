@@ -96,9 +96,7 @@ func (s *service) GetFriendsRankedByPoints(userID uuid.UUID) ([]types.User, erro
 		FROM friends f
 		JOIN users u ON f.friend_id = u.id
 		WHERE f.user_id = $1
-		ORDER BY u.rocketpoints DESC
 	`
-
 	rows, err := s.db.Query(query, userID)
 	if err != nil {
 		logger.Error("Failed to get friends", err)
@@ -115,6 +113,25 @@ func (s *service) GetFriendsRankedByPoints(userID uuid.UUID) ([]types.User, erro
 		}
 		friends = append(friends, friend)
 	}
+
+	// Also include the user themselves
+	var user types.User
+	userQuery := `
+		SELECT id, username, email, rocketpoints
+		FROM users
+		WHERE id = $1
+	`
+	err = s.db.QueryRow(userQuery, userID).Scan(&user.ID, &user.Username, &user.Email, &user.RocketPoints)
+	if err != nil {
+		logger.Error("Failed to get user for self-inclusion in ranking", err)
+	} else {
+		friends = append(friends, user)
+	}
+
+	// Sort by rocketpoints descending
+	sort.Slice(friends, func(i, j int) bool {
+		return friends[i].RocketPoints > friends[j].RocketPoints
+	})
 
 	if friends == nil {
 		friends = []types.User{}
