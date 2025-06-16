@@ -65,8 +65,9 @@ var _ = Describe("Ranking Handlers API", func() {
 		Expect(resp.StatusCode).To(Equal(200))
 		var friendsRanking []map[string]any
 		_ = json.NewDecoder(resp.Body).Decode(&friendsRanking)
-		Expect(len(friendsRanking)).To(Equal(2))
+		Expect(len(friendsRanking)).To(Equal(3))
 		Expect(friendsRanking[0]["username"]).To(Equal(userB))
 		Expect(friendsRanking[1]["username"]).To(Equal(userC))
+		Expect(friendsRanking[2]["username"]).To(Equal(userA))
 	})
 })

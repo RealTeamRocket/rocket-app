@@ -1,10 +1,12 @@
 package server
 
 import (
+	"encoding/base64"
 	"errors"
 	"net/http"
 
 	"rocket-backend/internal/custom_error"
+	"rocket-backend/internal/types"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 )
@@ -32,12 +34,26 @@ func (s *Server) GetFriendsRankedHandler(c *gin.Context) {
 		return
 	}
 
-	if len(friends) == 0 {
-		c.JSON(http.StatusOK, []interface{}{})
-		return
+	var friendsWithImages []types.UserWithImageDTO
+	for _, user := range friends {
+		userImage, err := s.db.GetUserImage(user.ID)
+		var imageName, imageData string
+		if err == nil && userImage != nil {
+			imageName = userImage.Name
+			imageData = base64.StdEncoding.EncodeToString(userImage.Data)
+		}
+		friendsWithImages = append(friendsWithImages, types.UserWithImageDTO{
+			ID:           user.ID,
+			Username:     user.Username,
+			Email:        user.Email,
+			RocketPoints: user.RocketPoints,
+			ImageName:    imageName,
+			ImageData:    imageData,
+			Steps:        0,
+		})
 	}
 
-	c.JSON(http.StatusOK, friends)
+	c.JSON(http.StatusOK, friendsWithImages)
 }
 
 func (s *Server) GetUserRankingHandler(c *gin.Context) {
@@ -51,5 +67,25 @@ func (s *Server) GetUserRankingHandler(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, ranking)
+	var usersWithImages []types.UserWithImageDTO
+	for _, user := range ranking {
+		userImage, err := s.db.GetUserImage(user.ID)
+		var imageName, imageData string
+		if err == nil && userImage != nil {
+			imageName = userImage.Name
+			imageData = base64.StdEncoding.EncodeToString(userImage.Data)
+		}
+
+		usersWithImages = append(usersWithImages, types.UserWithImageDTO{
+			ID:           user.ID,
+			Username:     user.Username,
+			Email:        user.Email,
+			RocketPoints: user.RocketPoints,
+			ImageName:    imageName,
+			ImageData:    imageData,
+			Steps:        0, // no steps needed for ranking
+		})
+	}
+
+	c.JSON(http.StatusOK, usersWithImages)
 }
