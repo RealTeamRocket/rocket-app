@@ -83,6 +83,10 @@ func (s *service) GetFriends(userID uuid.UUID) ([]types.User, error) {
 		return friends[i].Username < friends[j].Username
 	})
 
+	if friends == nil {
+		friends = []types.User{}
+	}
+
 	return friends, nil
 }
 
@@ -110,6 +114,10 @@ func (s *service) GetFriendsRankedByPoints(userID uuid.UUID) ([]types.User, erro
 			return nil, fmt.Errorf("%w: failed to scan friend row", custom_error.ErrFailedToRetrieveData)
 		}
 		friends = append(friends, friend)
+	}
+
+	if friends == nil {
+		friends = []types.User{}
 	}
 
 	return friends, nil
@@ -143,6 +151,10 @@ func (s *service) GetFollowers(userID uuid.UUID) ([]types.User, error) {
 	sort.Slice(followers, func(i, j int) bool {
 		return followers[i].Username < followers[j].Username
 	})
+
+	if followers == nil {
+		followers = []types.User{}
+	}
 
 	return followers, nil
 }
