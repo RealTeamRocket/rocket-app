@@ -1,12 +1,31 @@
 <script setup lang="ts">
-import type { RankedUser } from '@/types'
+import { ref } from 'vue'
+import { getInitials, getColor } from '@/utils/userUtils'
+import ImageModal from '@/components/modals/ImageModal.vue'
 
-defineProps<{
+interface RankedUser {
+  id: string
+  username: string
+  rocket_points: number
+  imageData?: string
+  isFriend?: boolean
+}
+
+const props = defineProps<{
   user: RankedUser
   onClose: () => void
   onAddFriend: (username: string) => void
   currentUsername: string
 }>()
+
+const showImageModal = ref(false)
+const emit = defineEmits(['goToProfile'])
+function openImageModal() {
+  if (props.user.imageData) showImageModal.value = true
+}
+function goToProfile() {
+  emit('goToProfile', props.user.username)
+}
 </script>
 
 <template>
@@ -14,14 +33,36 @@ defineProps<{
     <div class="profile-dialog">
       <button class="close-btn" @click="onClose">Close</button>
       <div class="profile-img-col">
-        <img :src="user.imageUrl || '/src/assets/icons/user.svg'" class="profile-avatar" />
+        <template v-if="user.imageData">
+          <img
+            :src="`data:image/*;base64,${user.imageData}`"
+            class="profile-avatar"
+            @click="openImageModal"
+            style="cursor:pointer"
+            title="Click to enlarge"
+          />
+        </template>
+        <template v-else>
+          <div
+            class="profile-avatar initials-avatar"
+            :style="{ background: getColor(user.username), cursor: 'default' }"
+          >
+            {{ getInitials(user.username) }}
+          </div>
+        </template>
       </div>
       <div class="profile-info-col">
-        <h2>{{ user.username }}</h2>
+        <h2 class="profile-username-link" @click="goToProfile" title="Go to profile">{{ user.username }}</h2>
         <p>Punkte: {{ user.rocket_points }}</p>
         <div class="profile-actions">
           <template v-if="user.isFriend">
-            <img src="/src/assets/icons/user.svg" alt="Friend Icon" class="friend-icon" />
+            <span class="friend-badge">
+              <svg class="friend-badge-icon" viewBox="0 0 20 20" fill="currentColor">
+                <circle cx="10" cy="10" r="10" fill="#34c759"/>
+                <path d="M7.5 10.5l2 2 3-3" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              <span class="friend-badge-label">Friend</span>
+            </span>
           </template>
           <template v-else-if="user.username === currentUsername">
             <span></span>
@@ -32,6 +73,13 @@ defineProps<{
         </div>
       </div>
     </div>
+    <ImageModal
+      v-if="user.imageData"
+      :show="showImageModal"
+      :src="`data:image/*;base64,${user.imageData}`"
+      :alt="user.username"
+      @close="showImageModal = false"
+    />
   </div>
 </template>
 <style scoped>
@@ -86,15 +134,45 @@ flex: 0 0 200px;
 }
 
 .profile-avatar {
-width: 180px;
-height: 180px;
-border-radius: 50%;
+  width: 180px;
+  height: 180px;
+  border-radius: 50%;
+  object-fit: cover;
+  display: block;
+}
+
+.initials-avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 3.2rem;
+  font-weight: 700;
+  color: #fff;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  width: 180px;
+  height: 180px;
+  border-radius: 50%;
+  user-select: none;
 }
 
 .profile-info-col {
-align-items: flex-start;
-justify-content: center;
-padding: 0 2em;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 0 2em;
+}
+.profile-username-link {
+  cursor: pointer;
+  color: #1e3c72;
+  text-decoration: none;
+  transition: color 0.15s;
+  font-size: 2rem;
+  font-weight: 700;
+  margin: 0 0 0.2em 0;
+}
+.profile-username-link:hover {
+  color: #2196f3;
+  text-decoration: none;
 }
 
 .profile-actions {
@@ -105,6 +183,31 @@ margin-top: 2em;
 width: 48px;
 height: 48px;
 filter: invert(41%) sepia(98%) saturate(1200%) hue-rotate(74deg) brightness(110%) contrast(120%);
+}
+
+.friend-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5em;
+  background: #eaffea;
+  border-radius: 18px;
+  padding: 0.4em 1.1em 0.4em 0.7em;
+  font-weight: 700;
+  color: #228c22;
+  font-size: 1.1em;
+  box-shadow: 0 2px 8px rgba(52,199,89,0.08);
+  border: 1.5px solid #34c759;
+}
+.friend-badge-icon {
+  width: 1.5em;
+  height: 1.5em;
+  margin-right: 0.2em;
+  flex-shrink: 0;
+}
+.friend-badge-label {
+  font-size: 1em;
+  color: #228c22;
+  letter-spacing: 0.01em;
 }
 
 .add-btn {

@@ -1,5 +1,13 @@
 <script setup lang="ts">
-import type { RankedUser } from '@/types' // Passe den Import ggf. an
+import { getInitials, getColor } from '@/utils/userUtils'
+
+interface RankedUser {
+  id: string
+  username: string
+  rocket_points: number
+  imageData?: string
+  isFriend?: boolean
+}
 
 defineProps<{
   users: RankedUser[]
@@ -9,42 +17,48 @@ defineProps<{
 }>()
 </script>
 <template>
-  <div class="rest">
+  <div class="list-container">
     <div
-        class="rest-user"
-        v-for="(user, idx) in users"
-        :key="user.id || idx"
-        @click="openProfile(user)"
+      class="list-user-card"
+      v-for="(user, idx) in users"
+      :key="user.id || idx"
+      @click="openProfile(user)"
     >
-      <div class="rest-img">
+      <div class="list-avatar-col">
         <img
-            v-if="user.imageUrl"
-            :src="user.imageUrl"
-            alt="User Icon"
-            class="user-avatar"
+          v-if="user.imageData"
+          :src="`data:image/*;base64,${user.imageData}`"
+          alt="User Icon"
+          class="list-avatar"
         />
-        <img
-            v-else
-            src="/src/assets/icons/user.svg"
-            alt="Default User Icon"
-            class="user-avatar"
-            style="color: lightgray"
-        />
+        <div
+          v-else
+          class="list-avatar list-avatar-initials"
+          :style="{ backgroundColor: getColor(user.username) }"
+        >
+          {{ getInitials(user.username) }}
+        </div>
       </div>
-      <div class="rest-username">
-        {{ user.username }}
-      </div>
-      <div class="rest-rocketpoints">
-        {{ user.rocket_points }}
-        <img
+      <div class="list-info-col">
+        <div class="list-username">{{ user.username }}</div>
+        <div class="list-rocketpoints">
+          <img
             src="/src/assets/icons/rocket.svg"
             alt="Rocket"
-            style="width:1.3em;height:1.3em;vertical-align:middle;margin-right:0.35em;"
-        />
+            class="rocket-icon"
+          />
+          {{ user.rocket_points }}
+        </div>
       </div>
-      <div class="rest-action">
+      <div class="list-action-col">
         <template v-if="user.isFriend">
-          <img src="/src/assets/icons/user.svg" alt="Friend Icon" class="friend-icon" />
+          <span class="friend-badge">
+            <svg class="friend-badge-icon" viewBox="0 0 20 20" fill="currentColor">
+              <circle cx="10" cy="10" r="10" fill="#34c759"/>
+              <path d="M7.5 10.5l2 2 3-3" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <span class="friend-badge-label">Friend</span>
+          </span>
         </template>
         <template v-else-if="user.username === currentUsername">
           <span></span>
@@ -58,82 +72,142 @@ defineProps<{
 </template>
 
 <style scoped>
-.rest {
+.list-container {
   width: 100%;
-  max-width: 34%;
+  max-width: 420px;
   margin-top: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
 }
-.rest-user {
+
+.list-user-card {
   display: flex;
   align-items: center;
-  width: 100%;
-  background: linear-gradient(#f6fcff 0%, #eafeea 60%, #e6f7fa 100%);
-  border-radius: 24px;
-  border: 2px solid #e3f0fb;
+  background: #f8fafc;
+  border-radius: 18px;
+  border: 1.5px solid #e3eaf3;
   box-shadow: 0 1px 6px rgba(30,60,114,0.06);
-  margin-bottom: 1.5rem;
-  height: 72px;
-  overflow: hidden;
-  gap: 12%;
+  padding: 0.7em 1.2em;
+  transition: box-shadow 0.18s, transform 0.13s;
+  cursor: pointer;
+  min-height: 60px;
+  gap: 1.2rem;
 }
-.rest-user:hover {
-  opacity: 0.8;
+.list-user-card:hover {
+  box-shadow: 0 4px 16px rgba(30,60,114,0.13);
+  transform: translateY(-2px) scale(1.02);
+  background: #f0f6fa;
 }
-.rest-img,
-.rest-username,
-.rest-rocketpoints,
-.rest-action {
+
+.list-avatar-col {
+  flex: 0 0 44px;
   display: flex;
   align-items: center;
-  height: 100%;
-  padding: 0.7em 1.2em;
+  justify-content: center;
 }
-.user-avatar {
-  width: 48px;
-  height: 48px;
+.list-avatar {
+  width: 44px;
+  height: 44px;
   border-radius: 50%;
   object-fit: cover;
-  margin-right: 1em;
   background: #f5f5f5;
-}
-.rest-username,
-.rest-rocketpoints,
-.rest-action {
-  min-width: 100px;
-}
-.rest-rocketpoints {
-  margin-left: 4rem;
-  font-weight: bold;
-}
-.rest-username {
-  margin-left: 2rem;
-  font-weight: bold;
-}
-.rest-action {
-  width: 56px;
-  text-align: center;
+  border: 1.5px solid #e3eaf3;
+  display: flex;
+  align-items: center;
   justify-content: center;
-  padding-left: 0;
+  font-weight: 700;
+  font-size: 1.15em;
+  color: #fff;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  user-select: none;
 }
+.list-avatar-initials {
+  background: #bfc1c2;
+  border: 1.5px solid #e3eaf3;
+}
+
+.list-info-col {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.2em;
+}
+.list-username {
+  font-size: 1.08em;
+  font-weight: 600;
+  color: #223;
+  margin-bottom: 0.1em;
+}
+.list-rocketpoints {
+  display: flex;
+  align-items: center;
+  font-size: 0.98em;
+  color: #2a5298;
+  font-weight: 500;
+  gap: 0.3em;
+}
+.rocket-icon {
+  width: 1.1em;
+  height: 1.1em;
+  margin-right: 0.15em;
+  vertical-align: middle;
+}
+
+.list-action-col {
+  flex: 0 0 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 .add-btn {
   background: linear-gradient(90deg, #2196f3 0%, #00bcd4 100%);
   color: #fff;
   border: none;
-  border-radius: 24px;
-  padding: 0.5em 1.5em;
-  font-weight: bold;
-  font-size: 1em;
+  border-radius: 16px;
+  padding: 0.35em 1.1em;
+  font-weight: 600;
+  font-size: 0.98em;
   cursor: pointer;
-  box-shadow: 0 2px 8px rgba(33, 150, 243, 0.18);
+  box-shadow: 0 2px 8px rgba(33, 150, 243, 0.10);
   transition: background 0.2s, transform 0.1s;
 }
 .add-btn:hover {
   background: linear-gradient(90deg, #1976d2 0%, #0097a7 100%);
-  transform: translateY(-2px) scale(1.04);
+  transform: translateY(-1px) scale(1.03);
 }
 .friend-icon {
-  width: 48px;
-  height: 48px;
-  filter: invert(41%) sepia(98%) saturate(1200%) hue-rotate(74deg) brightness(110%) contrast(120%);
+  display: none;
+}
+
+.friend-badge {
+  display: flex;
+  align-items: center;
+  gap: 0.3em;
+  background: #eaffea;
+  border-radius: 16px;
+  padding: 0.2em 0.8em 0.2em 0.4em;
+  font-size: 0.98em;
+  font-weight: 600;
+  color: #218838;
+  border: 1.5px solid #34c759;
+  box-shadow: 0 1px 4px rgba(52,199,89,0.08);
+}
+
+.friend-badge-icon {
+  width: 20px;
+  height: 20px;
+  margin-right: 0.1em;
+  flex-shrink: 0;
+}
+
+.friend-badge-label {
+  font-size: 1em;
+  font-weight: 600;
+  color: #218838;
+  letter-spacing: 0.01em;
 }
 </style>
