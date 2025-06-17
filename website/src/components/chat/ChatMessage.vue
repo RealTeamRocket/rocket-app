@@ -33,6 +33,7 @@
       <!-- YouTube preview -->
       <div v-if="youtubeId" class="youtube-preview mt-2 d-flex justify-content-center">
         <iframe
+          title="youtube link"
           :src="`https://www.youtube.com/embed/${youtubeId}`"
           width="320"
           height="180"
