@@ -1,9 +1,10 @@
 <template>
-  <Navbar />
-  <div class="challenges-view">
-    <h1>Challenges</h1>
-    <ChallengeList :challenges="challenges"
-      @complete="handleCompleteChallenge"
+  <div class="page-wrapper">
+    <Navbar />
+    <div class="challenges-view">
+      <h1>Challenges</h1>
+      <ChallengeList :challenges="challenges"
+        @complete="handleCompleteChallenge"
       @invite="handleInvite"/>
     <FriendInvitePopup
       v-if="showInvitePopup"
@@ -12,7 +13,7 @@
   </div>
   <Footer />
   <DailyChallengeProgress :completed="completedCount" :total="totalCount" />
-  
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -79,11 +80,23 @@ onMounted(async () => {
 </script>
 
 <style scoped>
+.page-wrapper {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  /* Make space for the fixed progress bar */
+  padding-bottom: 3.5rem;
+}
 .challenges-view {
+  flex: 1;
   padding: 2rem;
-  padding-bottom: 4.5rem;
 }
 .challenges-view h1 {
   text-align: center;
+}
+.footer {
+  margin-top: auto;
+  /* Add extra bottom padding so it's scrollable above the progress bar */
+  padding-bottom: 2.5rem;
 }
 </style>
