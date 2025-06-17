@@ -1,35 +1,37 @@
 <template>
-  <Navbar />
-  <div class="friendlist-page">
-    <FriendSearchBar v-model:search="search" />
-    <div v-if="loading" class="loading-indicator">
-      Loading...
-    </div>
-    <template v-else>
-      <div v-if="search" class="search-results-section">
-        <h3 class="result-headline">Search Results</h3>
+  <div class="page-wrapper">
+    <Navbar />
+    <div class="friendlist-page">
+      <FriendSearchBar v-model:search="search" />
+      <div v-if="loading" class="loading-indicator">
+        Loading...
+      </div>
+      <template v-else>
+        <div v-if="search" class="search-results-section">
+          <h3 class="result-headline">Search Results</h3>
+          <div class="friend-grid">
+            <FriendCard
+              v-for="user in filteredUserResults"
+              :key="user.id"
+              :friend="user"
+              :isFriend="false"
+              @add-friend="addFriend"
+            />
+          </div>
+        </div>
         <div class="friend-grid">
           <FriendCard
-            v-for="user in filteredUserResults"
-            :key="user.id"
-            :friend="user"
-            :isFriend="false"
-            @add-friend="addFriend"
+            v-for="friend in filteredFriends"
+            :key="friend.id"
+            :friend="friend"
+            :isFriend="true"
+            @unfollow="unfollowFriend"
           />
         </div>
-      </div>
-      <div class="friend-grid">
-        <FriendCard
-          v-for="friend in filteredFriends"
-          :key="friend.id"
-          :friend="friend"
-          :isFriend="true"
-          @unfollow="unfollowFriend"
-        />
-      </div>
-    </template>
+      </template>
+    </div>
+    <Footer />
   </div>
-  <Footer />
 </template>
 
 <script setup lang="ts">
@@ -129,6 +131,7 @@ const addFriend = async (user: User) => {
 
 <style scoped>
 .friendlist-page {
+  flex: 1;
   padding: 2rem;
   max-width: 900px;
   margin: 0 auto;
@@ -156,5 +159,14 @@ const addFriend = async (user: User) => {
   text-align: center;
   font-size: 1.2rem;
   margin: 2rem 0;
+}
+.page-wrapper {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.footer {
+  margin-top: auto;
 }
 </style>
