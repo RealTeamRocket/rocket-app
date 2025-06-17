@@ -1,18 +1,20 @@
 <template>
-  <Navbar />
-  <div class="download-view">
-    <h1>Download the Rocket App</h1>
-    <p>You can download the latest version of the Rocket App for Android below:</p>
-    <a
-      class="download-btn"
-      :href="apkUrl"
-      download
-    >
-      Download APK
-    </a>
-    <p class="note">If you have trouble installing, make sure to allow installation from unknown sources in your device settings.</p>
+  <div class="page-wrapper">
+    <Navbar />
+    <div class="download-view">
+      <h1>Download the Rocket App</h1>
+      <p>You can download the latest version of the Rocket App for Android below:</p>
+      <a
+        class="download-btn"
+        :href="apkUrl"
+        download
+      >
+        Download APK
+      </a>
+      <p class="note">If you have trouble installing, make sure to allow installation from unknown sources in your device settings.</p>
+    </div>
+    <Footer />
   </div>
-  <Footer />
 </template>
 
 <script setup lang="ts">
@@ -22,6 +24,11 @@ const apkUrl = '/apk/rocket-app-latest.apk'
 </script>
 
 <style scoped>
+.page-wrapper {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
 .download-view {
   max-width: 500px;
   margin: 2rem auto;
@@ -50,5 +57,8 @@ const apkUrl = '/apk/rocket-app-latest.apk'
   color: #64748b;
   font-size: 0.95rem;
   margin-top: 1.2rem;
+}
+.footer {
+  margin-top: auto;
 }
 </style>
