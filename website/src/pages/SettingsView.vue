@@ -1,109 +1,96 @@
 <template>
   <Navbar :key="navbarKey" />
-  <div class="settings-page">
-    <h1>Settings</h1>
-    <div class="settings-card">
-      <!-- Profile Image Section -->
-      <div class="profile-section">
-        <span
-          v-if="userImage && userImage !== 'https://via.placeholder.com/120'"
-          class="profile-img"
-        >
-          <img :src="userImage" alt="Profile" class="profile-img" />
-        </span>
-        <span v-else class="profile-img profile-initials" :style="{ backgroundColor: userColor }">
-          {{ userInitials }}
-        </span>
-        <div class="profile-actions">
-          <input type="file" ref="fileInput" @change="onImageSelected" accept="image/*" hidden />
-          <button @click="triggerFileInput">Upload New Image</button>
-          <button @click="showDeleteImageConfirm = true" class="danger">Delete Image</button>
-        </div>
-      </div>
-
-      <!-- User Info Section -->
-      <div class="info-section">
-        <label>
-          Name:
-          <input v-model="name" type="text" />
-          <button @click="updateName" style="margin-left: 0.5rem">Save Name</button>
-        </label>
-        <label>
-          Email:
-          <input v-model="email" type="email" />
-          <button @click="updateEmail" style="margin-left: 0.5rem">Save Email</button>
-        </label>
-      </div>
-
-      <!-- Password Change Section -->
-      <div class="password-section">
-        <label>
-          Current Password:
-          <input v-model="currentPassword" type="password" />
-        </label>
-        <label>
-          New Password:
-          <input v-model="newPassword" type="password" />
-        </label>
-        <label>
-          Confirm New Password:
-          <input v-model="confirmPassword" type="password" />
-        </label>
-        <button @click="changePassword">Change Password</button>
-      </div>
-
-      <!-- Step Goal Section -->
-      <div class="goal-section">
-        <label>
-          Daily Step Goal:
-          <input v-model.number="dailyGoal" type="number" min="0" />
-        </label>
-        <button @click="updateGoal">Update Goal</button>
-      </div>
-
-      <!-- Danger Zone -->
-      <div class="danger-zone">
-        <button @click="logout" class="logout">Logout</button>
-        <button @click="showDeleteAccountConfirm = true" class="danger">Delete Account</button>
-      </div>
+  <div class="settings-tabbar-layout">
+    <div class="settings-tabbar">
+      <button
+        :class="{ active: section === 'profile' }"
+        @click="section = 'profile'"
+      >Profile</button>
+      <button
+        :class="{ active: section === 'security' }"
+        @click="section = 'security'"
+      >Security</button>
+      <button
+        :class="{ active: section === 'account' }"
+        @click="section = 'account'"
+      >Account</button>
     </div>
-    <!-- Modals -->
-    <ConfirmDialog
-      :open="showDeleteImageConfirm"
-      title="Delete Profile Image"
-      message="Are you sure you want to delete your profile image?"
-      confirmText="Delete"
-      cancelText="Cancel"
-      @confirm="deleteImage"
-      @cancel="showDeleteImageConfirm = false"
-    />
-    <ConfirmDialog
-      :open="showDeleteAccountConfirm"
-      title="Delete Account"
-      message="Are you sure you want to delete your account? This cannot be undone."
-      confirmText="Delete"
-      cancelText="Cancel"
-      @confirm="deleteAccount"
-      @cancel="showDeleteAccountConfirm = false"
-    />
-    <NotificationModal
-      :open="notification.open"
-      :message="notification.message"
-      :type="notification.type"
-      :autoClose="notification.autoClose"
-      @close="notification.open = false"
-    />
+    <div class="settings-tab-content">
+      <ProfileSettings
+        v-if="section==='profile'"
+        :userImage="userImage"
+        :userColor="userColor"
+        :userInitials="userInitials"
+        :name="name"
+        :dailyGoal="dailyGoal"
+        @update-name="updateName"
+        @update-goal="updateGoal"
+        @delete-image="showDeleteImageConfirm = true"
+        @trigger-file-input="triggerFileInput"
+        @image-selected="onImageSelected"
+      />
+      <SecuritySettings
+        v-if="section==='security'"
+        :email="email"
+        @update-email="updateEmail"
+        @change-password="changePassword"
+        :currentPassword="currentPassword"
+        :newPassword="newPassword"
+        :confirmPassword="confirmPassword"
+        @update:currentPassword="val => currentPassword = val"
+        @update:newPassword="val => newPassword = val"
+        @update:confirmPassword="val => confirmPassword = val"
+      />
+      <AccountSettings
+        v-if="section==='account'"
+        :userImage="userImage"
+        :userColor="userColor"
+        :userInitials="userInitials"
+        @logout="logout"
+        @delete-account="showDeleteAccountConfirm = true"
+      />
+      <!-- Modals -->
+      <ConfirmDialog
+        :open="showDeleteImageConfirm"
+        title="Delete Profile Image"
+        message="Are you sure you want to delete your profile image?"
+        confirmText="Delete"
+        cancelText="Cancel"
+        @confirm="deleteImage"
+        @cancel="showDeleteImageConfirm = false"
+      />
+      <ConfirmDialog
+        :open="showDeleteAccountConfirm"
+        title="Delete Account"
+        message="Are you sure you want to delete your account? This cannot be undone."
+        confirmText="Delete"
+        cancelText="Cancel"
+        @confirm="deleteAccount"
+        @cancel="showDeleteAccountConfirm = false"
+      />
+      <NotificationModal
+        :open="notification.open"
+        :message="notification.message"
+        :type="notification.type"
+        :autoClose="notification.autoClose"
+        @close="notification.open = false"
+      />
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, reactive, onMounted, computed } from 'vue'
 import Navbar from '@/components/Navbar.vue'
+import ProfileSettings from '@/components/settings/ProfileSettings.vue'
+import SecuritySettings from '@/components/settings/SecuritySettings.vue'
+import AccountSettings from '@/components/settings/AccountSettings.vue'
 import api from '@/api/backend-api'
 import { useRouter } from 'vue-router'
 import ConfirmDialog from '@/components/modals/ConfirmDialog.vue'
 import NotificationModal from '@/components/modals/NotificationModal.vue'
 import { getColor, getInitials } from '@/utils/userUtils'
+
 
 const router = useRouter()
 
@@ -113,6 +100,7 @@ const savedName = ref('')
 const email = ref('')
 
 const navbarKey = ref(0)
+const section = ref<'profile'|'security'|'account'>('profile')
 
 const currentPassword = ref('')
 const newPassword = ref('')
@@ -134,14 +122,12 @@ const notification = reactive({
   open: false,
   message: '',
   type: 'info' as 'success' | 'error' | 'info',
-  autoClose: 2200
+  autoClose: 2200,
 })
 
-function showNotification(
-  message: string,
-  type: 'success' | 'error' | 'info' = 'info',
-  autoClose = 2200
-) {
+
+
+function showNotification(message: string, type: 'success' | 'error' | 'info' = 'info', autoClose = 2200) {
   notification.message = message
   notification.type = type
   notification.open = true
@@ -161,6 +147,8 @@ async function onImageSelected(event: Event) {
       const imageRes = await api.getUserImage()
       if (imageRes.data && imageRes.data.data && imageRes.data.mime_type) {
         userImage.value = `data:${imageRes.data.mime_type};base64,${imageRes.data.data}`
+      } else {
+        userImage.value = 'https://via.placeholder.com/120'
       }
       showNotification('Profile image updated!', 'success')
       navbarKey.value++
@@ -176,15 +164,18 @@ async function deleteImage() {
     await api.deleteImage()
     userImage.value = 'https://via.placeholder.com/120'
     showNotification('Profile image deleted.', 'success')
+    navbarKey.value++
   } catch (error) {
     showNotification('Failed to delete image', 'error')
   }
 }
 
-async function updateName() {
+async function updateName(newName: string) {
   try {
-    await api.updateUserInfo({ name: name.value })
-    savedName.value = name.value
+    console.log('Updating name to:', newName)
+    await api.updateUserInfo({ name: newName })
+    name.value = newName
+    savedName.value = newName
     showNotification('Name updated!', 'success')
     navbarKey.value++ // Force Navbar reload
   } catch (e) {
@@ -192,28 +183,30 @@ async function updateName() {
   }
 }
 
-async function updateEmail() {
+async function updateEmail(newEmail: string) {
   try {
-    await api.updateUserInfo({ email: email.value })
+    console.log('Updating email to:', newEmail)
+    await api.updateUserInfo({ email: newEmail })
+    email.value = newEmail
     showNotification('Email updated!', 'success')
   } catch (e) {
     showNotification('Failed to update email', 'error')
   }
 }
 
-async function changePassword() {
-  if (!currentPassword.value || !newPassword.value || !confirmPassword.value) {
+async function changePassword({ currentPassword: curr, newPassword: next, confirmPassword: confirm }: { currentPassword: string, newPassword: string, confirmPassword: string }) {
+  if (!curr || !next || !confirm) {
     showNotification('Please fill all password fields', 'error')
     return
   }
-  if (newPassword.value !== confirmPassword.value) {
+  if (next !== confirm) {
     showNotification('New passwords do not match', 'error')
     return
   }
   try {
     await api.updateUserInfo({
-      currentPassword: currentPassword.value,
-      newPassword: newPassword.value
+      currentPassword: curr,
+      newPassword: next
     })
     showNotification('Password updated!', 'success')
     currentPassword.value = ''
@@ -224,9 +217,10 @@ async function changePassword() {
   }
 }
 
-async function updateGoal() {
+async function updateGoal(newGoal: number) {
   try {
-    await api.updateStepGoal(dailyGoal.value)
+    await api.updateStepGoal(newGoal)
+    dailyGoal.value = newGoal
     showNotification('Daily goal updated', 'success')
   } catch (error) {
     showNotification('Failed to update daily goal', 'error')
@@ -243,14 +237,12 @@ async function logout() {
 }
 
 async function deleteAccount() {
-  if (confirm('Are you sure you want to delete your account? This cannot be undone.')) {
     try {
       await api.deleteUser()
-      router.push
+      router.push('/login')
     } catch (error) {
       alert('Failed to delete account')
     }
-  }
 }
 
 // Optionally, fetch user info and settings on mount
@@ -283,20 +275,51 @@ onMounted(async () => {
 </script>
 
 <style scoped>
-.settings-page {
-  max-width: 500px;
-  margin: 2rem auto;
-  padding: 1.5rem;
-}
-.settings-card {
-  background: #fff;
-  border-radius: 16px;
-  box-shadow: 0 2px 16px rgba(0, 0, 0, 0.07);
-  padding: 2rem;
+.settings-tabbar-layout {
+  min-height: 80vh;
+  background: #f6f8fa;
   display: flex;
   flex-direction: column;
-  gap: 2rem;
+  align-items: stretch;
 }
+
+.settings-tabbar {
+  display: flex;
+  gap: 1rem;
+  padding: 2.5rem 2rem 1.5rem 2rem;
+  background: #f7fafd;
+  border-bottom: 1px solid #e0eaff;
+  justify-content: center;
+}
+
+.settings-tabbar button {
+  background: none;
+  border: none;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #4a90e2;
+  padding: 0.5rem 1.5rem;
+  border-radius: 6px 6px 0 0;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+
+.settings-tabbar button.active,
+.settings-tabbar button:hover {
+  background: #e0eaff;
+  color: #222;
+}
+
+.settings-tab-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 3rem 2rem;
+  min-width: 0;
+}
+
 .profile-section {
   display: flex;
   align-items: center;
@@ -328,13 +351,15 @@ onMounted(async () => {
   gap: 0.5rem;
 }
 .info-section label,
-.goal-section label {
+.goal-section label,
+.password-section label {
   display: flex;
   flex-direction: column;
   margin-bottom: 1rem;
 }
 .info-section input,
-.goal-section input {
+.goal-section input,
+.password-section input {
   padding: 0.5rem;
   border-radius: 6px;
   border: 1px solid #ccc;
@@ -370,5 +395,11 @@ button.logout:hover {
   gap: 1rem;
   justify-content: flex-end;
   margin-top: 2rem;
+}
+.fade-enter-active, .fade-leave-active {
+  transition: opacity 0.25s;
+}
+.fade-enter-from, .fade-leave-to {
+  opacity: 0;
 }
 </style>
