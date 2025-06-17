@@ -2,7 +2,13 @@
   <div class="profile-settings">
     <div class="profile-img-row">
       <span v-if="userImage && userImage !== 'https://via.placeholder.com/120'" class="profile-img">
-        <img :src="userImage" alt="Profile" class="profile-img" />
+        <img
+          :src="userImage"
+          alt="Profile"
+          class="profile-img"
+          @click="showImageModal = true"
+          style="cursor:pointer;"
+        />
       </span>
       <span v-else class="profile-img profile-initials" :style="{ backgroundColor: userColor }">
         {{ userInitials }}
@@ -23,11 +29,20 @@
       <input v-model.number="localDailyGoal" type="number" min="0" />
       <button @click="emitUpdateGoal">Save</button>
     </label>
+    <!-- Place modal outside the avatar span, only show if image is not placeholder and showImageModal is true -->
+    <ImageModal
+      v-if="userImage && userImage !== 'https://via.placeholder.com/120' && showImageModal"
+      :show="showImageModal"
+      :src="userImage"
+      alt="Profile Image"
+      @close="showImageModal = false"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, watch, toRefs } from 'vue'
+import { ref, watch } from 'vue'
+import ImageModal from '../modals/ImageModal.vue'
 
 const props = defineProps<{
   userImage: string
@@ -41,6 +56,7 @@ const emit = defineEmits(['update-name', 'update-goal', 'delete-image', 'trigger
 const fileInput = ref<HTMLInputElement | null>(null)
 const localName = ref(props.name)
 const localDailyGoal = ref(props.dailyGoal)
+const showImageModal = ref(false)
 
 watch(() => props.name, (val) => { localName.value = val })
 watch(() => props.dailyGoal, (val) => { localDailyGoal.value = val })

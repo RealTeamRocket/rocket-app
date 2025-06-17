@@ -3,14 +3,30 @@
     <span v-if="!hasImage" class="account-profile-initials" :style="{ backgroundColor: userColor }">
       {{ userInitials }}
     </span>
-    <img v-else :src="userImage" alt="Profile" class="account-profile-img" />
+    <img
+      v-else
+      :src="userImage"
+      alt="Profile"
+      class="account-profile-img"
+      @click="showImageModal = true"
+      style="cursor:pointer;"
+    />
     <button @click="$emit('logout')" class="logout-btn">Logout</button>
     <button @click="$emit('delete-account')" class="danger-btn">Delete Account</button>
+    <!-- Place modal outside the img, only show if hasImage and showImageModal -->
+    <ImageModal
+      v-if="hasImage && showImageModal"
+      :show="showImageModal"
+      :src="userImage"
+      alt="Profile Image"
+      @close="showImageModal = false"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { ref, computed } from 'vue'
+import ImageModal from '../modals/ImageModal.vue'
 
 const props = defineProps<{ userImage: string; userColor: string; userInitials: string }>()
 defineEmits(['logout', 'delete-account'])
@@ -18,6 +34,7 @@ defineEmits(['logout', 'delete-account'])
 const hasImage = computed(
   () => props.userImage && props.userImage !== 'https://via.placeholder.com/120'
 )
+const showImageModal = ref(false)
 </script>
 
 <style scoped>
@@ -69,15 +86,15 @@ const hasImage = computed(
   border: none;
   font-size: 1rem;
   cursor: pointer;
-  background: #f5f5f5;
-  color: #232946;
+  background: #1976d2;
+  color: #fff;
   transition:
     background 0.18s,
     color 0.18s;
 }
 
 .logout-btn:hover {
-  background: #e0e0e0;
+  background: #1565c0;
 }
 
 .danger-btn {
