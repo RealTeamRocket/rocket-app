@@ -122,3 +122,27 @@ func (s *Server) UpdateImageHandler(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{"message": "Image updated successfully"})
 }
+
+func (s *Server) DeleteImageHandler(c *gin.Context) {
+	userID, exists := c.Get("userID")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "User not authenticated"})
+		return
+	}
+
+	userUUID, err := uuid.Parse(userID.(string))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid user ID format"})
+		return
+	}
+
+	logger.Info("Deleting image for user", "userID", userUUID)
+
+	err = s.db.DeleteUserImage(userUUID)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete image"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Image deleted successfully"})
+}

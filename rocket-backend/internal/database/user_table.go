@@ -116,3 +116,21 @@ func (s *service) GetAllUsers(excludeUserID *uuid.UUID) ([]types.User, error) {
 
 	return users, nil
 }
+
+func (s *service) DeleteUser(userID uuid.UUID) error {
+	// First, delete from users (this will cascade to all dependent tables)
+	query := `DELETE FROM users WHERE id = $1`
+	_, err := s.db.Exec(query, userID)
+	if err != nil {
+		return fmt.Errorf("%w: %v", custom_error.ErrFailedToDelete, err)
+	}
+
+	// Then, delete from credentials (since users references credentials, not the other way around)
+	credQuery := `DELETE FROM credentials WHERE id = $1`
+	_, credErr := s.db.Exec(credQuery, userID)
+	if credErr != nil {
+		return fmt.Errorf("%w: %v", custom_error.ErrFailedToDelete, credErr)
+	}
+
+	return nil
+}
