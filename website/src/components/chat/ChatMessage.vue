@@ -72,7 +72,6 @@ function handleReaction() {
   }
 }
 
-// YouTube link detection and extraction
 function extractYouTubeId(url: string): string | null {
   // Handles both youtu.be and youtube.com/watch?v= links
   const match = url.match(
@@ -93,10 +92,8 @@ const youtubeId = computed(() => {
 
 // Replace URLs in message with clickable links (except YouTube, which gets preview)
 function linkify(text: string) {
-  // Don't linkify YouTube links (they get a preview)
   const ytRegex = /(https?:\/\/(?:www\.)?(?:youtube\.com\/watch\?v=|youtu\.be\/)[A-Za-z0-9_-]{11})/
   if (ytRegex.test(text)) {
-    // Remove YouTube link from text (it will be previewed)
     text = text.replace(ytRegex, '')
   }
   // Linkify other URLs
@@ -130,9 +127,17 @@ function linkify(text: string) {
   background: #000;
 }
 .chat-message-text a {
-  color: #1976d2;
   text-decoration: underline;
   word-break: break-all;
+  transition: color 0.2s;
+}
+
+::v-deep .chat-message-text a {
+  color: #ffffff !important;
+}
+::v-deep .chat-message-text a:hover {
+  color: #ffd600 !important;
+  background: transparent;
 }
 
 .reaction-badge {
