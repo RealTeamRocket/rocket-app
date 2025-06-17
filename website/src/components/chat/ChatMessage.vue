@@ -132,10 +132,10 @@ function linkify(text: string) {
   transition: color 0.2s;
 }
 
-::v-deep .chat-message-text a {
+:deep(.chat-message-text a){
   color: #ffffff !important;
 }
-::v-deep .chat-message-text a:hover {
+:deep(.chat-message-text a:hover) {
   color: #ffd600 !important;
   background: transparent;
 }
