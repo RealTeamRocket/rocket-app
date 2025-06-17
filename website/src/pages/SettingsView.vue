@@ -1,18 +1,17 @@
 <template>
-  <Navbar />
+  <Navbar :key="navbarKey" />
   <div class="settings-page">
     <h1>Settings</h1>
     <div class="settings-card">
       <!-- Profile Image Section -->
       <div class="profile-section">
-        <span v-if="userImage && userImage !== 'https://via.placeholder.com/120'" class="profile-img">
+        <span
+          v-if="userImage && userImage !== 'https://via.placeholder.com/120'"
+          class="profile-img"
+        >
           <img :src="userImage" alt="Profile" class="profile-img" />
         </span>
-        <span
-          v-else
-          class="profile-img profile-initials"
-          :style="{ backgroundColor: userColor }"
-        >
+        <span v-else class="profile-img profile-initials" :style="{ backgroundColor: userColor }">
           {{ userInitials }}
         </span>
         <div class="profile-actions">
@@ -27,12 +26,12 @@
         <label>
           Name:
           <input v-model="name" type="text" />
-          <button @click="updateName" style="margin-left: 0.5rem;">Save Name</button>
+          <button @click="updateName" style="margin-left: 0.5rem">Save Name</button>
         </label>
         <label>
           Email:
           <input v-model="email" type="email" />
-          <button @click="updateEmail" style="margin-left: 0.5rem;">Save Email</button>
+          <button @click="updateEmail" style="margin-left: 0.5rem">Save Email</button>
         </label>
       </div>
 
@@ -106,14 +105,15 @@ import ConfirmDialog from '@/components/modals/ConfirmDialog.vue'
 import NotificationModal from '@/components/modals/NotificationModal.vue'
 import { getColor, getInitials } from '@/utils/userUtils'
 
-
 const router = useRouter()
 
 const userImage = ref('https://via.placeholder.com/120')
 const name = ref('')
+const savedName = ref('')
 const email = ref('')
 
-// Password change fields
+const navbarKey = ref(0)
+
 const currentPassword = ref('')
 const newPassword = ref('')
 const confirmPassword = ref('')
@@ -121,10 +121,10 @@ const dailyGoal = ref(10000)
 const fileInput = ref<HTMLInputElement | null>(null)
 
 const userColor = computed(() => {
-  return getColor(name.value || 'User')
+  return getColor(savedName.value || 'User')
 })
 const userInitials = computed(() => {
-  return getInitials(name.value || 'User')
+  return getInitials(savedName.value || 'User')
 })
 
 const showDeleteImageConfirm = ref(false)
@@ -134,10 +134,14 @@ const notification = reactive({
   open: false,
   message: '',
   type: 'info' as 'success' | 'error' | 'info',
-  autoClose: 2200,
+  autoClose: 2200
 })
 
-function showNotification(message: string, type: 'success' | 'error' | 'info' = 'info', autoClose = 2200) {
+function showNotification(
+  message: string,
+  type: 'success' | 'error' | 'info' = 'info',
+  autoClose = 2200
+) {
   notification.message = message
   notification.type = type
   notification.open = true
@@ -157,16 +161,14 @@ async function onImageSelected(event: Event) {
       const imageRes = await api.getUserImage()
       if (imageRes.data && imageRes.data.data && imageRes.data.mime_type) {
         userImage.value = `data:${imageRes.data.mime_type};base64,${imageRes.data.data}`
-      } else {
-        userImage.value = 'https://via.placeholder.com/120'
       }
       showNotification('Profile image updated!', 'success')
+      navbarKey.value++
     } catch (error) {
       showNotification('Failed to upload image', 'error')
     }
   }
 }
-
 
 async function deleteImage() {
   showDeleteImageConfirm.value = false
@@ -182,7 +184,9 @@ async function deleteImage() {
 async function updateName() {
   try {
     await api.updateUserInfo({ name: name.value })
+    savedName.value = name.value
     showNotification('Name updated!', 'success')
+    navbarKey.value++ // Force Navbar reload
   } catch (e) {
     showNotification('Failed to update name', 'error')
   }
@@ -259,6 +263,7 @@ onMounted(async () => {
     ])
     if (userRes.data) {
       name.value = userRes.data.username || ''
+      savedName.value = userRes.data.username || ''
       email.value = userRes.data.email || ''
     }
     if (settingsRes.data && settingsRes.data.step_goal) {
@@ -286,7 +291,7 @@ onMounted(async () => {
 .settings-card {
   background: #fff;
   border-radius: 16px;
-  box-shadow: 0 2px 16px rgba(0,0,0,0.07);
+  box-shadow: 0 2px 16px rgba(0, 0, 0, 0.07);
   padding: 2rem;
   display: flex;
   flex-direction: column;
