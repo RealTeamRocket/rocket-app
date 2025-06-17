@@ -1,18 +1,20 @@
 <template>
-  <Navbar />
-  <div class="profile-page">
-    <TabBar :tabs="tabs" v-model="activeTab" />
-    <div v-if="activeTab === 'Profile'">
-      <ProfileTab :user="user" />
+  <div class="page-wrapper">
+    <Navbar />
+    <div class="profile-page">
+      <TabBar :tabs="tabs" v-model="activeTab" />
+      <div v-if="activeTab === 'Profile'">
+        <ProfileTab :user="user" />
+      </div>
+      <div v-else-if="activeTab === 'Followers'">
+        <FollowListTab :users="followedUsers" title="Followers" />
+      </div>
+      <div v-else-if="activeTab === 'Following'">
+        <FollowListTab :users="followingUsers" title="Following" />
+      </div>
     </div>
-    <div v-else-if="activeTab === 'Followers'">
-      <FollowListTab :users="followedUsers" title="Followers" />
-    </div>
-    <div v-else-if="activeTab === 'Following'">
-      <FollowListTab :users="followingUsers" title="Following" />
-    </div>
+    <Footer />
   </div>
-  <Footer />
 </template>
 
 <script setup lang="ts">
@@ -85,7 +87,16 @@ watch(
 </script>
 
 <style scoped>
+.page-wrapper {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
 .profile-page {
+  flex: 1;
   padding: 2rem;
+}
+.footer {
+  margin-top: auto;
 }
 </style>
