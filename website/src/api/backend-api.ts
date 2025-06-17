@@ -117,5 +117,30 @@ export default {
   },
   getAllUsers(): Promise<AxiosResponse> {
     return protectedAxiosApi.get('/users', { withCredentials: true })
+  },
+  deleteUser(): Promise<AxiosResponse> {
+    return protectedAxiosApi.delete('/user', { withCredentials: true })
+  },
+  deleteImage(): Promise<AxiosResponse> {
+    return protectedAxiosApi.delete('/settings/image', { withCredentials: true })
+  },
+  uploadImage(imageFile: File): Promise<AxiosResponse> {
+    const formData = new FormData()
+    formData.append('image', imageFile)
+
+    return protectedAxiosApi.post('/settings/image', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+      withCredentials: true
+    })
+  },
+  updateStepGoal(value: number): Promise<AxiosResponse> {
+    return protectedAxiosApi.post(
+      '/settings/step-goal',
+      { stepGoal: value },
+      { withCredentials: true }
+    )
+  },
+  getSettings(): Promise<AxiosResponse> {
+    return protectedAxiosApi.get('/settings', { withCredentials: true })
   }
 }
