@@ -142,5 +142,8 @@ export default {
   },
   getSettings(): Promise<AxiosResponse> {
     return protectedAxiosApi.get('/settings', { withCredentials: true })
+  },
+  updateUserInfo(data: { name?: string; email?: string; currentPassword?: string; newPassword?: string }): Promise<AxiosResponse> {
+    return protectedAxiosApi.post('/settings/userinfo', data, { withCredentials: true })
   }
 }

@@ -43,6 +43,10 @@ type Service interface {
 	GetTopUsers(limit int) ([]types.User, error)
 	GetAllUsers(excludeUserID *uuid.UUID) ([]types.User, error)
 	DeleteUser(userID uuid.UUID) error
+	UpdateUserName(userID uuid.UUID, newName string) error
+	UpdateUserEmail(userID uuid.UUID, newEmail string) error
+	CheckUserPassword(userID uuid.UUID, currentPassword string) (bool, error)
+	UpdateUserPassword(userID uuid.UUID, newPassword string) error
 
 	// daily_steps
 	UpdateDailySteps(userID uuid.UUID, steps int) error

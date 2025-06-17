@@ -27,16 +27,30 @@
         <label>
           Name:
           <input v-model="name" type="text" />
+          <button @click="updateName" style="margin-left: 0.5rem;">Save Name</button>
         </label>
         <label>
           Email:
           <input v-model="email" type="email" />
+          <button @click="updateEmail" style="margin-left: 0.5rem;">Save Email</button>
+        </label>
+      </div>
+
+      <!-- Password Change Section -->
+      <div class="password-section">
+        <label>
+          Current Password:
+          <input v-model="currentPassword" type="password" />
         </label>
         <label>
-          Password:
-          <input v-model="password" type="password" placeholder="New password" />
+          New Password:
+          <input v-model="newPassword" type="password" />
         </label>
-        <button @click="updateUserInfo">Save Changes</button>
+        <label>
+          Confirm New Password:
+          <input v-model="confirmPassword" type="password" />
+        </label>
+        <button @click="changePassword">Change Password</button>
       </div>
 
       <!-- Step Goal Section -->
@@ -98,7 +112,11 @@ const router = useRouter()
 const userImage = ref('https://via.placeholder.com/120')
 const name = ref('')
 const email = ref('')
-const password = ref('')
+
+// Password change fields
+const currentPassword = ref('')
+const newPassword = ref('')
+const confirmPassword = ref('')
 const dailyGoal = ref(10000)
 const fileInput = ref<HTMLInputElement | null>(null)
 
@@ -161,19 +179,45 @@ async function deleteImage() {
   }
 }
 
-async function updateUserInfo() {
-  // TODO: Implement user info update logic
-  // try {
-  //   // If you have a backendApi.updateUserInfo, use it. Otherwise, leave as TODO.
-  //   if (backendApi.updateUserInfo) {
-  //     await backendApi.updateUserInfo(name.value, email.value, password.value)
-  //     alert('User info updated')
-  //   } else {
-  //     alert('User info update API not implemented')
-  //   }
-  // } catch (error) {
-  //   alert('Failed to update user info')
-  // }
+async function updateName() {
+  try {
+    await api.updateUserInfo({ name: name.value })
+    showNotification('Name updated!', 'success')
+  } catch (e) {
+    showNotification('Failed to update name', 'error')
+  }
+}
+
+async function updateEmail() {
+  try {
+    await api.updateUserInfo({ email: email.value })
+    showNotification('Email updated!', 'success')
+  } catch (e) {
+    showNotification('Failed to update email', 'error')
+  }
+}
+
+async function changePassword() {
+  if (!currentPassword.value || !newPassword.value || !confirmPassword.value) {
+    showNotification('Please fill all password fields', 'error')
+    return
+  }
+  if (newPassword.value !== confirmPassword.value) {
+    showNotification('New passwords do not match', 'error')
+    return
+  }
+  try {
+    await api.updateUserInfo({
+      currentPassword: currentPassword.value,
+      newPassword: newPassword.value
+    })
+    showNotification('Password updated!', 'success')
+    currentPassword.value = ''
+    newPassword.value = ''
+    confirmPassword.value = ''
+  } catch (e) {
+    showNotification('Failed to update password', 'error')
+  }
 }
 
 async function updateGoal() {
