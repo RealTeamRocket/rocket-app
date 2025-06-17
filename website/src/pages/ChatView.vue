@@ -3,11 +3,13 @@
   <div class="chatview-wrapper d-flex flex-column align-items-center justify-content-center">
     <ChatRoom :user="user"/>
   </div>
+  <Footer />
 </template>
 
 <script setup lang="ts">
 import Navbar from '@/components/Navbar.vue'
 import ChatRoom from '@/components/chat/ChatRoom.vue'
+import Footer from '@/components/footer/Footer.vue'
 import { ref, onMounted } from 'vue'
 import api from '@/api/backend-api'
 
