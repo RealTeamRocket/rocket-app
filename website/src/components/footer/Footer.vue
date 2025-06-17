@@ -1,16 +1,27 @@
 <template>
   <footer class="footer">
     <div class="footer-content">
+      <div class="footer-section footer-address">
+        <span class="footer-title">Address</span>
+        <span>Hochschule für Technik Stuttgart</span>
+        <span>Schellingstraße 24</span>
+        <span>70174 Stuttgart</span>
+        <span>Germany</span>
+      </div>
       <div class="footer-section footer-legal">
         <span class="footer-title">Legal</span>
         <a href="/legal-notice" target="_blank" rel="noopener">Legal Notice</a>
         <a href="/privacy-policy" target="_blank" rel="noopener">Privacy Policy</a>
+        <a href="/accessibility" target="_blank" rel="noopener">Accessibility</a>
       </div>
       <div class="footer-section footer-contact">
         <span class="footer-title">Contact</span>
-        <a href="mailto:your@email.com">your@email.com</a>
-        <a href="https://instagram.com/youraccount" target="_blank" rel="noopener" aria-label="Instagram" class="footer-instagram">
-          <span style="font-size: 1.3em;">📸</span>
+        <a href="mailto:info@hft-stuttgart.de">info@hft-stuttgart.de</a>
+        <a href="https://www.instagram.com/hft_stuttgart/" target="_blank" rel="noopener" aria-label="Instagram" class="footer-instagram">
+            <i class="fab fa-instagram" style="font-size: 1.3em;"></i>
+        </a>
+        <a href="https://www.youtube.com/c/Hochschulef%C3%BCrTechnikStuttgart" target="_blank" rel="noopener" aria-label="YouTube" class="footer-youtube">
+            <i class="fab fa-youtube" style="font-size: 1.3em;"></i>
         </a>
       </div>
     </div>
@@ -31,17 +42,19 @@
 }
 
 .footer-content {
-  max-width: 900px;
+  max-width: 1100px;
   margin: 0 auto;
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-start;
+  gap: 2rem;
 }
 
 .footer-section {
   display: flex;
   flex-direction: column;
   gap: 0.3rem;
+  min-width: 180px;
 }
 
 .footer-title {
@@ -60,19 +73,28 @@
   font-size: 1em;
 }
 
-.footer-legal a:hover,
-.footer-contact a:hover {
+.footer-legal a:hover {
   color: #ffd580; 
   text-decoration: underline;
 }
 
-.footer-instagram {
+.footer-instagram,
+.footer-youtube {
   display: inline-flex;
   align-items: center;
   margin-top: 0.1rem;
+  margin-right: 0.6rem;
 }
 
-@media (max-width: 700px) {
+.footer-instagram:hover i {
+  color: #f8a8f4;
+}
+
+.footer-youtube:hover i {
+  color: #ff4c4c;
+}
+
+@media (max-width: 900px) {
   .footer-content {
     flex-direction: column;
     align-items: flex-start;
@@ -81,6 +103,7 @@
   }
   .footer-section {
     width: 100%;
+    min-width: unset;
   }
 }
 </style>
