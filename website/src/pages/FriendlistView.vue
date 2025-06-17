@@ -165,7 +165,6 @@ const addFriend = async (user: User) => {
   display: flex;
   flex-direction: column;
 }
-
 .footer {
   margin-top: auto;
 }
