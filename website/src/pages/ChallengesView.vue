@@ -8,10 +8,11 @@
     <FriendInvitePopup
       v-if="showInvitePopup"
       :challenge-id="inviteChallengeId!"
-      @close="showInvitePopup = false"/>
+      @close="showInvitePopup = false"/> 
   </div>
-  <DailyChallengeProgress :completed="completedCount" :total="totalCount" />
   <Footer />
+  <DailyChallengeProgress :completed="completedCount" :total="totalCount" />
+  
 </template>
 
 <script setup lang="ts">
@@ -80,6 +81,7 @@ onMounted(async () => {
 <style scoped>
 .challenges-view {
   padding: 2rem;
+  padding-bottom: 4.5rem;
 }
 .challenges-view h1 {
   text-align: center;
