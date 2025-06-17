@@ -198,7 +198,6 @@ async function deleteAccount() {
   if (confirm('Are you sure you want to delete your account? This cannot be undone.')) {
     try {
       await api.deleteUser()
-      alert('Account deleted')
       router.push
     } catch (error) {
       alert('Failed to delete account')
