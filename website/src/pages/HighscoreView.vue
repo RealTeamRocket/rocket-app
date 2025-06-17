@@ -83,7 +83,6 @@ const loadRanking = async () => {
     )
 
 
-    console.log(rankedUsers.value)
   } catch {
     console.error("Error fetching ranking")
   }

@@ -54,7 +54,8 @@ const allUsers = ref<User[]>([]);
 const fetchFriends = async () => {
   try {
     const res = await backendApi.getFriends();
-    friends.value = res.data.map((f: any) => ({
+    const data = res.data ?? [];
+    friends.value = data.map((f: any) => ({
       id: f.id,
       username: f.username,
       email: f.email,
@@ -66,13 +67,13 @@ const fetchFriends = async () => {
     console.error('Failed to fetch friends:', e);
     friends.value = [];
   }
-
 };
 
 const fetchAllUsers = async () => {
   try {
     const res = await backendApi.getAllUsers();
-    allUsers.value = res.data.map((u: any) => ({
+    const data = res.data ?? [];
+    allUsers.value = data.map((u: any) => ({
       id: u.id,
       username: u.username,
       email: u.email,
@@ -84,7 +85,6 @@ const fetchAllUsers = async () => {
     console.error('Failed to fetch all users:', e);
     allUsers.value = [];
   }
-
 };
 
 const loading = ref(true);
