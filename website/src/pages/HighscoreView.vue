@@ -28,6 +28,7 @@
       </div>
     </div>
   </div>
+  <Footer />
 </template>
 <script setup lang="ts">
 import Podium from '@/components/highscore/Podium.vue'
@@ -38,6 +39,7 @@ import api from '@/api/backend-api'
 import List from "@/components/highscore/List.vue";
 import ProfileCard from '@/components/highscore/ProfileCard.vue'
 import Rocket from '@/components/highscore/Rocket.vue'
+import Footer from '@/components/footer/Footer.vue'
 
 interface RankedUser {
   id: string

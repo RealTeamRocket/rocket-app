@@ -12,10 +12,12 @@
     </a>
     <p class="note">If you have trouble installing, make sure to allow installation from unknown sources in your device settings.</p>
   </div>
+  <Footer />
 </template>
 
 <script setup lang="ts">
 import Navbar from '@/components/Navbar.vue'
+import Footer from '@/components/footer/Footer.vue'
 const apkUrl = '/apk/rocket-app-latest.apk'
 </script>
 

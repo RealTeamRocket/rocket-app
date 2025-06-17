@@ -4,10 +4,12 @@
     <h1>Settings</h1>
     <p>This is the Settings page. Here you will see settings and can change them.</p>
   </div>
+  <Footer />
 </template>
 
 <script setup lang="ts">
 import Navbar from '@/components/Navbar.vue'
+import Footer from '@/components/footer/Footer.vue'
 </script>
 
 <style scoped>

@@ -11,6 +11,7 @@
       @close="showInvitePopup = false"/>
   </div>
   <DailyChallengeProgress :completed="completedCount" :total="totalCount" />
+  <Footer />
 </template>
 
 <script setup lang="ts">
@@ -20,6 +21,7 @@ import ChallengeList from '@/components/challenges/ChallengeList.vue';
 import DailyChallengeProgress from '@/components/challenges/DailyChallengeProgress.vue';
 import FriendInvitePopup from '@/components/challenges/FriendInvitePopup.vue';
 import backendApi from '@/api/backend-api';
+import Footer from '@/components/footer/Footer.vue'
 
 const challenges = ref<{ id: string; text: string; points: number }[]>([]);
 const completedCount = ref(0);

@@ -123,6 +123,7 @@
       </template>
     </main>
   </div>
+  <Footer />
 </template>
 
 <script setup lang="ts">
@@ -136,6 +137,7 @@ import ElevationProfile from '@/components/runs/ElevationProfile.vue'
 import { parseRoute } from '@/utils/routes'
 import PlanRunMap from '@/components/runs/plan/PlanRunMap.vue'
 import ConfirmDialog from '@/components/modals/ConfirmDialog.vue'
+import Footer from '@/components/footer/Footer.vue'
 
 const tab = ref<'past' | 'plan' | 'planned'>('past')
 

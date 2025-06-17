@@ -12,6 +12,7 @@
       <FollowListTab :users="followingUsers" title="Following" />
     </div>
   </div>
+  <Footer />
 </template>
 
 <script setup lang="ts">
@@ -22,6 +23,7 @@ import FollowListTab from '@/components/profile/FollowListTab.vue'
 import { ref, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import api from '@/api/backend-api'
+import Footer from '@/components/footer/Footer.vue'
 
 interface User {
    id: string

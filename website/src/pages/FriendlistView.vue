@@ -29,6 +29,7 @@
       </div>
     </template>
   </div>
+  <Footer />
 </template>
 
 <script setup lang="ts">
@@ -37,6 +38,7 @@ import Navbar from '@/components/Navbar.vue';
 import FriendSearchBar from '@/components/friends/FriendSearchBar.vue';
 import FriendCard from '@/components/friends/FriendCard.vue';
 import backendApi from '@/api/backend-api';
+import Footer from '@/components/footer/Footer.vue'
 
 interface User {
   id: string;

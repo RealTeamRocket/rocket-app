@@ -18,6 +18,7 @@
       <HomeGuest />
     </div>
   </div>
+  <Footer />
 </template>
 
 <script setup lang="ts">
@@ -29,6 +30,7 @@ import HomeGuest from '@/components/dashboard/HomeGuest.vue'
 import ActivityPanel from '@/components/dashboard/ActivityPanel.vue'
 import { useAuth } from '@/utils/useAuth'
 import api from '@/api/backend-api'
+import Footer from '@/components/footer/Footer.vue'
 
 type StepStatistic = {
   day: string
