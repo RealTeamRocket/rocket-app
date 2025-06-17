@@ -181,11 +181,19 @@ onBeforeUnmount(() => {
   font-size: 1rem;
   padding: 0.25rem 0.5rem;
   transition: color 0.2s;
+  border-bottom: 2.5px solid transparent;
 }
 
 .nav-link:hover {
   color: #fff;
   text-decoration: underline;
+}
+
+.router-link-exact-active.nav-link,
+.router-link-active.nav-link {
+  color: #fff;
+  border-bottom: 2.5px solid #ffb347;
+  text-decoration: none;
 }
 
 .user-info {

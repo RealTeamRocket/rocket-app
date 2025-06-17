@@ -9,6 +9,7 @@ import (
 	"github.com/google/uuid"
 	_ "github.com/jackc/pgx/v5/stdlib"
 	_ "github.com/joho/godotenv/autoload"
+	"golang.org/x/crypto/bcrypt"
 )
 
 func (s *service) SaveUserProfile(user types.User) error {
@@ -84,6 +85,72 @@ func (s *service) GetTopUsers(limit int) ([]types.User, error) {
 	return users, nil
 }
 
+// UpdateUserName updates the username for a given user UUID.
+func (s *service) UpdateUserName(userID uuid.UUID, newName string) error {
+	query := `UPDATE users SET username = $2 WHERE id = $1`
+	_, err := s.db.Exec(query, userID, newName)
+	if err != nil {
+		return fmt.Errorf("%w: %v", custom_error.ErrFailedToUpdate, err)
+	}
+	return nil
+}
+
+// UpdateUserEmail updates the email for a given user UUID in both users and credentials tables.
+func (s *service) UpdateUserEmail(userID uuid.UUID, newEmail string) error {
+	tx, err := s.db.Begin()
+	if err != nil {
+		return fmt.Errorf("failed to begin transaction: %w", err)
+	}
+	defer tx.Rollback()
+
+	// Update in users table
+	queryUsers := `UPDATE users SET email = $2 WHERE id = $1`
+	if _, err := tx.Exec(queryUsers, userID, newEmail); err != nil {
+		return fmt.Errorf("%w: %v", custom_error.ErrFailedToUpdate, err)
+	}
+
+	// Update in credentials table
+	queryCreds := `UPDATE credentials SET email = $2 WHERE id = $1`
+	if _, err := tx.Exec(queryCreds, userID, newEmail); err != nil {
+		return fmt.Errorf("%w: %v", custom_error.ErrFailedToUpdate, err)
+	}
+
+	if err := tx.Commit(); err != nil {
+		return fmt.Errorf("failed to commit transaction: %w", err)
+	}
+	return nil
+}
+
+// CheckUserPassword checks if the provided password matches the user's current password using bcrypt.
+func (s *service) CheckUserPassword(userID uuid.UUID, currentPassword string) (bool, error) {
+	var hashedPassword string
+	query := `SELECT password FROM credentials WHERE id = $1`
+	err := s.db.QueryRow(query, userID).Scan(&hashedPassword)
+	if err != nil {
+		return false, fmt.Errorf("%w: %v", custom_error.ErrFailedToRetrieveData, err)
+	}
+	// Use bcrypt for password verification
+	if err := bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(currentPassword)); err != nil {
+		return false, nil
+	}
+	return true, nil
+}
+
+// UpdateUserPassword updates the user's password in the credentials table using bcrypt.
+func (s *service) UpdateUserPassword(userID uuid.UUID, newPassword string) error {
+	// Hash the new password using bcrypt
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(newPassword), bcrypt.DefaultCost)
+	if err != nil {
+		return fmt.Errorf("failed to hash new password: %w", err)
+	}
+	query := `UPDATE credentials SET password = $2 WHERE id = $1`
+	_, err = s.db.Exec(query, userID, string(hashedPassword))
+	if err != nil {
+		return fmt.Errorf("%w: %v", custom_error.ErrFailedToUpdate, err)
+	}
+	return nil
+}
+
 func (s *service) GetAllUsers(excludeUserID *uuid.UUID) ([]types.User, error) {
 	var users []types.User
 	var rows *sql.Rows
@@ -115,4 +182,22 @@ func (s *service) GetAllUsers(excludeUserID *uuid.UUID) ([]types.User, error) {
 	}
 
 	return users, nil
+}
+
+func (s *service) DeleteUser(userID uuid.UUID) error {
+	// First, delete from users (this will cascade to all dependent tables)
+	query := `DELETE FROM users WHERE id = $1`
+	_, err := s.db.Exec(query, userID)
+	if err != nil {
+		return fmt.Errorf("%w: %v", custom_error.ErrFailedToDelete, err)
+	}
+
+	// Then, delete from credentials (since users references credentials, not the other way around)
+	credQuery := `DELETE FROM credentials WHERE id = $1`
+	_, credErr := s.db.Exec(credQuery, userID)
+	if credErr != nil {
+		return fmt.Errorf("%w: %v", custom_error.ErrFailedToDelete, credErr)
+	}
+
+	return nil
 }

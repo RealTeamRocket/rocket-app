@@ -24,8 +24,23 @@
           class="chat-username me-2"
           :style="{ color: getColor(username) }"
         >{{ username }}</span>
-        <span class="chat-message-text">{{ message }}</span>
+        <span
+          class="chat-message-text"
+          v-html="linkify(message)"
+        ></span>
         <span class="chat-message-time ms-2">{{ formatTime(timestamp) }}</span>
+      </div>
+      <!-- YouTube preview -->
+      <div v-if="youtubeId" class="youtube-preview mt-2 d-flex justify-content-center">
+        <iframe
+          title="youtube link"
+          :src="`https://www.youtube.com/embed/${youtubeId}`"
+          width="320"
+          height="180"
+          frameborder="0"
+          allowfullscreen
+          style="border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.10);"
+        ></iframe>
       </div>
     </div>
   </div>
@@ -33,6 +48,7 @@
 
 <script setup lang="ts">
 import { getColor } from '@/utils/userUtils'
+import { computed } from 'vue'
 
 const props = defineProps<{
   username: string
@@ -56,6 +72,37 @@ function handleReaction() {
     props.onReact()
   }
 }
+
+function extractYouTubeId(url: string): string | null {
+  // Handles both youtu.be and youtube.com/watch?v= links
+  const match = url.match(
+    /(?:youtube\.com\/watch\?v=|youtu\.be\/)([A-Za-z0-9_-]{11})/
+  )
+  return match ? match[1] : null
+}
+
+const youtubeId = computed(() => {
+  const urlMatch = props.message.match(
+    /(https?:\/\/(?:www\.)?(?:youtube\.com\/watch\?v=|youtu\.be\/)[A-Za-z0-9_-]{11})/
+  )
+  if (urlMatch) {
+    return extractYouTubeId(urlMatch[0])
+  }
+  return null
+})
+
+// Replace URLs in message with clickable links (except YouTube, which gets preview)
+function linkify(text: string) {
+  const ytRegex = /(https?:\/\/(?:www\.)?(?:youtube\.com\/watch\?v=|youtu\.be\/)[A-Za-z0-9_-]{11})/
+  if (ytRegex.test(text)) {
+    text = text.replace(ytRegex, '')
+  }
+  // Linkify other URLs
+  return text.replace(
+    /(https?:\/\/[^\s]+)/g,
+    '<a href="$1" target="_blank" rel="noopener noreferrer">$1</a>'
+  )
+}
 </script>
 
 <style scoped>
@@ -66,6 +113,32 @@ function handleReaction() {
   padding-bottom: 0.3rem;
   font-size: 0.97rem;
   border-radius: 1.1em 1.1em 1.1em 0.3em;
+}
+
+.youtube-preview {
+  width: 100%;
+  margin-top: 0.5em;
+  margin-bottom: 0.2em;
+  display: flex;
+  justify-content: center;
+}
+.youtube-preview iframe {
+  max-width: 100%;
+  border: none;
+  background: #000;
+}
+.chat-message-text a {
+  text-decoration: underline;
+  word-break: break-all;
+  transition: color 0.2s;
+}
+
+:deep(.chat-message-text a){
+  color: #ffffff !important;
+}
+:deep(.chat-message-text a:hover) {
+  color: #ffd600 !important;
+  background: transparent;
 }
 
 .reaction-badge {

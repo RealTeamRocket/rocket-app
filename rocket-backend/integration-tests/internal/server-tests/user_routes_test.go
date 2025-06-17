@@ -118,4 +118,26 @@ var _ = Describe("Protected Handlers API", func() {
 		_ = json.NewDecoder(resp.Body).Decode(&users)
 		Expect(users).To(BeNil())
 	})
+
+	It("should delete the user account", func() {
+		delToken := registerAndLogin("deleteuser@example.com", "password123", "deleteuser")
+
+		req, _ := http.NewRequest("DELETE", baseURL+"/protected/user", nil)
+		req.Header.Set("Authorization", "Bearer "+delToken)
+		resp, err := http.DefaultClient.Do(req)
+		Expect(err).To(BeNil())
+		defer resp.Body.Close()
+		Expect(resp.StatusCode).To(Equal(200))
+		var result map[string]any
+		_ = json.NewDecoder(resp.Body).Decode(&result)
+		Expect(result["message"]).To(Equal("User deleted successfully"))
+
+		// Try to access a protected endpoint with the same token, should be unauthorized
+		req2, _ := http.NewRequest("GET", baseURL+"/protected/user", nil)
+		req2.Header.Set("Authorization", "Bearer "+delToken)
+		resp2, err := http.DefaultClient.Do(req2)
+		Expect(err).To(BeNil())
+		defer resp2.Body.Close()
+		Expect(resp2.StatusCode).To(Equal(401))
+	})
 })

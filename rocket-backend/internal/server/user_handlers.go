@@ -263,3 +263,29 @@ func (s *Server) GetUserByNameHandler(c *gin.Context) {
 
 	c.JSON(http.StatusOK, userWithImage)
 }
+
+func (s *Server) DeleteUserHandler(c *gin.Context) {
+	userID, exists := c.Get("userID")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "User not authenticated"})
+		return
+	}
+
+	userUUID, err := uuid.Parse(userID.(string))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid user ID format"})
+		return
+	}
+
+	err = s.db.DeleteUser(userUUID)
+	if err != nil {
+		if errors.Is(err, custom_error.ErrUserNotFound) {
+			c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
+		} else {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete user"})
+		}
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "User deleted successfully"})
+}

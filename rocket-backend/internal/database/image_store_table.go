@@ -56,3 +56,39 @@ func (s *service) GetUserImage(userID uuid.UUID) (*types.UserImage, error) {
 
 	return &img, nil
 }
+
+func (s *service) DeleteUserImage(userID uuid.UUID) error {
+	var imageID uuid.UUID
+	err := s.db.QueryRow(`
+		SELECT image_id FROM settings WHERE user_id = $1
+	`, userID).Scan(&imageID)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			logger.Warn("No settings found for user:", userID)
+			return nil
+		}
+		logger.Error("Failed to get image_id from settings", err)
+		return fmt.Errorf("%w: %v", custom_error.ErrFailedToRetrieveData, err)
+	}
+	if imageID == uuid.Nil {
+		return nil
+	}
+
+	_, err = s.db.Exec(`
+		UPDATE settings SET image_id = NULL WHERE user_id = $1
+	`, userID)
+	if err != nil {
+		logger.Error("Failed to remove image reference from settings", err)
+		return fmt.Errorf("%w: %v", custom_error.ErrFailedToDelete, err)
+	}
+
+	_, err = s.db.Exec(`
+		DELETE FROM image_store WHERE id = $1
+	`, imageID)
+	if err != nil {
+		logger.Error("Failed to delete image", err)
+		return fmt.Errorf("%w: %v", custom_error.ErrFailedToDelete, err)
+	}
+
+	return nil
+}

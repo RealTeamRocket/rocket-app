@@ -27,17 +27,25 @@
         />
       </div>
     </div>
+    <NotificationModal
+      :open="notification.open"
+      :message="notification.message"
+      :type="notification.type"
+      :autoClose="notification.autoClose"
+      @close="notification.open = false"
+    />
   </div>
 </template>
 <script setup lang="ts">
 import Podium from '@/components/highscore/Podium.vue'
 import ToggleSwitch from '@/components/highscore/ToggleSwitch.vue'
 import Navbar from '@/components/Navbar.vue'
-import {ref, onMounted, computed} from 'vue'
+import {ref, onMounted, computed, reactive} from 'vue'
 import api from '@/api/backend-api'
 import List from "@/components/highscore/List.vue";
 import ProfileCard from '@/components/highscore/ProfileCard.vue'
 import Rocket from '@/components/highscore/Rocket.vue'
+import NotificationModal from '@/components/modals/NotificationModal.vue'
 
 interface RankedUser {
   id: string
@@ -83,7 +91,6 @@ const loadRanking = async () => {
     )
 
 
-    console.log(rankedUsers.value)
   } catch {
     console.error("Error fetching ranking")
   }
@@ -107,14 +114,37 @@ function goToProfileFromDialog(username: string) {
   router.push(`/profile/${encodeURIComponent(username)}`)
 }
 
+const notification = reactive({
+  open: false,
+  message: '',
+  type: 'info' as 'success' | 'error' | 'info',
+  autoClose: 2200,
+})
+
+function showNotification(message: string, type: 'success' | 'error' | 'info' = 'info', autoClose = 2200) {
+  notification.message = message
+  notification.type = type
+  notification.open = true
+  notification.autoClose = autoClose
+}
+
 function addFriend(friendName: string) {
   api.addFriend(friendName)
       .then(() => {
-        alert('Freund hinzugefügt!')
+        showNotification('Freund hinzugefügt!', 'success')
+        rankedUsers.value = rankedUsers.value.map(u =>
+          u.username === friendName ? { ...u, isFriend: true } : u
+        )
+        rankedFriends.value = rankedFriends.value.map(u =>
+          u.username === friendName ? { ...u, isFriend: true } : u
+        )
+        if (showProfileDialog.value && selectedProfile.value && selectedProfile.value.username === friendName) {
+          selectedProfile.value = { ...selectedProfile.value, isFriend: true }
+        }
         loadRanking()
       })
       .catch((err) => {
-        alert('Fehler beim Hinzufügen: ' + (err.response?.data?.message || err.message))
+        showNotification('Fehler beim Hinzufügen: ' + (err.response?.data?.message || err.message), 'error')
       })
 }
 
@@ -138,7 +168,7 @@ function closeProfile() {
 .highscore-bg {
   min-height: 100vh;
   width: 100vw;
-  background: linear-gradient(120deg, #e0e7ff 0%, #f8fafc 100%);
+  /* background: linear-gradient(120deg, #e0e7ff 0%, #f8fafc 100%); */
   display: flex;
   justify-content: center;
   align-items: flex-start;
