@@ -10,13 +10,13 @@
       </div>
       <div class="footer-section footer-legal">
         <span class="footer-title">Legal</span>
-        <a href="/legal-notice" target="_blank" rel="noopener">Legal Notice</a>
-        <a href="/privacy-policy" target="_blank" rel="noopener">Privacy Policy</a>
-        <a href="/accessibility" target="_blank" rel="noopener">Accessibility</a>
+        <router-link to="/legal-notice">Legal Notice</router-link>
+        <router-link to="/privacy-policy">Privacy Policy</router-link>
+        <router-link to="/accessibility">Accessibility</router-link>
       </div>
       <div class="footer-section footer-contact">
         <span class="footer-title">Contact</span>
-        <a href="mailto:info@hft-stuttgart.de">info@hft-stuttgart.de</a>
+        <a href="mailto:info@hft-stuttgart.de" id="footer-email">info@hft-stuttgart.de</a>
         <a href="https://www.instagram.com/hft_stuttgart/" target="_blank" rel="noopener" aria-label="Instagram" class="footer-instagram">
             <i class="fab fa-instagram" style="font-size: 1.3em;"></i>
         </a>
@@ -73,7 +73,7 @@
   font-size: 1em;
 }
 
-.footer-legal a:hover {
+.footer-legal a:hover, #footer-email:hover {
   color: #ffd580; 
   text-decoration: underline;
 }
