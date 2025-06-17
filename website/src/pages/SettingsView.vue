@@ -5,7 +5,16 @@
     <div class="settings-card">
       <!-- Profile Image Section -->
       <div class="profile-section">
-        <img :src="userImage" alt="Profile" class="profile-img" />
+        <span v-if="userImage && userImage !== 'https://via.placeholder.com/120'" class="profile-img">
+          <img :src="userImage" alt="Profile" class="profile-img" />
+        </span>
+        <span
+          v-else
+          class="profile-img profile-initials"
+          :style="{ backgroundColor: userColor }"
+        >
+          {{ userInitials }}
+        </span>
         <div class="profile-actions">
           <input type="file" ref="fileInput" @change="onImageSelected" accept="image/*" hidden />
           <button @click="triggerFileInput">Upload New Image</button>
@@ -75,12 +84,13 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted } from 'vue'
+import { ref, reactive, onMounted, computed } from 'vue'
 import Navbar from '@/components/Navbar.vue'
 import api from '@/api/backend-api'
 import { useRouter } from 'vue-router'
 import ConfirmDialog from '@/components/modals/ConfirmDialog.vue'
 import NotificationModal from '@/components/modals/NotificationModal.vue'
+import { getColor, getInitials } from '@/utils/userUtils'
 
 
 const router = useRouter()
@@ -91,6 +101,13 @@ const email = ref('')
 const password = ref('')
 const dailyGoal = ref(10000)
 const fileInput = ref<HTMLInputElement | null>(null)
+
+const userColor = computed(() => {
+  return getColor(name.value || 'User')
+})
+const userInitials = computed(() => {
+  return getInitials(name.value || 'User')
+})
 
 const showDeleteImageConfirm = ref(false)
 const showDeleteAccountConfirm = ref(false)
@@ -134,11 +151,13 @@ async function onImageSelected(event: Event) {
 
 
 async function deleteImage() {
+  showDeleteImageConfirm.value = false
   try {
     await api.deleteImage()
     userImage.value = 'https://via.placeholder.com/120'
+    showNotification('Profile image deleted.', 'success')
   } catch (error) {
-    alert('Failed to delete image')
+    showNotification('Failed to delete image', 'error')
   }
 }
 
@@ -160,9 +179,9 @@ async function updateUserInfo() {
 async function updateGoal() {
   try {
     await api.updateStepGoal(dailyGoal.value)
-    alert('Daily goal updated')
+    showNotification('Daily goal updated', 'success')
   } catch (error) {
-    alert('Failed to update daily goal')
+    showNotification('Failed to update daily goal', 'error')
   }
 }
 
@@ -240,6 +259,19 @@ onMounted(async () => {
   height: 120px;
   border-radius: 50%;
   object-fit: cover;
+  border: 2px solid #eee;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #fff;
+  background: #2a5298;
+  user-select: none;
+  overflow: hidden;
+}
+.profile-initials {
+  object-fit: none;
   border: 2px solid #eee;
 }
 .profile-actions {
