@@ -147,8 +147,6 @@ func (s *Server) DeleteImageHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "Image deleted successfully"})
 }
 
-// UpdateUserInfoHandler allows updating name, email, or password separately.
-// For password change, requires currentPassword and newPassword in the request.
 func (s *Server) UpdateUserInfoHandler(c *gin.Context) {
 	userID, exists := c.Get("userID")
 	if !exists {
