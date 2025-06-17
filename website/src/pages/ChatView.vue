@@ -29,10 +29,10 @@ onMounted(async () => {
 
 <style scoped>
 .chatview-wrapper {
-  min-height: 100vh;
+  min-height:  90vh;
   width: 100vw;
   padding: 0;
   margin: 0;
-  background: #f5f7fa;
+  /* background: #f5f7fa; */
 }
 </style>

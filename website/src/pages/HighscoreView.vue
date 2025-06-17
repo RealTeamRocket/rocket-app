@@ -168,7 +168,7 @@ function closeProfile() {
 .highscore-bg {
   min-height: 100vh;
   width: 100vw;
-  background: linear-gradient(120deg, #e0e7ff 0%, #f8fafc 100%);
+  /* background: linear-gradient(120deg, #e0e7ff 0%, #f8fafc 100%); */
   display: flex;
   justify-content: center;
   align-items: flex-start;
