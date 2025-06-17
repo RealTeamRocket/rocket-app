@@ -42,6 +42,11 @@ type Service interface {
 	GetUserIDByName(name string) (uuid.UUID, error)
 	GetTopUsers(limit int) ([]types.User, error)
 	GetAllUsers(excludeUserID *uuid.UUID) ([]types.User, error)
+	DeleteUser(userID uuid.UUID) error
+	UpdateUserName(userID uuid.UUID, newName string) error
+	UpdateUserEmail(userID uuid.UUID, newEmail string) error
+	CheckUserPassword(userID uuid.UUID, currentPassword string) (bool, error)
+	UpdateUserPassword(userID uuid.UUID, newPassword string) error
 
 	// daily_steps
 	UpdateDailySteps(userID uuid.UUID, steps int) error
@@ -55,6 +60,7 @@ type Service interface {
 	UpdateSettingsImage(userId uuid.UUID, imageID uuid.UUID) error
 	UpdateStepGoal(userId uuid.UUID, stepGoal int) error
 	UpdateImage(userId uuid.UUID, imageID uuid.UUID) error
+	DeleteUserImage(userID uuid.UUID) error
 
 	// images
 	SaveImage(filename string, data []byte) (uuid.UUID, error)

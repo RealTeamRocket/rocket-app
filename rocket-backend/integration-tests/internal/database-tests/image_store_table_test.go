@@ -4,9 +4,9 @@ import (
 	"bytes"
 	"time"
 
+	"github.com/google/uuid"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
-	"github.com/google/uuid"
 )
 
 var _ = Describe("Image Store Table Integration", func() {
@@ -90,6 +90,63 @@ var _ = Describe("Image Store Table Integration", func() {
 		var gotName string
 		var gotData []byte
 		err := row.Scan(&gotID, &gotName, &gotData)
+		Expect(err).ToNot(BeNil())
+	})
+
+	It("should save and delete a user image", func() {
+		imageID := uuid.New()
+		imgName := "todelete.png"
+		imgData := []byte{0x89, 0x50, 0x4E, 0x47}
+
+		_, err := testDbInstance.Exec(`
+			INSERT INTO image_store (id, image_name, image_data)
+			VALUES ($1, $2, $3)
+		`, imageID, imgName, imgData)
+		Expect(err).To(BeNil())
+
+		// Link image to user in settings
+		_, err = testDbInstance.Exec(`
+			UPDATE settings SET image_id = $1 WHERE user_id = $2
+		`, imageID, userID)
+		Expect(err).To(BeNil())
+
+		// Delete user image
+		_, err = testDbInstance.Exec(`
+			UPDATE settings SET image_id = NULL WHERE user_id = $1
+		`, userID)
+		Expect(err).To(BeNil())
+		_, err = testDbInstance.Exec(`
+			DELETE FROM image_store WHERE id = $1
+		`, imageID)
+		Expect(err).To(BeNil())
+
+		// Confirm deletion
+		row := testDbInstance.QueryRow(`
+			SELECT COUNT(*) FROM image_store WHERE id = $1
+		`, imageID)
+		var count int
+		err = row.Scan(&count)
+		Expect(err).To(BeNil())
+		Expect(count).To(Equal(0))
+	})
+
+	It("should return error when getting image for user with no image", func() {
+		// Remove image_id from settings if present
+		_, err := testDbInstance.Exec(`
+			UPDATE settings SET image_id = NULL WHERE user_id = $1
+		`, userID)
+		Expect(err).To(BeNil())
+
+		row := testDbInstance.QueryRow(`
+			SELECT i.id, i.image_name, i.image_data
+			FROM settings s
+			JOIN image_store i ON s.image_id = i.id
+			WHERE s.user_id = $1
+		`, userID)
+		var gotID uuid.UUID
+		var gotName string
+		var gotData []byte
+		err = row.Scan(&gotID, &gotName, &gotData)
 		Expect(err).ToNot(BeNil())
 	})
 })

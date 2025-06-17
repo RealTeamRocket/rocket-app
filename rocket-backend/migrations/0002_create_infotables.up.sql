@@ -60,7 +60,7 @@ CREATE TABLE friends (
 CREATE TABLE runs (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid (),
     created_at TIMESTAMP DEFAULT now (),
-    user_id UUID NOT NULL REFERENCES users (id),
+    user_id UUID NOT NULL REFERENCES users (id) ON DELETE CASCADE,
     route GEOMETRY (LINESTRING, 4326),
     duration VARCHAR(16),
     distance REAL
@@ -92,7 +92,7 @@ CREATE TABLE chat_messages_reactions (
 CREATE TABLE planned_runs (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     created_at TIMESTAMP DEFAULT now(),
-    user_id UUID NOT NULL REFERENCES users(id),
+    user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     route GEOMETRY(LINESTRING, 4326),
     name VARCHAR(255) NOT NULL,
     distance REAL,
