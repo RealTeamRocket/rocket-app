@@ -1,24 +1,26 @@
 <template>
-  <Navbar />
-  <div class="dashboard-container">
-    <div v-if="isLoggedIn" class="dashboard-header">
-      <h1>Welcome back, Astronaut!</h1>
-      <p>Here’s your step dashboard. Ready to break your record?</p>
-    </div>
-    <div v-if="isLoggedIn" class="dashboard-main">
-      <div class="dashboard-left">
-        <StatsCards :stats="stats" />
-        <StepChart :data="chartData" :labels="chartLabels" />
+  <div class="page-wrapper">
+    <Navbar />
+    <div class="dashboard-container">
+      <div v-if="isLoggedIn" class="dashboard-header">
+        <h1>Welcome back, Astronaut!</h1>
+        <p>Here’s your step dashboard. Ready to break your record?</p>
       </div>
-      <div class="dashboard-right">
-        <ActivityPanel />
+      <div v-if="isLoggedIn" class="dashboard-main">
+        <div class="dashboard-left">
+          <StatsCards :stats="stats" />
+          <StepChart :data="chartData" :labels="chartLabels" />
+        </div>
+        <div class="dashboard-right">
+          <ActivityPanel />
+        </div>
+      </div>
+      <div v-else>
+        <HomeGuest />
       </div>
     </div>
-    <div v-else>
-      <HomeGuest />
-    </div>
+    <Footer />
   </div>
-  <Footer />
 </template>
 
 <script setup lang="ts">
@@ -85,10 +87,16 @@ watch(isLoggedIn, (val) => {
 </script>
 
 <style scoped>
+.page-wrapper {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
 .dashboard-container {
   max-width: 1200px;
   margin: 0 auto;
   padding: 2rem 1rem;
+  flex: 1;
 }
 .dashboard-header {
   text-align: center;
@@ -135,5 +143,8 @@ watch(isLoggedIn, (val) => {
   100% {
     opacity: 1;
   }
+}
+.footer {
+  margin-top: auto;
 }
 </style>
