@@ -337,7 +337,7 @@ const handleConfirmDelete = async () => {
 }
 .runs-view {
   display: flex;
-  height: 100vh;
+  height: 110vh;
 }
 .run-details {
   flex: 1;
