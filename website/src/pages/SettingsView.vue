@@ -78,8 +78,8 @@
       />
     </div>
   </div>
-  </div>
   <Footer />
+  </div>
 </template>
 
 <script setup lang="ts">
