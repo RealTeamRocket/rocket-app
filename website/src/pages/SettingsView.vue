@@ -1,4 +1,5 @@
 <template>
+  <div class="page-wrapper">
   <Navbar :key="navbarKey" />
   <div class="settings-tabbar-layout">
     <div class="settings-tabbar">
@@ -77,9 +78,12 @@
       />
     </div>
   </div>
+  <Footer />
+  </div>
 </template>
 
 <script setup lang="ts">
+import Footer from '@/components/footer/Footer.vue'
 import { ref, reactive, onMounted, computed } from 'vue'
 import Navbar from '@/components/Navbar.vue'
 import ProfileSettings from '@/components/settings/ProfileSettings.vue'
@@ -272,6 +276,7 @@ onMounted(async () => {
     // Ignore errors for optional fetches
   }
 })
+
 </script>
 
 <style scoped>
@@ -401,5 +406,13 @@ button.logout:hover {
 }
 .fade-enter-from, .fade-leave-to {
   opacity: 0;
+}
+.footer {
+  margin-top: auto;
+}
+.page-wrapper {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
 }
 </style>

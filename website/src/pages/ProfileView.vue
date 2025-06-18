@@ -1,16 +1,19 @@
 <template>
-  <Navbar />
-  <div class="profile-page">
-    <TabBar :tabs="tabs" v-model="activeTab" />
-    <div v-if="activeTab === 'Profile'">
-      <ProfileTab :user="user" />
+  <div class="page-wrapper">
+    <Navbar />
+    <div class="profile-page">
+      <TabBar :tabs="tabs" v-model="activeTab" />
+      <div v-if="activeTab === 'Profile'">
+        <ProfileTab :user="user" />
+      </div>
+      <div v-else-if="activeTab === 'Followers'">
+        <FollowListTab :users="followedUsers" title="Followers" />
+      </div>
+      <div v-else-if="activeTab === 'Following'">
+        <FollowListTab :users="followingUsers" title="Following" />
+      </div>
     </div>
-    <div v-else-if="activeTab === 'Followers'">
-      <FollowListTab :users="followedUsers" title="Followers" />
-    </div>
-    <div v-else-if="activeTab === 'Following'">
-      <FollowListTab :users="followingUsers" title="Following" />
-    </div>
+    <Footer />
   </div>
 </template>
 
@@ -22,6 +25,7 @@ import FollowListTab from '@/components/profile/FollowListTab.vue'
 import { ref, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import api from '@/api/backend-api'
+import Footer from '@/components/footer/Footer.vue'
 
 interface User {
    id: string
@@ -83,7 +87,16 @@ watch(
 </script>
 
 <style scoped>
+.page-wrapper {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
 .profile-page {
+  flex: 1;
   padding: 2rem;
+}
+.footer {
+  margin-top: auto;
 }
 </style>

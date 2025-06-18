@@ -11,6 +11,9 @@ import ProfileView from '@/pages/ProfileView.vue'
 import SettingsView from '@/pages/SettingsView.vue'
 import NotFoundView from '@/pages/NotFound.vue'
 import DownloadView from '@/pages/DownloadView.vue'
+import LegalNoticeView from '@/pages/LegalNoticeView.vue'
+import PrivacyPolicyView from '@/pages/PrivacyPolicyView.vue'
+import AccessibilityView from '@/pages/AccessibilityView.vue'
 import { useAuth } from '@/utils/useAuth'
 
 const routes = [
@@ -25,6 +28,9 @@ const routes = [
   { path: '/download', component: DownloadView },
   { path: '/settings', component: SettingsView },
   { path: '/profile/:username', component: ProfileView, props: true },
+  { path: '/legal-notice', component: LegalNoticeView },
+  { path: '/privacy-policy', component: PrivacyPolicyView },
+  { path: '/accessibility', component: AccessibilityView },
   { path: '/:pathMatch(.*)*', component: NotFoundView } // Catch-all for 404
 ]
 

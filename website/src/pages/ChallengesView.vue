@@ -1,16 +1,19 @@
 <template>
-  <Navbar />
-  <div class="challenges-view">
-    <h1>Challenges</h1>
-    <ChallengeList :challenges="challenges"
-      @complete="handleCompleteChallenge"
+  <div class="page-wrapper">
+    <Navbar />
+    <div class="challenges-view">
+      <h1>Challenges</h1>
+      <ChallengeList :challenges="challenges"
+        @complete="handleCompleteChallenge"
       @invite="handleInvite"/>
     <FriendInvitePopup
       v-if="showInvitePopup"
       :challenge-id="inviteChallengeId!"
-      @close="showInvitePopup = false"/>
+      @close="showInvitePopup = false"/> 
   </div>
+  <Footer />
   <DailyChallengeProgress :completed="completedCount" :total="totalCount" />
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -20,6 +23,7 @@ import ChallengeList from '@/components/challenges/ChallengeList.vue';
 import DailyChallengeProgress from '@/components/challenges/DailyChallengeProgress.vue';
 import FriendInvitePopup from '@/components/challenges/FriendInvitePopup.vue';
 import backendApi from '@/api/backend-api';
+import Footer from '@/components/footer/Footer.vue'
 
 const challenges = ref<{ id: string; text: string; points: number }[]>([]);
 const completedCount = ref(0);
@@ -76,10 +80,23 @@ onMounted(async () => {
 </script>
 
 <style scoped>
+.page-wrapper {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  /* Make space for the fixed progress bar */
+  padding-bottom: 3.5rem;
+}
 .challenges-view {
+  flex: 1;
   padding: 2rem;
 }
 .challenges-view h1 {
   text-align: center;
+}
+.footer {
+  margin-top: auto;
+  /* Add extra bottom padding so it's scrollable above the progress bar */
+  padding-bottom: 2.5rem;
 }
 </style>

@@ -35,6 +35,7 @@
       @close="notification.open = false"
     />
   </div>
+  <Footer />
 </template>
 <script setup lang="ts">
 import Podium from '@/components/highscore/Podium.vue'
@@ -46,6 +47,7 @@ import List from "@/components/highscore/List.vue";
 import ProfileCard from '@/components/highscore/ProfileCard.vue'
 import Rocket from '@/components/highscore/Rocket.vue'
 import NotificationModal from '@/components/modals/NotificationModal.vue'
+import Footer from '@/components/footer/Footer.vue'
 
 interface RankedUser {
   id: string
