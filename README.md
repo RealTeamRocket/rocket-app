@@ -3,3 +3,6 @@
 
 ## Architecture
 ![Architecture](./docs/Architecture.png)
+
+## ER-Model
+![ER](./docs/RocketERLight.png)
