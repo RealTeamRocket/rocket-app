@@ -2,7 +2,7 @@
 
 
 ## Architecture
-![Architecture](./docs/Architecture.png)
+![Architecture](./docs/images/Architecture.png)
 
 ## ER-Model
-![ER](./docs/RocketERLight.png)
+![ER](./docs/images/RocketERLight.png)
