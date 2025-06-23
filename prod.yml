@@ -68,7 +68,7 @@ services:
     image: nginx:1.27-alpine
     volumes:
       - ./nginx-reverse.conf:/etc/nginx/nginx.conf:ro
-      - ./lets-encrypt:/etc/letsencrypt:ro
+      - /etc/lets-encrypt:/etc/letsencrypt:ro
     ports:
       - "443:443"
       # - "8088:80"
