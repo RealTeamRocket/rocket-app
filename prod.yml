@@ -17,15 +17,11 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
-    ports:
-      - "8081:8080"
     networks:
       - blueprint
 
   frontend:
     image: zephiron/rocket-website:latest
-    ports:
-      - "8080:80"
     depends_on:
       - backend
     networks:
@@ -71,7 +67,7 @@ services:
       - /etc/letsencrypt:/etc/letsencrypt:ro
     ports:
       - "443:443"
-      # - "8088:80"
+      - "80:80"
     depends_on:
       - frontend
       - backend
