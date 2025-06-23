@@ -3,7 +3,12 @@
     <h2 class="panel-title">Activity Feed</h2>
     <ul class="activity-list">
       <li v-for="(activity, idx) in activities" :key="idx" class="activity-item" :class="{ 'user-activity': activity.isUser }">
-        <span v-if="activity.image_data" class="avatar avatar-img">
+        <span
+          v-if="activity.image_data"
+          class="avatar avatar-img"
+          @click.stop="openImageModal(activity)"
+          style="cursor:pointer;"
+        >
           <img
             :src="`data:${activity.image_type || 'image/jpeg'};base64,${activity.image_data}`"
             alt="User"
@@ -14,19 +19,33 @@
           <span>{{ activity.initials }}</span>
         </div>
         <div class="activity-content">
-          <span class="name">{{ activity.name }}</span>
+          <span
+            class="name clickable"
+            @click.stop="goToProfile(activity.name)"
+            style="cursor:pointer;"
+          >{{ activity.name }}</span>
           <span class="desc">{{ activity.description }}</span>
           <span class="time">{{ activity.time }}</span>
         </div>
       </li>
     </ul>
+    <!-- Image Popup Modal -->
+    <ImageModal
+      v-if="showImageModal"
+      :show="showImageModal"
+      :src="modalImageSrc"
+      alt="Profile Full"
+      @close="showImageModal = false"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref } from 'vue'
+import { useRouter } from 'vue-router'
 import api from '@/api/backend-api'
 import { getColor, getInitials } from '@/utils/userUtils'
+import ImageModal from '@/components/modals/ImageModal.vue'
 
 interface Activity {
   name: string
@@ -53,6 +72,27 @@ function formatRelativeTime(iso: string): string {
 
 const activities = ref<Activity[]>([])
 
+const showImageModal = ref(false)
+const modalImageSrc = ref<string | undefined>(undefined)
+const router = useRouter()
+
+const goToProfile = (username: string) => {
+  // Route to the user's profile page
+  router.push(`/profile/${username}`)
+}
+
+const getUserImage = (image_data: string | null | undefined, image_type?: string) => {
+  return image_data ? `data:${image_type || 'image/jpeg'};base64,${image_data}` : undefined
+}
+
+const openImageModal = (activity: { image_data?: string | null, image_type?: string }) => {
+  if (activity.image_data) {
+    modalImageSrc.value = getUserImage(activity.image_data, activity.image_type)
+    showImageModal.value = true
+  }
+}
+
+import { onMounted } from 'vue'
 onMounted(async () => {
   try {
     const { username, activities: backendActivities } = (await api.getActivityFeed()).data
@@ -113,7 +153,6 @@ onMounted(async () => {
   border-bottom: 1px solid #f4f8fb;
   transition: background 0.2s, box-shadow 0.2s;
   border-radius: 10px;
-  cursor: pointer;
 }
 
 .activity-item:hover {
@@ -178,5 +217,9 @@ onMounted(async () => {
 .time {
   color: #b0b8c9;
   font-size: 0.85rem;
+}
+.username.clickable {
+  text-decoration: underline;
+  color: #1e3c72;
 }
 </style>
