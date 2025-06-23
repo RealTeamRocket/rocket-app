@@ -63,11 +63,11 @@ services:
   reverse-proxy:
     image: nginx:1.27-alpine
     volumes:
-      - ./nginx-reverse.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx-reverse.conf:/etc/nginx/conf.d/default.conf:ro
       - /etc/letsencrypt:/etc/letsencrypt:ro
     ports:
-      - "443:443"
       - "80:80"
+      - "443:443"
     depends_on:
       - frontend
       - backend
