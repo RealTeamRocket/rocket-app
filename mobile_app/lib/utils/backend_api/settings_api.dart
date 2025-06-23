@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
-
-
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:http/http.dart' as http;
 import 'base_api.dart';
 
 class SettingsResponse {
@@ -59,15 +59,21 @@ class SettingsApi {
   }
 
   static Future<void> updateImage(String jwt, File imageFile) async {
-    final response = await BaseApi.postMultipart(
-      '/api/v1/protected/settings/image',
-      headers: {'Authorization': 'Bearer $jwt'},
-      file: imageFile,
-      fileFieldName: 'image',
-    );
+    final String backendUrl = dotenv.get('BACKEND_URL', fallback: "http://10.0.2.2:8080");
+    final uri = Uri.parse('$backendUrl/v1/protected/settings/image');
+    String apiKey = dotenv.get('API_KEY', fallback: "default-api-key");
+    final request = http.MultipartRequest('POST', uri)
+      ..headers['Authorization'] = 'Bearer $jwt'
+      ..headers['X-API-KEY'] = apiKey
+      ..files.add(await http.MultipartFile.fromPath('image', imageFile.path));
+
+    final streamedResponse = await request.send();
+    final response = await http.Response.fromStream(streamedResponse);
 
     if (response.statusCode != 200) {
-      throw Exception('Failed to update image');
+      print('Upload fehlgeschlagen: ${response.statusCode}');
+      print('Fehlerantwort: ${response.body}');
+      throw Exception('Image upload failed');
     }
   }
 }
