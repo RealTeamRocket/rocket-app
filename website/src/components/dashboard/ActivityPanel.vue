@@ -73,7 +73,7 @@ function formatRelativeTime(iso: string): string {
 const activities = ref<Activity[]>([])
 
 const showImageModal = ref(false)
-const modalImageSrc = ref<string | undefined>(undefined)
+const modalImageSrc = ref<string>('') // always a string for ImageModal
 const router = useRouter()
 
 const goToProfile = (username: string) => {
@@ -87,7 +87,7 @@ const getUserImage = (image_data: string | null | undefined, image_type?: string
 
 const openImageModal = (activity: { image_data?: string | null, image_type?: string }) => {
   if (activity.image_data) {
-    modalImageSrc.value = getUserImage(activity.image_data, activity.image_type)
+    modalImageSrc.value = getUserImage(activity.image_data, activity.image_type) || ''
     showImageModal.value = true
   }
 }
