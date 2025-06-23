@@ -1,11 +1,10 @@
-name: Build and Push Docker Image
-
 on:
   push:
     branches:
       - master
     paths:
-      - 'rocket-backend/**'  
+      - 'rocket-backend/**'
+      - 'website/**'
   workflow_dispatch:
 
 jobs:
@@ -28,10 +27,19 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
 
-      # Build and Push Docker Image
-      - name: Build and Push Docker Image
+      # Build and Push Backend Image
+      - name: Build and Push Backend Image
         uses: docker/build-push-action@v4
         with:
           context: ./rocket-backend
           push: true
           tags: ${{ secrets.DOCKER_USERNAME }}/rocket-backend:latest
+
+      # Build and Push Website Image
+      - name: Build and Push Website Image
+        uses: docker/build-push-action@v4
+        with:
+          context: ./website
+          file: ./website/Dockerfile
+          push: true
+          tags: ${{ secrets.DOCKER_USERNAME }}/rocket-website:latest
