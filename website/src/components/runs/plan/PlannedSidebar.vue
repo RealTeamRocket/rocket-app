@@ -62,7 +62,9 @@ const formatDate = (dateStr: string) => {
 
 <style scoped>
 .run-sidebar {
-  width: 300px;
+  width: 340px;
+  min-width: 260px;
+  max-width: 100%;
   background: #f7f7f7;
   border-right: 1px solid #ddd;
   overflow-y: auto;
@@ -101,6 +103,8 @@ const formatDate = (dateStr: string) => {
   text-align: left;
   margin-top: 0.2rem;
   color: #222;
+  overflow-wrap: break-word;
+  word-break: break-word;
 }
 .run-name {
   font-size: 1.05rem;
@@ -125,6 +129,8 @@ const formatDate = (dateStr: string) => {
 .run-detail-value {
   color: #222;
   font-weight: 600;
+  overflow-wrap: break-word;
+  word-break: break-word;
 }
 .icon-svg {
   width: 1.15em;
@@ -135,6 +141,10 @@ const formatDate = (dateStr: string) => {
 }
 .run-detail-value.date {
   white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: block;
+  max-width: 100%;
   font-size: 0.97em;
 }
 </style>

@@ -11,20 +11,20 @@
         <div class="run-info">
           <div class="run-date">
             <span class="icon-calendar" title="Date">
-              <svg><use href="/src/assets/icons/calender.svg#icon" /></svg>
+              <img src="@/assets/icons/calender.svg" alt="Date" />
             </span>
             <span class="run-date-value">{{ formatDate(run.created_at) }}</span>
           </div>
           <div class="run-detail-row">
             <span class="icon-distance" title="Distance">
-              <svg><use href="/src/assets/icons/ruler.svg#icon" /></svg>
+              <img src="@/assets/icons/ruler.svg" alt="Distance" />
             </span>
             <span class="run-detail-label">Distance:</span>
             <span class="run-detail-value">{{ run.distance?.toFixed(2) ?? '?' }} km</span>
           </div>
           <div class="run-detail-row">
             <span class="icon-duration" title="Duration">
-              <svg><use href="/src/assets/icons/rocket.svg#icon" /></svg>
+              <img src="@/assets/icons/label.svg" alt="Duration" />
             </span>
             <span class="run-detail-label">Duration:</span>
             <span class="run-detail-value">{{ run.duration ?? '?' }}</span>
@@ -67,7 +67,9 @@ const formatDate = (dateStr: string) => {
 
 <style scoped>
 .run-sidebar {
-  width: 300px;
+  width: 340px;
+  min-width: 260px;
+  max-width: 100%;
   background: #f7f7f7;
   border-right: 1px solid #ddd;
   overflow-y: auto;
@@ -106,6 +108,8 @@ const formatDate = (dateStr: string) => {
   text-align: left;
   margin-top: 0.2rem;
   color: #222;
+  overflow-wrap: break-word;
+  word-break: break-word;
 }
 .run-date {
   font-size: 1.05rem;
@@ -118,6 +122,10 @@ const formatDate = (dateStr: string) => {
 }
 .run-date-value {
   white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: block;
+  max-width: 100%;
   font-size: 0.97em;
 }
 .run-detail-row {
@@ -134,6 +142,8 @@ const formatDate = (dateStr: string) => {
 .run-detail-value {
   color: #222;
   font-weight: 600;
+  overflow-wrap: break-word;
+  word-break: break-word;
 }
 .icon-calendar,
 .icon-distance,
@@ -145,9 +155,9 @@ const formatDate = (dateStr: string) => {
   height: 1.1em;
   vertical-align: middle;
 }
-.icon-calendar svg,
-.icon-distance svg,
-.icon-duration svg {
+.icon-calendar img,
+.icon-distance img,
+.icon-duration img {
   width: 1em;
   height: 1em;
   display: block;
