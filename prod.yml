@@ -1,0 +1,76 @@
+services:
+  backend:
+    build:
+      context: ./rocket-backend
+      dockerfile: Dockerfile
+      target: prod
+    restart: unless-stopped
+    environment:
+      APP_ENV: ${APP_ENV}
+      PORT: 8080
+      JWT_SECRET: ${JWT_SECRET}
+      API_KEY: ${API_KEY}
+      BLUEPRINT_DB_HOST: postgres
+      BLUEPRINT_DB_PORT: 5432
+      BLUEPRINT_DB_DATABASE: ${BLUEPRINT_DB_DATABASE}
+      BLUEPRINT_DB_USERNAME: ${BLUEPRINT_DB_USERNAME}
+      BLUEPRINT_DB_PASSWORD: ${BLUEPRINT_DB_PASSWORD}
+      BLUEPRINT_DB_SCHEMA: ${BLUEPRINT_DB_SCHEMA}
+      DATABASE_URL: postgres://${BLUEPRINT_DB_USERNAME}:${BLUEPRINT_DB_PASSWORD}@postgres:5432/${BLUEPRINT_DB_DATABASE}?sslmode=disable&search_path=${BLUEPRINT_DB_SCHEMA}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - blueprint
+
+  frontend:
+    build:
+      context: ./website
+      dockerfile: Dockerfile
+      target: deploy
+    restart: unless-stopped
+    ports:
+      - "8080:80"
+    depends_on:
+      - backend
+    networks:
+      - blueprint
+
+  postgres:
+    image: postgis/postgis:latest
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${BLUEPRINT_DB_DATABASE}
+      POSTGRES_USER: ${BLUEPRINT_DB_USERNAME}
+      POSTGRES_PASSWORD: ${BLUEPRINT_DB_PASSWORD}
+    ports:
+      - "${BLUEPRINT_DB_PORT:-5432}:5432"
+    volumes:
+      - psql_volume_bp:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${BLUEPRINT_DB_USERNAME} -d ${BLUEPRINT_DB_DATABASE}"]
+      interval: 5s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+    networks:
+      - blueprint
+
+  migrate:
+    image: migrate/migrate
+    networks:
+      - blueprint
+    volumes:
+      - ./rocket-backend/migrations:/migrations
+    entrypoint: ["/bin/sh", "-c"]
+    command: ["migrate -path /migrations -database postgres://${BLUEPRINT_DB_USERNAME}:${BLUEPRINT_DB_PASSWORD}@postgres:5432/${BLUEPRINT_DB_DATABASE}?sslmode=disable up"]
+    restart: on-failure
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+volumes:
+  psql_volume_bp:
+
+networks:
+  blueprint:
