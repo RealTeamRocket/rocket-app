@@ -70,7 +70,8 @@ services:
       - ./nginx-reverse.conf:/etc/nginx/nginx.conf:ro
       # - ./certs:/etc/nginx/certs:ro
     ports:
-      - "443:443"
+      # - "443:443"
+      - "8088:80"
     depends_on:
       - frontend
       - backend

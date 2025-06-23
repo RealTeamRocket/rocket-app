@@ -52,7 +52,7 @@ func (s *Server) LoginHandler(c *gin.Context) {
 		return
 	}
 
-	c.SetCookie("jwt_token", tokenString, 3600*72, "/", "", true, true)
+	c.SetCookie("jwt_token", tokenString, 3600*72, "/", "", false, true)
 	c.JSON(http.StatusOK, gin.H{"token": tokenString})
 }
 
