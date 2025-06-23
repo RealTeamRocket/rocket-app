@@ -21,7 +21,7 @@ services:
       - blueprint
 
   frontend:
-    image: zephiron/rocket-frontend:latest
+    image: zephiron/rocket-website:latest
     restart: unless-stopped
     ports:
       - "8080:80"
