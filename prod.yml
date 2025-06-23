@@ -1,9 +1,6 @@
 services:
   backend:
-    build:
-      context: ./rocket-backend
-      dockerfile: Dockerfile
-      target: prod
+    image: zephiron/rocket-backend:latest
     restart: unless-stopped
     environment:
       APP_ENV: ${APP_ENV}
@@ -24,10 +21,7 @@ services:
       - blueprint
 
   frontend:
-    build:
-      context: ./website
-      dockerfile: Dockerfile
-      target: deploy
+    image: zephiron/rocket-frontend:latest
     restart: unless-stopped
     ports:
       - "8080:80"
