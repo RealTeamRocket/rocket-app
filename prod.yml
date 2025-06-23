@@ -68,6 +68,7 @@ services:
     image: nginx:1.27-alpine
     volumes:
       - ./nginx-reverse.conf:/etc/nginx/nginx.conf:ro
+      # - ./certs:/etc/nginx/certs:ro
     ports:
       - "443:443"
     depends_on:
