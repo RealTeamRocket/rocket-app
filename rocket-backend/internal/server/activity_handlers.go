@@ -1,7 +1,11 @@
 package server
 
 import (
+	"encoding/base64"
 	"net/http"
+
+	"rocket-backend/internal/types"
+	"rocket-backend/pkg/logger"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
@@ -31,5 +35,36 @@ func (s *Server) GetActivityHandler(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch user data"})
 		return
 	}
-	c.JSON(http.StatusOK, gin.H{"username": user.Username ,"activities": activities})
+
+	var activitiesWithImages []types.ActivityWithUserAndImage
+	for _, activity := range activities {
+		img, err := s.db.GetUserImage(activity.UserID)
+		if err != nil {
+			logger.Error("Failed to get image", err)
+			img = nil
+		}
+
+		if img != nil {
+			encodedImage := base64.StdEncoding.EncodeToString(img.Data)
+			activitiesWithImages = append(activitiesWithImages, types.ActivityWithUserAndImage{
+				Name:      activity.Name,
+				Time:      activity.Time,
+				Message:   activity.Message,
+				ImageName: img.Name,
+				ImageType: http.DetectContentType(img.Data),
+				ImageData: encodedImage,
+			})
+		} else {
+			activitiesWithImages = append(activitiesWithImages, types.ActivityWithUserAndImage{
+				Name:      activity.Name,
+				Time:      activity.Time,
+				Message:   activity.Message,
+				ImageName: "",
+				ImageType: "",
+				ImageData: "",
+			})
+		}
+	}
+
+	c.JSON(http.StatusOK, gin.H{"username": user.Username, "activities": activitiesWithImages})
 }

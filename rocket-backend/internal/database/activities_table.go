@@ -53,8 +53,7 @@ func (s *service) GetActivitiesForUserAndFriends(userID uuid.UUID) ([]types.Acti
 	var activities []types.ActivityWithUser
 	for rows.Next() {
 		var activity types.ActivityWithUser
-		var uid uuid.UUID
-		if err := rows.Scan(&uid, &activity.Name, &activity.Time, &activity.Message); err != nil {
+		if err := rows.Scan(&activity.UserID, &activity.Name, &activity.Time, &activity.Message); err != nil {
 			logger.Error(fmt.Sprintf("Failed to scan activity row: %v", err))
 			return nil, custom_error.ErrDatabaseQuery
 		}

@@ -3,7 +3,14 @@
     <h2 class="panel-title">Activity Feed</h2>
     <ul class="activity-list">
       <li v-for="(activity, idx) in activities" :key="idx" class="activity-item" :class="{ 'user-activity': activity.isUser }">
-        <div class="avatar" :style="{ backgroundColor: activity.color }">
+        <span v-if="activity.image_data" class="avatar avatar-img">
+          <img
+            :src="`data:${activity.image_type || 'image/jpeg'};base64,${activity.image_data}`"
+            alt="User"
+            style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover;"
+          />
+        </span>
+        <div v-else class="avatar" :style="{ backgroundColor: activity.color }">
           <span>{{ activity.initials }}</span>
         </div>
         <div class="activity-content">
@@ -28,6 +35,8 @@ interface Activity {
   description: string
   time: string
   isUser?: boolean
+  image_data?: string | null
+  image_type?: string
 }
 
 function formatRelativeTime(iso: string): string {
@@ -47,15 +56,17 @@ const activities = ref<Activity[]>([])
 onMounted(async () => {
   try {
     const { username, activities: backendActivities } = (await api.getActivityFeed()).data
-    activities.value = backendActivities.map(({ name, time, message }) => {
-      const displayName = name === 'You' ? username: name
+    activities.value = backendActivities.map(({ name, time, message, image_data, image_type }) => {
+      const displayName = name === 'You' ? username : name
       return {
         name: displayName,
         initials: getInitials(displayName),
         color: getColor(displayName),
         description: message,
         time: formatRelativeTime(time),
-        isUser: name === 'You'
+        isUser: name === 'You',
+        image_data,
+        image_type
       }
     })
   } catch {

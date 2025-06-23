@@ -58,10 +58,14 @@ type RunDTO struct {
 	CreatedAt string  `json:"created_at"`
 }
 
-type ActivityWithUser struct {
-	Name    string    `json:"name"`
-	Time    time.Time `json:"time"`
-	Message string    `json:"message"`
+
+type ActivityWithUserAndImage struct {
+	Name      string    `json:"name"`
+	Time      time.Time `json:"time"`
+	Message   string    `json:"message"`
+	ImageName string    `json:"image_name"`
+	ImageType string    `json:"image_type"`
+	ImageData string    `json:"image_data"`
 }
 
 type ChatMessage struct {

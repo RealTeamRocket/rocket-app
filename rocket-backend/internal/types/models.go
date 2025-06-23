@@ -39,3 +39,10 @@ type Activity struct {
 	Time    time.Time `json:"time"`
 	Message string    `json:"message"`
 }
+
+type ActivityWithUser struct {
+	UserID  uuid.UUID `json:"user_id"`
+	Name    string    `json:"name"`
+	Time    time.Time `json:"time"`
+	Message string    `json:"message"`
+}
