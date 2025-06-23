@@ -1,0 +1,29 @@
+# Ignore dependencies and build output
+node_modules
+dist
+
+# Ignore IDE/editor/project files
+.vscode
+.idea
+*.swp
+*.swo
+
+# Ignore logs and OS files
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.DS_Store
+Thumbs.db
+
+# Ignore test and coverage files
+coverage
+*.test.*
+*.spec.*
+
+# Ignore version control and dev configs
+.git
+.gitignore
+README.md
+.eslintrc.*
+.prettierrc.*
+.dockerignore

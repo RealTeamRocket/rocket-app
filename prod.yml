@@ -17,12 +17,13 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+    ports:
+      - "8081:8080"
     networks:
       - blueprint
 
   frontend:
     image: zephiron/rocket-website:latest
-    restart: unless-stopped
     ports:
       - "8080:80"
     depends_on:
@@ -62,6 +63,19 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+
+  reverse-proxy:
+    image: nginx:1.27-alpine
+    volumes:
+      - ./nginx-reverse.conf:/etc/nginx/nginx.conf:ro
+    ports:
+      - "8088:8088"
+      - "8443:8443"
+    depends_on:
+      - frontend
+      - backend
+    networks:
+      - blueprint
 
 volumes:
   psql_volume_bp:
