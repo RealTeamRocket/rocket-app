@@ -69,8 +69,7 @@ services:
     volumes:
       - ./nginx-reverse.conf:/etc/nginx/nginx.conf:ro
     ports:
-      - "8088:8088"
-      - "8443:8443"
+      - "443:443"
     depends_on:
       - frontend
       - backend
