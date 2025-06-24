@@ -143,7 +143,6 @@ func (s *Server) ChatWebSocketHandler(hub *ChatHub) gin.HandlerFunc {
 				outBytes, _ := json.Marshal(reactionEvent)
 				hub.broadcast <- outBytes
 			default:
-				// Handle normal chat message as before
 				var incomingMsg struct {
 					Message string `json:"message"`
 				}
