@@ -153,8 +153,70 @@ jobs:
 
 Durch diese Pipeline wird das Deployment effizient, reproduzierbar und sicher gestaltet – ein entscheidender Vorteil bei der iterativen Weiterentwicklung der Rocket App.
 
+\subsection{Setup und Lokale Ausführung}
+Um das System lokal vollständig auszuführen, werden folgende Tools benötigt:
 
-\subsection*{Architektur (HTTPS mit VPS)}
+\begin{itemize}
+    \item \textbf{Flutter} -- zum Kompilieren und Starten der mobilen Anwendung
+    \item \textbf{Docker \& Docker Compose} -- für das Starten des Backends und der PostgreSQL-Datenbank
+\end{itemize}
+
+\subsubsection{1. Backend und Datenbank starten}
+
+Zunächst muss das Backend gemeinsam mit der Datenbank gestartet werden. Dazu navigiert man ins Verzeichnis \texttt{rocket-backend} und führt dort den folgenden Befehl aus:
+
+\begin{verbatim}
+docker-compose up --build
+\end{verbatim}
+
+Dieser Befehl setzt voraus, dass im selben Verzeichnis eine \texttt{.env}-Datei vorhanden ist. Diese Datei enthält alle Konfigurationsvariablen für Backend und Datenbank. Ein Beispiel-Template sieht wie folgt aus:
+
+\begin{verbatim}
+PORT=8080
+APP_ENV=local
+BLUEPRINT_DB_HOST=postgres
+BLUEPRINT_DB_PORT=5432
+BLUEPRINT_DB_DATABASE=blueprint
+BLUEPRINT_DB_USERNAME=melkey
+BLUEPRINT_DB_PASSWORD=password1234
+BLUEPRINT_DB_SCHEMA=public
+
+# generated with openssl rand -base64 64
+JWT_SECRET=
+API_KEY=
+
+PGADMIN_DEFAULT_EMAIL=admin@admin.com
+PGADMIN_DEFAULT_PASSWORD=admin
+\end{verbatim}
+
+Nach dem Start des Containers wird die Datenbank automatisch durch ein spezielles Migration-Image \texttt{migrate/migrate} mit den benötigten Tabellen und Constraints versorgt.
+
+\subsubsection{2. Lokale Kommunikation mit dem Handy aktivieren}
+
+Damit die mobile App während der lokalen Entwicklung mit dem Backend kommunizieren kann, ist es entscheidend, dass das Handy im selben Netzwerk wie der Entwicklungsrechner ist. Zudem muss entweder:
+
+\begin{itemize}
+    \item die lokale Firewall deaktiviert oder entsprechend konfiguriert werden,
+    \item oder eine Regel erstellt werden, die eingehenden Traffic auf den Port \texttt{8080} (bzw. den in der \texttt{.env} definierten Port) erlaubt.
+\end{itemize}
+
+\subsubsection{3. Mobile App konfigurieren und starten}
+
+In der mobilen Anwendung (Verzeichnis \texttt{mobile\_app}) muss ebenfalls eine \texttt{.env}-Datei angelegt werden. Diese enthält die IP-Adresse des Rechners, auf dem das Backend läuft. Die Datei besteht aus nur einer Zeile:
+
+\begin{verbatim}
+BACKEND_URL=http://<IP_DEINES_RECHNERS>:8080
+\end{verbatim}
+
+Diese IP-Adresse kann je nach System mit dem Befehl \texttt{ip a} (Linux) oder \texttt{ipconfig} (Windows) ermittelt werden. Diese Angabe ist essenziell, da die mobile App sonst nicht weiß, wohin HTTP-Anfragen gesendet werden sollen. In der Produktionsumgebung ist diese Variable fest definiert, bei der lokalen Entwicklung muss sie jedoch manuell angepasst werden.
+
+\subsubsection*{Hinweis zur mobilen Ausführung}
+
+Die App sollte idealerweise auf einem physischen Smartphone installiert und ausgeführt werden. Grund hierfür ist, dass für einige Kernfunktionen (z.\,B. Geodaten, Schrittzählerdaten) reale Sensorsignale erforderlich sind, welche von Emulatoren in der Regel nicht bereitgestellt werden.
+
+\section{Architektur}
+
+\subsection{VPS Architektur mit HTTPS}
 
 Die Abbildung \ref{fig:https-architektur} zeigt die Systemarchitektur im produktiven Einsatz, wie sie auf einem Virtual Private Server (VPS) umgesetzt ist. Die Architektur wurde so entworfen, dass sie sicher, skalierbar und wartbar ist. Sie umfasst mehrere Technologien und Container, die gezielt für ihre jeweiligen Stärken eingesetzt werden.
 
@@ -210,16 +272,16 @@ Die \textbf{Vue.js-Webseite}, ebenfalls im Bild dargestellt, kommuniziert wie di
     \item \textbf{PostgreSQL:} Robuste, erweiterbare SQL-Datenbank mit Geo-Support
 \end{itemize}
 
-\section{Lokale Entwicklung}
+\subsection{Lokale Entwicklungsarchitektur}
 \label{sec:lokale-entwicklung}
 
-\subsection*{Unterschied zur Produktionsumgebung}
+\subsubsection{Unterschied zur Produktionsumgebung}
 
 Die lokale Entwicklungsumgebung ist eine vereinfachte Version der Produktivarchitektur. Ziel ist es, einzelne Komponenten unabhängig testen und entwickeln zu können, ohne direkt ein Deployment auf dem VPS durchführen zu müssen.
 
 Im Gegensatz zur vollständigen Produktionsarchitektur (siehe Abbildung \ref{fig:https-architektur}), bei der mehrere Docker-Container über einen Nginx-Reverse-Proxy orchestriert werden, wird in der lokalen Umgebung lediglich das Backend mit der zugehörigen Datenbank als \textbf{lokaler Docker-Container} betrieben.
 
-\subsection*{Architektur der lokalen Umgebung}
+\subsubsection{Architektur der lokalen Umgebung}
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.9\textwidth]{images/Architecture.png}
@@ -236,7 +298,7 @@ Die Mobile App kann über USB oder WLAN direkt auf einem realen Gerät installie
 \paragraph{Web-Frontend (Vue.js + Vite)}
 Das Web-Frontend basiert auf Vue.js und kann ohne Docker lokal gestartet werden. Dazu wird der \textbf{Vite Development Server} verwendet. Dieser bietet schnelles Hot Reloading und ist leichtgewichtig. Eine wichtige Besonderheit ist die Verwendung eines \textbf{Proxy-Setups}, das API-Anfragen aus dem Browser zur lokal laufenden Go-API weiterleitet. Dadurch können Frontend und Backend unabhängig voneinander entwickelt werden, ohne auf ein Deployment angewiesen zu sein.
 
-\subsection*{Backend Testing}
+\subsection{Backend Testing}
 
 Für das Go-Backend existiert eine umfassende Teststrategie, die auf \textbf{Integrationstests} basiert. Ziel ist es, nicht nur die einzelnen Funktionen isoliert zu testen, sondern auch das Zusammenspiel zwischen REST-Endpunkten und Datenbankabfragen realistisch zu überprüfen.
 
@@ -275,67 +337,6 @@ Alle Tests werden automatisch ausgeführt, sobald ein Pull Request (PR) auf den 
     \item die Softwarequalität über alle Sprints hinweg erhalten bleibt.
 \end{itemize}
 
-\section{Setup und Lokale Ausführung}
-
-Um das System lokal vollständig auszuführen, werden folgende Tools benötigt:
-
-\begin{itemize}
-    \item \textbf{Flutter} -- zum Kompilieren und Starten der mobilen Anwendung
-    \item \textbf{Docker \& Docker Compose} -- für das Starten des Backends und der PostgreSQL-Datenbank
-\end{itemize}
-
-\subsection*{1. Backend und Datenbank starten}
-
-Zunächst muss das Backend gemeinsam mit der Datenbank gestartet werden. Dazu navigiert man ins Verzeichnis \texttt{rocket-backend} und führt dort den folgenden Befehl aus:
-
-\begin{verbatim}
-docker-compose up --build
-\end{verbatim}
-
-Dieser Befehl setzt voraus, dass im selben Verzeichnis eine \texttt{.env}-Datei vorhanden ist. Diese Datei enthält alle Konfigurationsvariablen für Backend und Datenbank. Ein Beispiel-Template sieht wie folgt aus:
-
-\begin{verbatim}
-PORT=8080
-APP_ENV=local
-BLUEPRINT_DB_HOST=postgres
-BLUEPRINT_DB_PORT=5432
-BLUEPRINT_DB_DATABASE=blueprint
-BLUEPRINT_DB_USERNAME=melkey
-BLUEPRINT_DB_PASSWORD=password1234
-BLUEPRINT_DB_SCHEMA=public
-
-# generated with openssl rand -base64 64
-JWT_SECRET=
-API_KEY=
-
-PGADMIN_DEFAULT_EMAIL=admin@admin.com
-PGADMIN_DEFAULT_PASSWORD=admin
-\end{verbatim}
-
-Nach dem Start des Containers wird die Datenbank automatisch durch ein spezielles Migration-Image \texttt{migrate/migrate} mit den benötigten Tabellen und Constraints versorgt.
-
-\subsection*{2. Lokale Kommunikation mit dem Handy aktivieren}
-
-Damit die mobile App während der lokalen Entwicklung mit dem Backend kommunizieren kann, ist es entscheidend, dass das Handy im selben Netzwerk wie der Entwicklungsrechner ist. Zudem muss entweder:
-
-\begin{itemize}
-    \item die lokale Firewall deaktiviert oder entsprechend konfiguriert werden,
-    \item oder eine Regel erstellt werden, die eingehenden Traffic auf den Port \texttt{8080} (bzw. den in der \texttt{.env} definierten Port) erlaubt.
-\end{itemize}
-
-\subsection*{3. Mobile App konfigurieren und starten}
-
-In der mobilen Anwendung (Verzeichnis \texttt{mobile\_app}) muss ebenfalls eine \texttt{.env}-Datei angelegt werden. Diese enthält die IP-Adresse des Rechners, auf dem das Backend läuft. Die Datei besteht aus nur einer Zeile:
-
-\begin{verbatim}
-BACKEND_URL=http://<IP_DEINES_RECHNERS>:8080
-\end{verbatim}
-
-Diese IP-Adresse kann je nach System mit dem Befehl \texttt{ip a} (Linux) oder \texttt{ipconfig} (Windows) ermittelt werden. Diese Angabe ist essenziell, da die mobile App sonst nicht weiß, wohin HTTP-Anfragen gesendet werden sollen. In der Produktionsumgebung ist diese Variable fest definiert, bei der lokalen Entwicklung muss sie jedoch manuell angepasst werden.
-
-\subsection*{Hinweis zur mobilen Ausführung}
-
-Die App sollte idealerweise auf einem physischen Smartphone installiert und ausgeführt werden. Grund hierfür ist, dass für einige Kernfunktionen (z.\,B. Geodaten, Schrittzählerdaten) reale Sensorsignale erforderlich sind, welche von Emulatoren in der Regel nicht bereitgestellt werden.
 
 \section{ER-Modell und Datenbankarchitektur}
 
