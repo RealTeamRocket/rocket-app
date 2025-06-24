@@ -5,7 +5,7 @@
 \geometry{margin=1in}
 \usepackage{graphicx}
 \usepackage{hyperref}
-\usepackage{minted}        % for code highlighting (requires -shell-escape)
+\usepackage{minted}
 \usepackage{titlesec}
 \usepackage{fancyhdr}
 \usepackage{caption}
@@ -14,6 +14,7 @@
 \usepackage{xcolor}
 \usepackage{float}
 
+% Code highlighting
 \lstset{
   basicstyle=\ttfamily\small,
   breaklines=true,
@@ -31,7 +32,6 @@
   morestring=[b]',
   morestring=[b]"
 }
-
 \lstdefinelanguage{dart}{
   morekeywords={
     async, await, break, case, catch, class, const, continue, default, do, else, enum, export,
@@ -50,7 +50,6 @@
   basicstyle=\ttfamily\small,
 }
 
-
 % Header and footer
 \pagestyle{fancy}
 \fancyhf{}
@@ -58,27 +57,55 @@
 \lhead{Rocket App}
 \rfoot{\thepage}
 
-% Section format
+% Section formatting
 \titleformat{\section}{\normalfont\Large\bfseries}{\thesection}{1em}{}
 \titleformat{\subsection}{\normalfont\large\bfseries}{\thesubsection}{1em}{}
 
-% Title page
-\title{
-    \vspace{4cm}
-    \Huge\textbf{Rocket App} \\
-    \LARGE\textit{Pervasive Computing} \\
-    \vspace{2cm}
-    \large Author: \\
-    \large Date: \today \\
-    \vfill
-}
-\date{}
-\author{}
+% Custom commands
+\newcommand{\email}[1]{\texttt{#1}}
+\newcommand{\id}[1]{\texttt{#1}}
 
+% Title page
 \begin{document}
 
-\maketitle
-\newpage
+\begin{titlepage}
+    \begin{flushright}
+        \includegraphics[width=4cm]{images/Logo-HFT-Stuttgart.png}
+    \end{flushright}
+    \vspace*{0.5cm}
+
+    \begin{center}
+        {\Huge \textbf{Rocket App} \par}
+        \vspace{0.3cm}
+        {\LARGE \textit{Pervasive Computing} \par}
+        \vspace{1.5cm}
+        \includegraphics[width=5cm]{images/AppIcon.png}
+        \vspace{1.5cm}
+
+        {\Large Autoren: \par}
+        \vspace{0.3cm}
+        \begin{tabular}{rl}
+            Paul Durz      & \email{22dupa1bif@hft-stuttgart.de} \\
+                          & Matrikelnummer: \id{1005080} \\
+            Dominik Gräter & \email{22grdo1bif@hft-stuttgart.de} \\
+                          & Matrikelnummer: \id{1005093} \\
+            Manuel Holm    & \email{22homa1bif@hft-stuttgart.de} \\
+                          & Matrikelnummer: \id{1005094} \\
+            Ron Seifried   & \email{22sero1bif@hft-stuttgart.de} \\
+                          & Matrikelnummer: \id{1005466} \\
+        \end{tabular}
+        \vspace{1.5cm}
+
+        \textbf{Hochschule für Technik Stuttgart} \\
+        Schellingstraße 24, 70174 Stuttgart, Deutschland \\
+        \email{info@hft-stuttgart.de} \\
+        \url{https://www.hft-stuttgart.de/}
+
+        \vfill
+        \large Abgabedatum: \today \\
+    \end{center}
+\end{titlepage}
+
 \tableofcontents
 \newpage
 
@@ -95,6 +122,12 @@ Die \textbf{Rocket App} ist eine mobile Anwendung, die es Nutzerinnen und Nutzer
 
 \subsection{Ziele und Motivation}
 Ziel der Rocket App ist es, Nutzerinnen und Nutzer zu einem aktiveren Lebensstil zu motivieren. Durch spielerische Elemente wie Punkte, Ranglisten und Challenges soll Bewegung im Alltag gefördert und langfristig zur Gewohnheit gemacht werden. Gerade im Kontext zunehmender Digitalisierung und Bewegungsmangel bietet die App eine niedrigschwellige Möglichkeit, körperliche Aktivität zu fördern und messbar zu machen.
+
+\subsection{Website}
+Für die Möglichkeit, die App mit einer Website erweitern zu dürfen, danken wir Professor Dr. Knauth und Prof. Dr. Mosler.
+Diese Erweiterungen und Darstellung der App auf einer Website sind nicht Teil der Pervasive Computing Vorlesung, gehören aber zu unserem Projekt dazu und sollten hier nicht unerwähnt bleiben.
+
+Die Website bietet dieselben Features wie die App, man kann aber auch noch Runs planen, man hat einen globalen Chat und man hat die Möglichkeit, die App zu downloaden.
 
 Die Zielgruppe der App sind Menschen, die ihre Bewegung im Alltag tracken und sich selbst oder im Wettbewerb mit anderen motivieren möchten. Dazu gehören sowohl Gelegenheitsnutzer als auch sportlich Aktive.
 
@@ -115,21 +148,21 @@ Durch die Kombination aus GitHub, strukturiertem Branch-Workflow und projektbezo
 
 Für die Entwicklung der \textbf{Rocket App} kamen unterschiedliche Entwicklungsumgebungen zum Einsatz, abgestimmt auf die jeweiligen Anforderungen der Frontend- und Backend-Komponenten.
 
-Die App wurde mit dem Framework \textbf{Flutter} entwickelt. Für die mobile Entwicklung wurde hauptsächlich \textbf{Android Studio} verwendet, insbesondere für das Erstellen, Debuggen und Testen auf realen Geräten sowie Emulatoren. Ergänzend kam auch der integrierte \textbf{Emulator von Visual Studio Code (VS Code)} zum Einsatz, insbesondere für schnelle Tests und kleinere Anpassungen während der Entwicklung. Dank der Flutter-Integration in beide Umgebungen konnten Entwickler flexibel je nach Präferenz arbeiten.
+Die App wurde mit dem Framework \textbf{Flutter}\cite{flutter} entwickelt. Für die mobile Entwicklung wurde hauptsächlich \textbf{Android Studio}\cite{androidstudio} verwendet, insbesondere für das Erstellen, Debuggen und Testen auf realen Geräten sowie Emulatoren. Ergänzend kam auch der integrierte \textbf{Emulator von Visual Studio Code (VS Code)}\cite{VSCode} zum Einsatz, insbesondere für schnelle Tests und kleinere Anpassungen während der Entwicklung. Dank der Flutter-Integration in beide Umgebungen konnten Entwickler flexibel je nach Präferenz arbeiten.
 
-Für das \textbf{Backend}, das in der Programmiersprache \textbf{Go} entwickelt wurde, war die Wahl der Entwicklungsumgebung weitgehend frei. Da Go standardmäßig nur über den Go Language Server Protocol (gopls) unterstützt wird, kamen primär Editoren mit entsprechender LSP-Unterstützung zum Einsatz. Die bevorzugten Tools waren hier \textbf{Visual Studio Code} sowie der moderne Editor \textbf{Zed}, welcher sich durch seine Performance und klare Nutzeroberfläche auszeichnet. Beide Umgebungen bieten durch die LSP-Anbindung komfortable Features wie Autovervollständigung, Syntaxhervorhebung und Code-Navigation.
+Für das \textbf{Backend}, das in der Programmiersprache \textbf{Go}\cite{golang} entwickelt wurde, war die Wahl der Entwicklungsumgebung weitgehend frei. Da Go standardmäßig nur über den Go Language Server Protocol (gopls)\cite{gopls} unterstützt wird, kamen primär Editoren mit entsprechender LSP-Unterstützung zum Einsatz. Die bevorzugten Tools waren hier \textbf{Visual Studio Code}\cite{VSCode} sowie der moderne Editor \textbf{Zed}\cite{zed}, welcher sich durch seine Performance und klare Nutzeroberfläche auszeichnet. Beide Umgebungen bieten durch die LSP-Anbindung komfortable Features wie Autovervollständigung, Syntaxhervorhebung und Code-Navigation.
 
 Durch diese vielseitige Toolauswahl konnten alle Projektbeteiligten in einer für sie optimalen Umgebung arbeiten, ohne auf zentrale Entwicklungsfeatures verzichten zu müssen. Dies förderte eine produktive Arbeitsweise und erhöhte die Effizienz im Entwicklungsalltag.
 
 \subsection{Virtual Private Server}
 
-Für das Hosting der Server-Komponenten der \textbf{Rocket App} wird ein \textbf{Virtual Private Server (VPS)} von \textbf{Oracle Cloud} genutzt. Auf diesem Server laufen sowohl das \textbf{Backend} als auch die dazugehörige \textbf{PostgreSQL-Datenbank}. Um die Dienste zuverlässig und portabel zu betreiben, werden beide Komponenten in separaten \textbf{Docker-Containern} ausgeführt.
+Für das Hosting der Server-Komponenten der \textbf{Rocket App} wird ein \textbf{Virtual Private Server (VPS)} von \textbf{Oracle Cloud} genutzt. Auf diesem Server laufen sowohl das \textbf{Backend} als auch die dazugehörige \textbf{PostgreSQL-Datenbank}\cite{postgresql}. Um die Dienste zuverlässig und portabel zu betreiben, werden beide Komponenten in separaten \textbf{Docker-Containern}\cite{docker} ausgeführt.
 
 Die Orchestrierung dieser Container erfolgt über eine \textbf{Docker Compose}-Konfiguration, die das Starten, Stoppen und Verwalten der Services vereinfacht. Zusätzlich kommt das Tool \textbf{Watchtower} zum Einsatz, das regelmäßig nach aktualisierten Docker-Images prüft. Sobald ein neues Image – beispielsweise des Backends – auf \textbf{Docker Hub} verfügbar ist, lädt Watchtower es automatisch herunter und startet den entsprechenden Container neu. Dadurch wird sichergestellt, dass der Server stets mit der aktuellsten Version läuft, ohne manuelles Eingreifen.
 
 \subsection{Deployment}
 
-Das Deployment des Backends ist vollständig automatisiert und in den Entwicklungsworkflow über \textbf{GitHub-Actions} integriert. Bei jedem \textbf{Pull Request auf den \texttt{master}-Branch}, der Änderungen im Verzeichnis \texttt{rocket-backend} betrifft, wird eine entsprechende GitHub-Action ausgelöst.
+Das Deployment des Backends ist vollständig automatisiert und in den Entwicklungsworkflow über \textbf{GitHub-Actions}\cite{github} integriert. Bei jedem \textbf{Pull Request auf den \texttt{master}-Branch}, der Änderungen im Verzeichnis \texttt{rocket-backend} betrifft, wird eine entsprechende GitHub-Action ausgelöst.
 
 Diese Action übernimmt das Erstellen eines neuen Docker-Images auf Basis des aktuellen Codes und lädt es anschließend in ein zentrales \textbf{Docker Hub}-Repository hoch. Sobald das neue Image dort verfügbar ist, erkennt \textbf{Watchtower} auf dem Oracle-Server das Update und sorgt automatisch für einen nahtlosen Rollout der neuen Backend-Version.
 
@@ -176,8 +209,8 @@ Durch diese Pipeline wird das Deployment effizient, reproduzierbar und sicher ge
 Um das System lokal vollständig auszuführen, werden folgende Tools benötigt:
 
 \begin{itemize}
-    \item \textbf{Flutter} -- zum Kompilieren und Starten der mobilen Anwendung
-    \item \textbf{Docker \& Docker Compose} -- für das Starten des Backends und der PostgreSQL-Datenbank
+    \item \textbf{Flutter}\cite{flutter} -- zum Kompilieren und Starten der mobilen Anwendung
+    \item \textbf{Docker \& Docker Compose}\cite{docker} -- für das Starten des Backends und der PostgreSQL-Datenbank\cite{postgresql}
 \end{itemize}
 
 \subsubsection{1. Backend und Datenbank starten}
@@ -208,7 +241,7 @@ PGADMIN_DEFAULT_EMAIL=admin@admin.com
 PGADMIN_DEFAULT_PASSWORD=admin
 \end{verbatim}
 
-Nach dem Start des Containers wird die Datenbank automatisch durch ein spezielles Migration-Image \texttt{migrate/migrate} mit den benötigten Tabellen und Constraints versorgt.
+Nach dem Start des Containers wird die Datenbank automatisch durch ein spezielles Migration-Image \texttt{migrate/migrate}\cite{migrate} mit den benötigten Tabellen und Constraints versorgt.
 
 \subsubsection{2. Lokale Kommunikation mit dem Handy aktivieren}
 
@@ -237,7 +270,7 @@ Die App sollte idealerweise auf einem physischen Smartphone installiert und ausg
 
 \subsection{VPS Architektur mit HTTPS}
 
-Die Abbildung \ref{fig:https-architektur} zeigt die Systemarchitektur im produktiven Einsatz, wie sie auf einem Virtual Private Server (VPS) umgesetzt ist. Die Architektur wurde so entworfen, dass sie sicher, skalierbar und wartbar ist. Sie umfasst mehrere Technologien und Container, die gezielt für ihre jeweiligen Stärken eingesetzt werden.
+Die Abbildung \ref{fig:https-architektur} zeigt die Systemarchitektur im produktiven Einsatz, wie sie auf einem Virtual Private Server (VPS) umgesetzt ist. Die Architektur wurde so entworfen, dass sie sicher, skalierbar und wartbar ist. Sie umfasst mehrere Technologien und Container, die gezielt für ihre jeweiligen Stärken eingesetzt werden\cite{docker}\cite{nginx}\cite{postgresql}.
 
 \begin{figure}[H]
     \centering
@@ -247,17 +280,17 @@ Die Abbildung \ref{fig:https-architektur} zeigt die Systemarchitektur im produkt
 \end{figure}
 
 \paragraph{Flutter Mobile App}
-Die \textbf{Rocket App}, entwickelt mit dem Flutter Framework, läuft auf iOS und Android. Sie dient als Hauptschnittstelle für die Nutzer. Flutter wurde gewählt, weil es eine performante, plattformübergreifende Entwicklung mit einer Codebasis ermöglicht und gleichzeitig native App-Erlebnisse bietet.
+Die \textbf{Rocket App}, entwickelt mit dem Flutter Framework\cite{flutter}, läuft auf iOS und Android. Sie dient als Hauptschnittstelle für die Nutzer. Flutter wurde gewählt, weil es eine performante, plattformübergreifende Entwicklung mit einer Codebasis ermöglicht und gleichzeitig native App-Erlebnisse bietet.
 
 Die App sendet ihre Daten  über REST-API-Aufrufe direkt an den VPS. Dabei handelt es sich um typische Aktionen wie das Hochladen von Läufen, Synchronisieren von Schritten, Highscorelisten oder das Abrufen von Challenges.
 
 \paragraph{VPS und Containerisierung}
 Der gesamte produktive Stack läuft auf einem \textbf{VPS (Virtual Private Server)}. Dies bietet volle Kontrolle über die Serverumgebung bei gleichzeitig moderaten Kosten.
 
-Im VPS sind alle Backend-Komponenten mithilfe von \textbf{Docker} containerisiert. Docker erlaubt es, die Applikation isoliert, portabel und versionssicher zu betreiben. Dies erleichtert auch das Deployment (z.\,B. durch GitHub Actions) sowie die Wartung im laufenden Betrieb.
+Im VPS sind alle Backend-Komponenten mithilfe von \textbf{Docker}\cite{docker} containerisiert. Docker erlaubt es, die Applikation isoliert, portabel und versionssicher zu betreiben. Dies erleichtert auch das Deployment (z.\,B. durch GitHub Actions\cite{github}) sowie die Wartung im laufenden Betrieb.
 
 \paragraph{Nginx als Reverse Proxy}
-Als erste Instanz innerhalb des VPS fungiert \textbf{Nginx}. Dieser Reverse Proxy nimmt eingehende HTTP(S)-Anfragen entgegen, kümmert sich um SSL/TLS-Verschlüsselung (z.\,B. mit Let's Encrypt) und leitet die Anfragen an den Go-Backend-Container weiter.
+Als erste Instanz innerhalb des VPS fungiert \textbf{Nginx}\cite{nginx}. Dieser Reverse Proxy nimmt eingehende HTTP(S)-Anfragen entgegen, kümmert sich um SSL/TLS-Verschlüsselung (z.\,B. mit Let's Encrypt) und leitet die Anfragen an den Go-Backend-Container weiter.
 
 Die Verwendung von Nginx bringt mehrere Vorteile:
 \begin{itemize}
@@ -267,7 +300,7 @@ Die Verwendung von Nginx bringt mehrere Vorteile:
 \end{itemize}
 
 \paragraph{Go Backend}
-Das \textbf{Go-Backend} ist der Kern der Serverlogik. Es verarbeitet alle Anfragen der Mobile App über REST-Schnittstellen. Go wurde gewählt wegen seiner hervorragenden Performance, statischen Typisierung, geringen Laufzeitanforderungen und der guten Eignung für API-Services.
+Das \textbf{Go-Backend} ist der Kern der Serverlogik. Es verarbeitet alle Anfragen der Mobile App über REST-Schnittstellen. Go\cite{golang} wurde gewählt wegen seiner hervorragenden Performance, statischen Typisierung, geringen Laufzeitanforderungen und der guten Eignung für API-Services.
 
 Typische Funktionen des Go-Backends sind:
 \begin{itemize}
@@ -277,18 +310,18 @@ Typische Funktionen des Go-Backends sind:
 \end{itemize}
 
 \paragraph{PostgreSQL Datenbank}
-Alle persistenten Daten werden in einer \textbf{PostgreSQL-Datenbank} gespeichert. PostgreSQL wurde aufgrund seiner Zuverlässigkeit, SQL-Kompatibilität und Unterstützung von Geodaten (PostGIS) ausgewählt. Es läuft ebenfalls als Docker-Container innerhalb des VPS-Netzwerks.
+Alle persistenten Daten werden in einer \textbf{PostgreSQL-Datenbank}\cite{postgresql} gespeichert. PostgreSQL wurde aufgrund seiner Zuverlässigkeit, SQL-Kompatibilität und Unterstützung von Geodaten (PostGIS) ausgewählt. Es läuft ebenfalls als Docker-Container innerhalb des VPS-Netzwerks.
 
 \paragraph{Weitere Komponenten (kurz)}
-Die \textbf{Vue.js-Webseite}, ebenfalls im Bild dargestellt, kommuniziert wie die App mit dem Backend. Zusätzlich nutzt sie WebSockets für Live-Interaktionen. Eine externe Schnittstelle – hier die \textbf{OpenTopoData API} – wird vom Backend genutzt, um Höhendaten für Strecken zu ermitteln.
+Die \textbf{Vue.js-Webseite}\cite{vuejs}, ebenfalls im Bild dargestellt, kommuniziert wie die App mit dem Backend. Zusätzlich nutzt sie WebSockets für Live-Interaktionen. Eine externe Schnittstelle – hier die \textbf{OpenTopoData API}\cite{open_topo_data} – wird vom Backend genutzt, um Höhendaten für Strecken zu ermitteln.
 
 \paragraph{Zusammenfassung der Architekturvorteile}
 \begin{itemize}
-    \item \textbf{Flutter:} Plattformübergreifende Entwicklung mit nativem Look \& Feel
-    \item \textbf{Go:} Hochperformant, ideal für APIs
-    \item \textbf{Docker:} Portabilität, einfache Updates und Isolierung
-    \item \textbf{Nginx:} Reverse Proxy für Sicherheit und Routing
-    \item \textbf{PostgreSQL:} Robuste, erweiterbare SQL-Datenbank mit Geo-Support
+    \item \textbf{Flutter:}\cite{flutter} Plattformübergreifende Entwicklung mit nativem Look \& Feel
+    \item \textbf{Go:}\cite{golang} Hochperformant, ideal für APIs
+    \item \textbf{Docker:}\cite{docker} Portabilität, einfache Updates und Isolierung
+    \item \textbf{Nginx:}\cite{nginx} Reverse Proxy für Sicherheit und Routing
+    \item \textbf{PostgreSQL:}\cite{postgresql} Robuste, erweiterbare SQL-Datenbank mit Geo-Support
 \end{itemize}
 
 \subsection{Lokale Entwicklungsarchitektur}
@@ -309,13 +342,13 @@ Im Gegensatz zur vollständigen Produktionsarchitektur (siehe Abbildung \ref{fig
 \end{figure}
 
 \paragraph{Backend \& Datenbank}
-Das Go-Backend wird lokal in einem Docker-Container gestartet, ebenso wie eine PostgreSQL-Datenbank mit PostGIS-Erweiterung. Dadurch wird eine konsistente Entwicklungsumgebung geschaffen, die der produktiven Struktur sehr nahekommt, jedoch ohne HTTPS-Absicherung oder externe Abhängigkeiten wie Nginx.
+Das Go-Backend wird lokal in einem Docker-Container\cite{docker} gestartet, ebenso wie eine PostgreSQL-Datenbank\cite{postgresql} mit PostGIS-Erweiterung. Dadurch wird eine konsistente Entwicklungsumgebung geschaffen, die der produktiven Struktur sehr nahekommt, jedoch ohne HTTPS-Absicherung oder externe Abhängigkeiten wie Nginx\cite{nginx}.
 
 \paragraph{Mobile App (Flutter)}
-Die Mobile App kann über USB oder WLAN direkt auf einem realen Gerät installiert werden. Die Verwendung eines echten Geräts ist zwingend notwendig, da die App auf Geo-Koordinaten (GPS) und Schrittzählerdaten zugreift, welche über Gerätesensoren bereitgestellt werden. Emulatoren liefern keine oder nur ungenaue Sensorwerte und sind daher für Entwicklung und Tests ungeeignet.
+Die Mobile App kann über USB oder WLAN direkt auf einem realen Gerät installiert werden. Die Verwendung eines echten Geräts ist zwingend notwendig, da die App auf Geo-Koordinaten (GPS) und Schrittzählerdaten zugreift, welche über Gerätesensoren bereitgestellt werden. Emulatoren liefern keine oder nur ungenaue Sensorwerte und sind daher für Entwicklung und Tests ungeeignet. Für das Schrittzählen wird das Plugin \texttt{pedometer}\cite{pedometer} verwendet.
 
 \paragraph{Web-Frontend (Vue.js + Vite)}
-Das Web-Frontend basiert auf Vue.js und kann ohne Docker lokal gestartet werden. Dazu wird der \textbf{Vite Development Server} verwendet. Dieser bietet schnelles Hot Reloading und ist leichtgewichtig. Eine wichtige Besonderheit ist die Verwendung eines \textbf{Proxy-Setups}, das API-Anfragen aus dem Browser zur lokal laufenden Go-API weiterleitet. Dadurch können Frontend und Backend unabhängig voneinander entwickelt werden, ohne auf ein Deployment angewiesen zu sein.
+Das Web-Frontend basiert auf Vue.js\cite{vuejs} und kann ohne Docker lokal gestartet werden. Dazu wird der \textbf{Vite Development Server}\cite{vite} verwendet. Dieser bietet schnelles Hot Reloading und ist leichtgewichtig. Eine wichtige Besonderheit ist die Verwendung eines \textbf{Proxy-Setups}, das API-Anfragen aus dem Browser zur lokal laufenden Go-API weiterleitet. Dadurch können Frontend und Backend unabhängig voneinander entwickelt werden, ohne auf ein Deployment angewiesen zu sein.
 
 \subsection{Backend Testing}
 
@@ -324,12 +357,12 @@ Für das Go-Backend existiert eine umfassende Teststrategie, die auf \textbf{Int
 \paragraph{Verwendete Tools}
 Zum Schreiben und Ausführen der Tests kommen zwei populäre Go-Testbibliotheken zum Einsatz:
 \begin{itemize}
-    \item \texttt{github.com/onsi/ginkgo/v2} – Framework für Behavior-Driven Development (BDD)
-    \item \texttt{github.com/onsi/gomega} – Assertion-Bibliothek für lesbare und präzise Testausdrücke
+    \item \texttt{github.com/onsi/ginkgo/v2}\cite{ginkgo} – Framework für Behavior-Driven Development (BDD)
+    \item \texttt{github.com/onsi/gomega}\cite{gomega} – Assertion-Bibliothek für lesbare und präzise Testausdrücke
 \end{itemize}
 
 \paragraph{Isolierte Testumgebung mit Testcontainers}
-Zur Laufzeit der Tests wird mit Hilfe von \texttt{testcontainers-go} eine isolierte Datenbankinstanz in einem temporären Docker-Container gestartet. Diese Testdatenbank wird automatisch erstellt, mit den notwendigen Migrationsskripten versehen und nach jedem Testlauf vollständig bereinigt.
+Zur Laufzeit der Tests wird mit Hilfe von \texttt{testcontainers-go}\cite{testcontainers} eine isolierte Datenbankinstanz in einem temporären Docker-Container\cite{docker} gestartet. Diese Testdatenbank wird automatisch erstellt, mit den notwendigen Migrationsskripten versehen und nach jedem Testlauf vollständig bereinigt.
 
 Dadurch ist sichergestellt, dass:
 \begin{itemize}
@@ -359,7 +392,7 @@ Alle Tests werden automatisch ausgeführt, sobald ein Pull Request (PR) auf den 
 
 \section{ER-Modell und Datenbankarchitektur}
 
-Die Anwendung verwendet \textbf{PostgreSQL} als relationale Datenbank, ergänzt durch zwei wichtige Erweiterungen:
+Die Anwendung verwendet \textbf{PostgreSQL}\cite{postgresql} als relationale Datenbank, ergänzt durch zwei wichtige Erweiterungen:
 
 \begin{itemize}
     \item \textbf{PostGIS}: Ermöglicht die Speicherung und Verarbeitung von Geodaten, insbesondere Routeninformationen als \texttt{LINESTRING}. Diese werden für Laufstrecken und geplante Routen benötigt.
@@ -407,7 +440,7 @@ Der große Vorteil von JWT liegt darin, dass alle nötigen Informationen in eine
 In unserer Architektur unterscheiden wir die Handhabung des Tokens zwischen App und Web:
 
 \begin{itemize}
-    \item \textbf{Mobile App:} Hier wird der JWT-Token nach erfolgreichem Login sicher im \texttt{SecureStorage} gespeichert, um ihn bei nachfolgenden API-Anfragen im Header mitzuschicken. Das Plugin \texttt{flutter\_secure\_storage} gewährleistet, dass der Token verschlüsselt und vor unbefugtem Zugriff geschützt ist. Ein Beispiel zur Speicherung sieht folgendermaßen aus:
+    \item \textbf{Mobile App:} Hier wird der JWT-Token nach erfolgreichem Login sicher im \texttt{SecureStorage} gespeichert, um ihn bei nachfolgenden API-Anfragen im Header mitzuschicken. Das Plugin \texttt{flutter\_secure\_storage}\cite{flutter_secure_storage} gewährleistet, dass der Token verschlüsselt und vor unbefugtem Zugriff geschützt ist. Ein Beispiel zur Speicherung sieht folgendermaßen aus:
 
 \begin{lstlisting}[language=Dart, caption=Speichern des JWT Tokens im Secure Storage]
 await _storage.write(key: 'jwt_token', value: loginResponse.token);
@@ -444,7 +477,7 @@ Durch diese Implementierung gewährleisten wir eine sichere, performante und fle
 \section{Handy App}
 \subsection{Foreground Task}
 
-Die App verwendet das Flutter-Plugin \texttt{flutter\_foreground\_task}, um dauerhaft im Vordergrund bzw. Hintergrund Schrittzahlen zu erfassen und regelmäßig an das Backend zu senden. Dies ist vor allem unter Android notwendig, da das Betriebssystem Hintergrundprozesse stark einschränkt und andernfalls wichtige Trackingdaten verloren gehen könnten.
+Die App verwendet das Flutter-Plugin \texttt{flutter\_foreground\_task}\cite{flutter_foreground_task}, um dauerhaft im Vordergrund bzw. Hintergrund Schrittzahlen zu erfassen und regelmäßig an das Backend zu senden. Dies ist vor allem unter Android notwendig, da das Betriebssystem Hintergrundprozesse stark einschränkt und andernfalls wichtige Trackingdaten verloren gehen könnten.
 
 Die Foreground Task besteht aus zwei getrennten Instanzen, welche in unterschiedlichen Isolates (Flutter-Threads) laufen. Diese kommunizieren nicht direkt über Speicher, sondern über Ports:
 
@@ -468,7 +501,7 @@ void startCallback() {
 \begin{itemize}[leftmargin=1.5em]
     \item \textbf{Hintergrundprozess (TaskHandler Isolate)}: Die Klasse \texttt{MyTaskHandler} implementiert den Hintergrunddienst. Dieser läuft in einem separaten Isolate, das keine direkte Verbindung zur Hauptanwendung hat. Die wichtigsten Aufgaben des TaskHandlers sind:
     \begin{itemize}
-        \item Schrittzählung mit dem Plugin \texttt{pedometer}
+        \item Schrittzählung mit dem Plugin \texttt{pedometer}\cite{pedometer}
         \item Tageswechsel erkennen und Schritte zurücksetzen
         \item Regelmäßige Synchronisierung mit dem Backend alle 15 Minuten
     \end{itemize}
@@ -522,9 +555,9 @@ Dieser Foreground Task bildet die Grundlage für die dauerhafte Aktivitätsaufze
 
 In unserer App wird die Lauf-Route eines Nutzers kontinuierlich mithilfe von GPS-Daten erfasst. Diese Positionsdaten werden als \textit{GeoPoints} gespeichert, um später die gesamte Laufstrecke rekonstruieren und visualisieren zu können.
 
-\subsubsection{Verwendung von OpenStreetMap}
+\subsubsection{Verwendung von OpenStreetMap\cite{openstreetmap}}
 
-Für die Darstellung der Routen auf der Karte setzen wir die Open-Source-Kartenplattform \textit{OpenStreetMap} (OSM) ein. Die Flutter-Bibliothek \texttt{flutter\_osm\_plugin} ermöglicht die nahtlose Integration der OSM-Karten in die App und bietet umfangreiche Funktionen, wie z.B. das Zeichnen von Wegen, Anzeige von Markern und Nutzerpositionen.
+Für die Darstellung der Routen auf der Karte setzen wir die Open-Source-Kartenplattform \textit{OpenStreetMap} (OSM)\cite{openstreetmap} ein. Die Flutter-Bibliothek \texttt{flutter\_osm\_plugin}\cite{flutter_osm_plugin} ermöglicht die nahtlose Integration der OSM-Karten in die App und bietet umfangreiche Funktionen, wie z.B. das Zeichnen von Wegen, Anzeige von Markern und Nutzerpositionen.
 
 OSM bietet den Vorteil, dass die Kartendaten frei verfügbar und anpassbar sind. So können wir die Laufstrecke direkt auf der Karte abbilden, indem wir die gesammelten Geo-Koordinaten als Pfad über die Karte legen.
 
@@ -599,5 +632,76 @@ double _calculateDistanceBetween(GeoPoint a, GeoPoint b) {
 \end{lstlisting}
 
 Die Summe aller Teilstrecken ergibt die Gesamtstrecke des Laufs.
+
+\section{Referenzen}
+
+\begin{thebibliography}{9}
+\bibitem{docker}
+Docker, \emph{Docker: Empowering App Development for Developers}, \url{https://www.docker.com/}
+
+\bibitem{flutter}
+Flutter, \emph{Flutter - Beautiful native apps in record time}, \url{https://flutter.dev/}
+
+\bibitem{pedometer}
+Pedometer, \emph{Flutter Pedometer Plugin}, \url{https://pub.dev/packages/pedometer}
+
+\bibitem{flutter_secure_storage}
+Flutter Secure Storage, \emph{Flutter Secure Storage Plugin}, \url{https://pub.dev/packages/flutter_secure_storage}
+
+\bibitem{flutter_osm_plugin}
+Flutter OSM Plugin, \emph{Flutter OSM Plugin for OpenStreetMap}, \url{https://pub.dev/packages/flutter_osm_plugin}
+
+\bibitem{migrate}
+Migrate, \emph{Migrate: Database Migration Tool}, \url{https://github.com/golang-migrate/migrate}
+
+\bibitem{gopls}
+Go Language Server Protocol, \emph{gopls: The Go Language Server}, \url{https://github.com/golang/tools/tree/master/gopls}
+
+\bibitem{golang}
+Go, \emph{The Go Programming Language}, \url{https://golang.org/}
+
+\bibitem{flutter_foreground_task}
+Flutter Foreground Task, \emph{Flutter Foreground Task Plugin}, \url{https://pub.dev/packages/flutter_foreground_task}
+
+\bibitem{vuejs}
+Vue.js, \emph{Vue.js: The Progressive JavaScript Framework}, \url{https://vuejs.org/}
+
+\bibitem{vite}
+Vite, \emph{Vite: Next Generation Frontend Tooling}, \url{https://vitejs.dev/}
+
+\bibitem{open_topo_data}
+OpenTopoData, \emph{OpenTopoData: Open Topographic Data}, \url{https://opentopodata.org/}
+
+\bibitem{openstreetmap}
+OpenStreetMap, \emph{OpenStreetMap Project}, \url{https://www.openstreetmap.org/}
+
+\bibitem{postgresql}
+PostgreSQL, \emph{The World's Most Advanced Open Source Relational Database}, \url{https://www.postgresql.org/}
+
+\bibitem{nginx}
+NGINX, \emph{NGINX Web Server}, \url{https://nginx.org/}
+
+\bibitem{androidstudio}
+Android Studio, \emph{Android Studio IDE}, \url{https://developer.android.com/studio}
+
+\bibitem{github}
+GitHub, \emph{GitHub: Where the world builds software}, \url{https://github.com/}
+
+\bibitem{zed}
+Zed, \emph{Zed: A modern code editor}, \url{https://zed.dev/}
+
+\bibitem{VSCode}
+Visual Studio Code, \emph{Visual Studio Code: Code Editing. Redefined}, \url{https://code.visualstudio.com/}
+
+\bibitem{ginkgo}
+Ginkgo, \emph{Ginkgo: BDD Testing Framework for Go}, \url{https://onsi.github.io/ginkgo/}
+
+\bibitem{gomega}
+Gomega, \emph{Gomega: Matcher Library for Go}, \url{https://onsi.github.io/gomega/}
+
+\bibitem{testcontainers}
+Testcontainers, \emph{Testcontainers for Go}, \url{https://golang.testcontainers.org/}
+
+\end{thebibliography}
 
 \end{document}
