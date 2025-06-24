@@ -555,9 +555,9 @@ Dieser Foreground Task bildet die Grundlage für die dauerhafte Aktivitätsaufze
 
 In unserer App wird die Lauf-Route eines Nutzers kontinuierlich mithilfe von GPS-Daten erfasst. Diese Positionsdaten werden als \textit{GeoPoints} gespeichert, um später die gesamte Laufstrecke rekonstruieren und visualisieren zu können.
 
-\subsubsection{Verwendung von OpenStreetMap\cite{openstreetmap}}
+\subsubsection{Verwendung von OpenStreetMap}
 
-Für die Darstellung der Routen auf der Karte setzen wir die Open-Source-Kartenplattform \textit{OpenStreetMap} (OSM)\cite{openstreetmap} ein. Die Flutter-Bibliothek \texttt{flutter\_osm\_plugin}\cite{flutter_osm_plugin} ermöglicht die nahtlose Integration der OSM-Karten in die App und bietet umfangreiche Funktionen, wie z.B. das Zeichnen von Wegen, Anzeige von Markern und Nutzerpositionen.
+Für die Darstellung der Routen auf der Karte setzen wir die Open-Source-Kartenplattform \textit{OpenStreetMap} (OSM)\cite{openstreetmap} ein. Die Flutter-Bibliothek \texttt{flutter\_osm\_plugin}\cite{flutter_osm_plugin} ermöglicht die nahtlose Integration der OSM-Karten in die App und bietet umfangreiche Funktionen, wie z.B. das Zeichnen von Wegen, die Anzeige von Markern und Nutzerpositionen.
 
 OSM bietet den Vorteil, dass die Kartendaten frei verfügbar und anpassbar sind. So können wir die Laufstrecke direkt auf der Karte abbilden, indem wir die gesammelten Geo-Koordinaten als Pfad über die Karte legen.
 
@@ -633,6 +633,7 @@ double _calculateDistanceBetween(GeoPoint a, GeoPoint b) {
 
 Die Summe aller Teilstrecken ergibt die Gesamtstrecke des Laufs.
 
+\newpage
 \section{Referenzen}
 
 \begin{thebibliography}{9}
