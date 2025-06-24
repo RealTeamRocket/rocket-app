@@ -12,6 +12,7 @@
 \usepackage{enumitem}
 \usepackage{listings}
 \usepackage{xcolor}
+%\usepackage{titling}
 \lstset{
   basicstyle=\ttfamily\small,
   breaklines=true,
@@ -43,20 +44,44 @@
 
 % Title page
 \title{
-    \vspace{4cm}
+    \begin{flushright}
+        \includegraphics[width=5cm]{C:/Users/dfgra/OneDrive/Documents/GitHub/rocket-app/docs/images/Logo-HFT-Stuttgart.png}
+    \end{flushright}
+    \begin{center}
+    {\huge \thetitle \par}
+        \vspace{1.5cm}
+        \includegraphics[width=6cm]{C:/Users/dfgra/OneDrive/Documents/GitHub/rocket-app/docs/images/AppIcon.png} % Bild nochmal in der Mitte
+        \vfill
+        {\Large \theauthor \par}
+        {\large \thedate \par}
+    \end{center}
+    \vspace{2cm}
     \Huge\textbf{Rocket App} \\
     \LARGE\textit{Pervasive Computing} \\
     \vspace{2cm}
-    \large Author: \\
     \large Date: \today \\
     \vfill
 }
-\date{}
-\author{}
+\newcommand{\email}[1]{\texttt{#1}}
+\newcommand{\id}[1]{\texttt{#1}}
+\author{
+    Paul Durz, \id{1005080}, \email{22dupa1bif@hft-stuttgaet.de}
+    \and
+    Dominik Gräter, \id{1005093}, \email{22grdo1bif@hft-stuttgart.de}
+    \and
+    Manuel Holm, \id{1005094}, \email{22homa1bif@hft-stuttgart.de}
+    \and
+    Ron Seifried,\id{1005466}, \email{22sero1bif@hft-stuttgart.de}
+}
+\newcommand{\institute}[1]{\par\medskip\centering #1\par\medskip}
 
 \begin{document}
-
 \maketitle
+\institute{
+    Hochschule für Technik Stuttgart, Schellingstraße 24, 70174 Stuttgart, Deutschland
+    \email{info@hft-stuttgart.de}
+    \url{https://www.hft-stuttgart.de/}
+}
 \newpage
 \tableofcontents
 \newpage
@@ -157,6 +182,34 @@ Durch diese Pipeline wird das Deployment effizient, reproduzierbar und sicher ge
     \item Prerequisites (e.g., Node.js, Python)
     \item Installation steps
 \end{enumerate}
-
+\subsection{Backend}
+\subsubsection{Umsetzung}
+\subsection{Frontend}
+\subsubsection{Umsetzung}
+\subsection{Schwierigkeiten}
+Schwierigkeiten waren vor allem das Anzeigen eines "getrackten Runs" auf der OSM-Karte. Ein Run besteht aus mehreren GPS-Punkten, diese sollen auf der Karte angezeigt werden.
+Das Problem war, dass die map_controller.dart den RoadType.foot nur für Routen zwischen zwei Punkte anzeigt. Also haben wir die Route in mehrere kleine Routen unterteilt, sodass die Karte diese anzeigt.\\
+\section{Extra/Website}
+\section{Fazit}
+\section{Zeiterfassung}
+Wir haben unsere Zeiten mit dem Tool \textbf{Clockify} erfasst. Dieses Tool ist zwar etwas schwächer als Everhour. Aber es ist kostenlos und man konnte seine Zeiten schnell und einfach erfassen.\\
+Hier eine Übersicht der erfassten Zeiten:
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.8\textwidth]{C:/Users/dfgra/OneDrive/Documents/GitHub/rocket-app/docs/images/AppIcon.png}
+    \caption{Clockify Zeiterfassung}
+    \label{fig:clockify}
+\end{figure}
+\section{Quellen}
+\begin{thebibliography}{8}
+    \bibitem{ref_url1}
+    OSM Wiki, \url{https://wiki.openstreetmap.org/wiki/DE:Hauptseite}, letzter Zugriff am 14.5.2025.
+    \bibitem{ref_url2}
+    Flutter Homepage, \url{https://flutter.dev/}, letzter Zugriff am 4.4.2025.
+    \bibitem{ref_url3}
+    Android Studio, \url{https://developer.android.com/studio}, letzter Zugriff am 4.4.2025.
+    \bibitem{ref_url4}
+    Clockify, \url{https://clockify.me/}, letzter Zugriff am 24.6.2025.
+\end{thebibliography}
 \end{document}
 
