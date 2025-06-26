@@ -60,7 +60,7 @@ class SettingsApi {
 
   static Future<void> updateImage(String jwt, File imageFile) async {
     final String backendUrl = dotenv.get('BACKEND_URL', fallback: "http://10.0.2.2:8080");
-    final uri = Uri.parse('$backendUrl/v1/protected/settings/image');
+    final uri = Uri.parse('$backendUrl/api/v1/protected/settings/image');
     String apiKey = dotenv.get('API_KEY', fallback: "default-api-key");
     final request = http.MultipartRequest('POST', uri)
       ..headers['Authorization'] = 'Bearer $jwt'

@@ -15,6 +15,7 @@ class _ProfilePageState extends State<ProfilePage> {
     return Scaffold(
       backgroundColor: ColorConstants.primaryColor,
       body: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Flexible(flex: 2, child: Profile()),
           Flexible(flex: 3, child: History()),
