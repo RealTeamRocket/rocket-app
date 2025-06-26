@@ -493,7 +493,7 @@ Durch diese Implementierung gewährleisten wir eine sichere, performante und fle
 \subsection{Endpunkte}
 
 Im Folgenden werden alle Backend-Endpunkte der Rocket App API dokumentiert. Die API ist unter dem Prefix \texttt{/api/v1} verfügbar. Für alle \texttt{/protected}-Routen ist eine Authentifizierung erforderlich (JWT im Header).
-Der Header für fast alle protected Endpunkte sieht so aus: 
+Der Header für fast alle protected Endpunkte sieht so aus:
     \textbf{Headers:}
     \begin{itemize}
         \item \texttt{Authorization: Bearer <token>}
@@ -1045,7 +1045,7 @@ Die gesamte Anwendung besteht aus mehreren Docker-Containern, die über ein geme
 
 \vspace{1em}
 
-\textbf{Vorteil der Build-Strategie:}  
+\textbf{Vorteil der Build-Strategie:}
 Da die \texttt{backend}- und \texttt{frontend}-Images bereits lokal entwickelt und anschließend auf Docker Hub (\texttt{zephiron/*}) veröffentlicht werden, muss der VPS keine eigenen Build-Prozesse ausführen. Dies spart sowohl Speicher als auch CPU-Zeit und minimiert mögliche Build-Fehler während der Bereitstellung. Die Container können dadurch direkt per \texttt{docker pull} geladen und gestartet werden.
 
 
@@ -1230,8 +1230,8 @@ double progress = currentSteps / dailyGoal;
 Die gesammelten Rocket Points werden in einer auffälligen Karte mit Raketen-Emoji angezeigt. Diese Anzeige reagiert dynamisch auf Lade- und Fehlerzustände:
 
 \begin{lstlisting}[language=Dart]
-rocketPoints != null 
-  ? '$rocketPoints RPs' 
+rocketPoints != null
+  ? '$rocketPoints RPs'
   : '... RPs'
 \end{lstlisting}
 
@@ -1451,7 +1451,7 @@ Oberhalb der Ansicht befindet sich eine Suchleiste, mit der gezielt nach Nutzern
     \item nicht gefolgte Nutzer, die mit einem ``\texttt{Follow}''-Button angezeigt werden (dritte Ansicht).
 \end{itemize}
 
-Bei jeder Eingabe (über \texttt{onChanged}) wird der Zustand \texttt{\_searchQuery} aktualisiert. Die Liste der bereits gefolgten Freunde sowie möglicher neuer Kontakte wird in der \texttt{build()}-Methode auf Basis dieses Werts dynamisch gefiltert. Die Filterung funktioniert über eine \textbf{Substring-Suche}: Der eingegebene Suchtext wird mit jedem Benutzernamen (kleinbuchstaben-normalisiert) verglichen. Enthält der Benutzername den Suchtext, wird das Element angezeigt: 
+Bei jeder Eingabe (über \texttt{onChanged}) wird der Zustand \texttt{\_searchQuery} aktualisiert. Die Liste der bereits gefolgten Freunde sowie möglicher neuer Kontakte wird in der \texttt{build()}-Methode auf Basis dieses Werts dynamisch gefiltert. Die Filterung funktioniert über eine \textbf{Substring-Suche}: Der eingegebene Suchtext wird mit jedem Benutzernamen (kleinbuchstaben-normalisiert) verglichen. Enthält der Benutzername den Suchtext, wird das Element angezeigt:
 
 \begin{lstlisting}[language=Dart, caption=Filter-Logik für Freundesliste und Suchergebnisse]
 final filteredFriends = friends.where((f) =>
@@ -1733,7 +1733,7 @@ GestureDetector(
 \end{lstlisting}
 
 \paragraph{Schritthistorie (Line Chart)}
-Darunter befindet sich ein Liniendiagramm, das die tägliche Schrittanzahl der vergangenen sieben Tage visualisiert. Die Datenpunkte werden per API geladen, wobei jeder Punkt einem Wochentag zugeordnet ist. 
+Darunter befindet sich ein Liniendiagramm, das die tägliche Schrittanzahl der vergangenen sieben Tage visualisiert. Die Datenpunkte werden per API geladen, wobei jeder Punkt einem Wochentag zugeordnet ist.
 
 Die Darstellung nutzt das Paket \texttt{fl\_chart}. Das Diagramm zeigt:
 \begin{itemize}
@@ -1834,7 +1834,7 @@ Im Folgenden ist eine detaillierte Aufschlüsselung der investierten Zeit nach e
 \section{Fazit}
 Die Entwicklung der Rocket App war ein anspruchsvolles, aber äußerst lehrreiches Projekt, das verschiedene Aspekte der modernen Softwareentwicklung praxisnah miteinander verknüpft hat.
 Von der Planung über die Implementierung bis hin zum Deployment konnten wir nicht nur unser technisches Wissen vertiefen, sondern auch wichtige Erfahrungen in der Teamarbeit,
-im Projektmanagement und in der interdisziplinären Kommunikation sammeln.
+im Projektmanagement und in der Kommunikation sammeln.
 Besonders hervorzuheben ist die Vielschichtigkeit des Projekts: Die Kombination aus mobiler App, Backend-API, Webplattform und DevOps-Elementen wie Containerisierung und automatisiertem Deployment
 stellte uns immer wieder vor neue Herausforderungen, die wir gemeinsam lösen konnten. Dabei haben sich Werkzeuge wie GitHub, Docker, Flutter und Go als wertvolle Technologien erwiesen.
 Neben der technischen Umsetzung stand auch die Nutzererfahrung im Fokus: Durch Features wie Gamification, soziale Interaktion und eine ansprechende UI ist es uns gelungen, eine Anwendung zu schaffen,
